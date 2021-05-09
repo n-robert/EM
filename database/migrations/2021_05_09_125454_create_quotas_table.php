@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePermitsTable extends Migration
+class CreateQuotasTable extends Migration
 {
     /**
      * Run the migrations.
@@ -18,17 +18,9 @@ class CreatePermitsTable extends Migration
         $columns['none'] = [
             'string' => [
                 '32' => [
-                    'user_ids',
+                    'year',
                     'employer_id',
-                    'quota_id',
-                ],
-            ],
-        ];
-
-        $columns['unique'] = [
-            'string' => [
-                '64' => [
-                    'number',
+                    'user_ids',
                 ],
             ],
         ];
@@ -40,20 +32,20 @@ class CreatePermitsTable extends Migration
         ];
 
         $columns['nullable:true'] = [
-            'date' => [
-                'issued_date',
-                'expired_date',
-            ],
-
             'text' => [
                 'history',
                 'details',
             ],
+            'date' => [
+                'issued_date',
+                'expired_date',
+            ],
         ];
 
-        Schema::create('permits', function (Blueprint $table) use ($columns) {
+        Schema::create('quotas', function (Blueprint $table) use ($columns) {
             $table->id();
             add_columns_from_array($columns, $table);
+            $table->index(['year', 'employer_id']);
             $table->timestamps();
         });
     }
@@ -65,6 +57,6 @@ class CreatePermitsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('permits');
+        Schema::dropIfExists('quotas');
     }
 }

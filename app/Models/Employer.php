@@ -21,17 +21,6 @@ class Employer extends BaseModel
     ];
 
     /**
-     * Employee constructor.
-     *
-     * @param  array $attributes
-     * @return void
-     */
-    public function __construct(array $attributes = [])
-    {
-        parent::__construct($attributes);
-    }
-
-    /**
      * Get all addresses employer has usage permits to.
      */
     public function addresses()

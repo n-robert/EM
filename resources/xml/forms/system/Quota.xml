@@ -1,97 +1,38 @@
 <?xml version="1.0"?>
 <form>
-    <fieldset>
-        <field
-                name="id"
-                type="hidden"/>
-        <field
-                name="user_ids"
-                type="userlist"
-                label="COM_FMSDOCS_USERS"
-                multiple="true"
-                size="45"
-                class="inputbox"/>
-        <field
-                name="employer_id"
-                required="true"
-                type="sqlselectlist"
-                table_name="employers"
-                option_text="name"
-                option_value="t.id"
-                where="t.type|NOT IN|(COM_FMSDOCS_UFMS, COM_FMSDOCS_OUFMS)"
-                label="COM_FMSDOCS_EMPLOYER"
-                size="45"
-                class="inputbox">
-            <option value="">COM_FMSDOCS_CHOOSE_EMPLOYER</option>
-        </field>
-        <field
-                name="year"
-                type="text"
-                label="COM_FMSDOCS_YEAR"
-                size="45"
-                class="inputbox"/>
-        <field
-                name="expired"
-                type="calendar"
-                format="%d.%m.%Y"
-                label="COM_FMSDOCS_EXPIRED"
-                size="45"
-                class="inputbox"/>
+    <field
+            name="id"
+            type="hidden"/>
+    <field
+            name="year"
+            type="text"
+            required="true"
+            label="Year"/>
+    <field
+            name="employer_id"
+            type="select"
+            required="true"
+            label="Employer"
+            model="Employer"/>
+    <field
+            name="expired_date"
+            type="date"
+            format="dd-MM-YYYY"/>
 
+    <fieldset name="details" show="true" repeatable="true">
         <field
-                name="details"
-                type="repeatable"
-                icon="list"
-                label="COM_FMSDOCS_VIEW_DETAILS"
-                default="{'country':[], 'occupation':[], 'quantity':[]}">
-            <fields name="params">
-                <fieldset hidden="true" name="schedule_modal" repeat="true">
-                    <field
-                            name="country"
-                            type="sqlselectlist"
-                            table_name="countries"
-                            option_text="name_ru"
-                            option_value="t.id"
-                            label="COM_FMSDOCS_COUNTRY">
-                        <option value="">COM_FMSDOCS_CHOOSE_COUNTRY</option>
-                    </field>
-                    <field
-                            name="occupation"
-                            type="sqlselectlist"
-                            distinct="true"
-                            table_name="occupations"
-                            option_text="name"
-                            option_value="t.id"
-                            label="COM_FMSDOCS_OCCUPATION">
-                        <option value="">COM_FMSDOCS_CHOOSE_OCCUPATION</option>
-                    </field>
-                    <field
-                            name="quantity"
-                            type="text"
-                            label="COM_FMSDOCS_QUANTITY"
-                            size="45"
-                            class="inputbox"/>
-                </fieldset>
-            </fields>
-        </field>
-
-        <fields name="params">
-            <fieldset name="basic">
-            </fieldset>
-        </fields>
-    </fieldset>
-
-    <fieldset name="accesscontrol">
-        <field name="asset_id" type="hidden" filter="unset"/>
+                name="country"
+                type="select"
+                label="Country"
+                model="Country"/>
         <field
-                name="rules"
-                type="rules"
-                label="COM_FMSDOCS_RULES"
-                translate="false"
-                filter="rules"
-                validate="rules"
-                class="inputbox"
-                component="com_fmsdocs"
-                section="employee"/>
+                name="occupation_id"
+                type="select"
+                label="Occupation"
+                model="Occupation"/>
+        <field
+                name="quantity"
+                label="Quantity"
+                type="text"/>
     </fieldset>
 </form>

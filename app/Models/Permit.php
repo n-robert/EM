@@ -29,7 +29,7 @@ class Permit extends BaseModel
      *
      * @var array
      */
-    public $repeatable = ['details' => ['country', 'occupation', 'number']];
+    public $repeatable = ['details' => ['country', 'occupation', 'quantity']];
 
     /**
      * @var array
@@ -46,17 +46,6 @@ class Permit extends BaseModel
      * @var array
      */
     protected $defaultOrderBy = ['number'];
-
-    /**
-     * Employee constructor.
-     *
-     * @param  array $attributes
-     * @return void
-     */
-    public function __construct(array $attributes = [])
-    {
-        parent::__construct($attributes);
-    }
 
     /**
      * Transform details field from JSON

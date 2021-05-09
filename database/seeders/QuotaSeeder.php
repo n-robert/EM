@@ -4,9 +4,9 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use App\Models\Permit;
+use App\Models\Quota;
 
-class PermitSeeder extends Seeder
+class QuotaSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -16,18 +16,17 @@ class PermitSeeder extends Seeder
     public function run()
     {
         $columns = [
-            'number',
+            'year',
+            'employer_id',
             'issued_date',
             'expired_date',
-            'employer_id',
-            'quota_id',
             'details',
             'user_ids',
             'published',
             'history',
         ];
 
-        $oldData = DB::table('robert_fmsdocs_permits')->get();
+        $oldData = DB::table('robert_fmsdocs_quotas')->get();
 
         foreach ($oldData as $oldDatum) {
             $newData = [];
@@ -82,7 +81,7 @@ class PermitSeeder extends Seeder
                 $newData[$column] = $value;
             }
 
-            Permit::insert($newData);
+            Quota::insert($newData);
         }
     }
 }

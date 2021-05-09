@@ -64,17 +64,6 @@ class Employee extends BaseModel
     ];
 
     /**
-     * Employee constructor.
-     *
-     * @param  array $attributes
-     * @return void
-     */
-    public function __construct(array $attributes = [])
-    {
-        parent::__construct($attributes);
-    }
-
-    /**
      * Get the employee's russian full name.
      *
      * @return string

@@ -22,17 +22,6 @@ class Address extends BaseModel
     protected $appends = ['usage_permits'];
 
     /**
-     * Address constructor.
-     *
-     * @param  array $attributes
-     * @return void
-     */
-    public function __construct(array $attributes = [])
-    {
-        parent::__construct($attributes);
-    }
-
-    /**
      * Get the model's usage permits.
      *
      * @return \Illuminate\Support\Collection
