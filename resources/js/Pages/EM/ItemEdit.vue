@@ -1,0 +1,126 @@
+<template>
+    <app-layout>
+        <centered-item :width="centeredItemWidth">
+            <form ref="itemForm" @submit.prevent="submit">
+                <item :item="item"
+                      :repeatable="repeatable"
+                      :formFields="formFields"
+                      :requiredFields="requiredFields"
+                      @addItem="addItem"
+                      @removeItem="removeItem">
+                    <fmsdocs-button type="button" @click.native="visit('/' + controllerNames)">
+                        {{__('Cancel')}}
+                    </fmsdocs-button>
+
+                    <fmsdocs-button type="button" @click.native="submit(action, 'apply')">
+                        {{__('Apply')}}
+                    </fmsdocs-button>
+
+                    <fmsdocs-button type="button" @click.native="submit(action, 'save')">
+                        {{__('Save')}}
+                    </fmsdocs-button>
+                </item>
+            </form>
+        </centered-item>
+    </app-layout>
+</template>
+
+<script>
+    import AppLayout from '../../Layouts/AppLayout';
+    import CenteredItem from './CenteredItem';
+    import Item from './Item';
+    import FmsdocsButton from './Button';
+    import qs from 'qs';
+
+    export default {
+        components: {
+            AppLayout,
+            CenteredItem,
+            Item,
+            FmsdocsButton,
+        },
+
+        props: [
+            'item',
+            'repeatable',
+            'action',
+            'formFields',
+            'requiredFields',
+            'controllerName',
+            'controllerNames',
+        ],
+
+        data()
+        {
+            let selected = {}, i = 0, newItems = {};
+
+            for (const key in this.repeatable) {
+                if (this.repeatable.hasOwnProperty(key)) {
+                    newItems[key] = this.repeatable[key];
+                }
+            }
+
+            return {
+                centeredItemWidth: {
+                    md: 'full',
+                    xl: '3/5',
+                },
+                errors: {},
+                newItems,
+            };
+        },
+
+        methods: {
+            submit(action, type)
+            {
+               let
+                    url = '/' + this.controllerName + '/' + action,
+                    formData = new FormData(this.$refs.itemForm)
+                ;
+
+                if (!validateRequiredFields(this.requiredFields, this.$el, this.errors)) {
+                    return false;
+                }
+
+                url += this.item.id ? ('/' + this.item.id) : '';
+                formData.append('type', type);
+                this.$inertia.post(url, formData);
+            },
+
+            visit(url)
+            {
+                this.$inertia.visit(url);
+            },
+
+            addItem(key) {
+                const formData = new FormData(this.$refs.itemForm);
+                let keyParams = [], k;
+
+                for(const pair of formData.entries()) {
+                    if (pair[0].startsWith(key)) {
+                        if (pair[0].indexOf('_date') !== -1) {
+                            pair[1] = this.formatDate(pair[1]);
+                        }
+
+                        keyParams.push(pair.join('='));
+                    }
+                }
+
+                keyParams = qs.parse(keyParams.join('&'));
+                keyParams = keyParams[key];
+
+                if (this.item[key] !== undefined && keyParams !== undefined) {
+                    if (keyParams.length === this.item[key].length) {
+                        this.item[key] = keyParams;
+                    }
+                }
+
+                this.item[key].push(this.newItems[key]);
+            },
+
+            removeItem(key, index) {
+                this.item[key].splice(index, 1);
+            },
+        },
+    };
+</script>

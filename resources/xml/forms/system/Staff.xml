@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<form>
+    <fieldset>
+        <field name="year"/>
+        <field name="01"/>
+        <field name="02"/>
+        <field name="03"/>
+        <field name="04"/>
+        <field name="05"/>
+        <field name="06"/>
+        <field name="07"/>
+        <field name="08"/>
+        <field name="09"/>
+        <field name="10"/>
+        <field name="11"/>
+        <field name="12"/>
+    </fieldset>
+
+    <fieldset name="accesscontrol">
+        <field name="asset_id" type="hidden" filter="unset"/>
+        <field
+                name="rules"
+                type="rules"
+                label="COM_FMSDOCS_RULES"
+                translate="false"
+                filter="rules"
+                validate="rules"
+                class="inputbox"
+                component="com_fmsdocs"
+                section="hiring"/>
+    </fieldset>
+</form>

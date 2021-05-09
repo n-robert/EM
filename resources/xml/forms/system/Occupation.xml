@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<form>
+    <field
+            name="id"
+            type="hidden"/>
+    <field
+            name="name_ru"
+            type="text"
+            required="true"/>
+    <field
+            name="code"
+            type="text"
+            required="true"/>
+    <field
+            name="description"
+            type="textarea"/>
+</form>

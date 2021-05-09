@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<form>
+    <field
+            name="id"
+            type="hidden"/>
+    <field
+            name="quota_id"
+            type="hidden"/>
+    <field
+            name="employer_id"
+            type="select"
+            required="true"
+            label="Employer"
+            model="Employer"/>
+    <field
+            name="number"
+            required="true"
+            type="text"
+            label="Number"/>
+    <field
+            name="issued_date"
+            type="date"
+            format="dd-MM-YYYY"/>
+    <field
+            name="expired_date"
+            type="date"
+            format="dd-MM-YYYY"/>
+
+    <fieldset name="details" show="true" repeatable="true">
+        <field
+                name="country"
+                type="select"
+                label="Country"
+                model="Country"/>
+        <field
+                name="occupation_id"
+                type="select"
+                label="Occupation"
+                model="Occupation"/>
+        <field
+                name="quantity"
+                label="Quantity"
+                type="text"/>
+    </fieldset>
+</form>
