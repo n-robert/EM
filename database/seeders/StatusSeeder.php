@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Carbon\Carbon;
 use App\Models\Status;
-use App\Models\Employee;
+use Illuminate\Support\Facades\DB;
 
 class StatusSeeder extends Seeder
 {
@@ -16,14 +16,16 @@ class StatusSeeder extends Seeder
      */
     public function run()
     {
-        $statuses =
-            Employee::withoutGlobalScopes()
-                ->distinct('status_id')
-                ->whereNotNull('status_id')
-                ->pluck('status_id');
+        $statuses = DB::table('statuses_source')->get(['id', 'name_ru', 'name_en']);
 
         foreach ($statuses as $status) {
-            Status::insert(['name_ru' => $status, 'user_ids' => '2', 'created_at' => Carbon::now()]);
+            Status::insert([
+                'id' => $status->id,
+                'name_ru' => $status->name_ru,
+                'name_en' => $status->name_en,
+                'user_ids' => '2',
+                'created_at' => Carbon::now()
+            ]);
         }
     }
 }

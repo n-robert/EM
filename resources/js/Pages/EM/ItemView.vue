@@ -1,5 +1,11 @@
 <template>
     <app-layout>
+        <template #header>
+            <centered-item :width="centeredItemWidth">
+                <div class="font-bold text-indigo-600">{{item.default_name}}</div>
+            </centered-item>
+        </template>
+
         <centered-item :width="centeredItemWidth">
             <item :item="item"
                   :formFields="formFields"></item>

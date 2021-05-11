@@ -26,7 +26,7 @@ class QuotaSeeder extends Seeder
             'history',
         ];
 
-        $oldData = DB::table('robert_fmsdocs_quotas')->get();
+        $oldData = DB::connection('mysqlextra')->table('fmsdocs_quotas')->get();
 
         foreach ($oldData as $oldDatum) {
             $newData = [];
@@ -69,8 +69,8 @@ class QuotaSeeder extends Seeder
 
                     foreach ($value->country as $key => $country) {
                         $tmpObj = new \stdClass();
-                        $tmpObj->country = $country;
-                        $tmpObj->occupation = $value->occupation[$key];
+                        $tmpObj->country_id = $country;
+                        $tmpObj->occupation_id = $value->occupation[$key];
                         $tmpObj->quantity = $value->quantity[$key];
                         $newValue[] = $tmpObj;
                     }

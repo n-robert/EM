@@ -21,7 +21,7 @@
 
     <fieldset name="details" show="true" repeatable="true">
         <field
-                name="country"
+                name="country_id"
                 type="select"
                 label="Country"
                 model="Country"/>

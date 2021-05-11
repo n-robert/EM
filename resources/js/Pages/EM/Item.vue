@@ -12,9 +12,7 @@
             </li>
         </ul>
 
-        <div class="p-4 table w-full border-r border-b border-l rounded-b-lg">
-            <div class="font-bold text-center mb-4">{{item.default_name}}</div>
-
+        <div class="p-4 table w-full border-r border-b border-l rounded-b-lg" :class="selected['id'] ? noTab : ''">
             <div v-for="(element, key) in formFields">
                 <tab v-if="element.type === 'fieldgroup'"
                      :key="key"
@@ -92,6 +90,7 @@
         inject: [
             'tabActive',
             'tabInActive',
+            'noTab',
         ],
 
         props: [

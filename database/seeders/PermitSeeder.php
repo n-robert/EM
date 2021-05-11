@@ -16,6 +16,7 @@ class PermitSeeder extends Seeder
     public function run()
     {
         $columns = [
+            'id',
             'number',
             'issued_date',
             'expired_date',
@@ -27,7 +28,7 @@ class PermitSeeder extends Seeder
             'history',
         ];
 
-        $oldData = DB::table('robert_fmsdocs_permits')->get();
+        $oldData = DB::connection('mysqlextra')->table('fmsdocs_permits')->get();
 
         foreach ($oldData as $oldDatum) {
             $newData = [];
@@ -70,8 +71,8 @@ class PermitSeeder extends Seeder
 
                     foreach ($value->country as $key => $country) {
                         $tmpObj = new \stdClass();
-                        $tmpObj->country = $country;
-                        $tmpObj->occupation = $value->occupation[$key];
+                        $tmpObj->country_id = $country;
+                        $tmpObj->occupation_id = $value->occupation[$key];
                         $tmpObj->quantity = $value->quantity[$key];
                         $newValue[] = $tmpObj;
                     }

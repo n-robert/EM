@@ -17,6 +17,7 @@ class OccupationSeeder extends Seeder
     public function run()
     {
         $columns = [
+            'id',
             'name_ru',
             'code',
             'description',
@@ -25,7 +26,7 @@ class OccupationSeeder extends Seeder
             'history',
         ];
 
-        $oldData = DB::table('robert_fmsdocs_occupations')->get();
+        $oldData = DB::connection('mysqlextra')->table('fmsdocs_occupations')->get();
 
         foreach ($oldData as $oldDatum) {
             $newData = [];

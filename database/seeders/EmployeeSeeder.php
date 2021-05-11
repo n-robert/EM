@@ -16,18 +16,13 @@ class EmployeeSeeder extends Seeder
     public function run()
     {
         $columns = [
-            'citizenship',
             'passport_number',
-            'status_id',
             'user_ids',
             'last_name_ru',
             'first_name_ru',
             'birth_date',
-            'passport_issued',
-            'passport_expired',
             'published',
             'gender',
-            'whence',
             'passport_serie',
             'passport_issuer',
             'passport_issuer_code',
@@ -49,52 +44,58 @@ class EmployeeSeeder extends Seeder
             'visa_number',
             'migr_card_serie',
             'migr_card_number',
-            'host',
-            'reg_address',
-            'real_address',
             'middle_name_ru',
             'last_name_en',
             'first_name_en',
             'middle_name_en',
             'entry_checkpoint',
             'resident_document',
-            'resident_document_issuer',
-            'work_permit_issuer',
             'cert_issuer',
-            'visa_issuer',
             'birth_place',
             'address',
             'history',
-            'resident_document_issued',
-            'resident_document_expired',
-            'work_permit_issued',
-            'work_permit_started',
-            'work_permit_expired',
-            'work_permit_paid_till',
             'hired_date',
             'fired_date',
-            'taxpayer_id_issued',
-            'cert_issued',
-            'visa_issued',
-            'visa_started',
-            'visa_expired',
             'entry_date',
-            'migr_card_issued',
             'reg_date',
             'departure_date',
         ];
 
-        $oldData = DB::table('robert_fmsdocs_employees')->get();
-        $statuses = DB::table('statuses')->pluck('id', 'name_ru');
+        $changedColumns = [
+            'citizenship_id',
+            'status_id',
+            'whence_id',
+            'reg_address_id',
+            'real_address_id',
+            'host_id',
+            'resident_document_issuer_id',
+            'work_permit_issuer_id',
+            'visa_issuer_id',
+            'passport_issued_date',
+            'passport_expired_date',
+            'resident_document_issued_date',
+            'resident_document_expired_date',
+            'work_permit_issued_date',
+            'work_permit_started_date',
+            'work_permit_expired_date',
+            'work_permit_paid_till_date',
+            'taxpayer_id_issued_date',
+            'cert_issued_date',
+            'visa_issued_date',
+            'visa_started_date',
+            'visa_expired_date',
+            'migr_card_issued_date',
+        ];
+
+        $columns = array_merge($columns, $changedColumns);
+        $oldData = DB::connection('mysqlextra')->table('fmsdocs_employees')->get();
+        $statuses = DB::table('statuses')->pluck('id', 'name_en');
 
         foreach ($oldData as $oldDatum) {
             $newData = [];
 
             foreach ($columns as $column) {
                 switch ($column) {
-                    case 'status_id':
-                        $key = 'status';
-                        break;
                     case 'created_at':
                         $key = 'created';
                         break;
@@ -105,47 +106,41 @@ class EmployeeSeeder extends Seeder
                         $key = $column;
                 }
 
-                $value = $oldDatum->$key;
+                if (in_array($column, $changedColumns)) {
+                    $key = preg_replace('~^(.+)(_id|_date)$~', '$1', $key);
+                }
+
+                $value =  str_replace('COM_FMSDOCS_', '', $oldDatum->{$key});
+
                 $dateFields = [
                     'birth_date',
-                    'passport_issued',
-                    'passport_expired',
-                    'resident_document_issued',
-                    'resident_document_expired',
-                    'work_permit_issued',
-                    'work_permit_started',
-                    'work_permit_expired',
-                    'work_permit_paid_till',
+                    'passport_issued_date',
+                    'passport_expired_date',
+                    'resident_document_issued_date',
+                    'resident_document_expired_date',
+                    'work_permit_issued_date',
+                    'work_permit_started_date',
+                    'work_permit_expired_date',
+                    'work_permit_paid_till_date',
                     'hired_date',
                     'fired_date',
-                    'taxpayer_id_issued',
-                    'cert_issued',
-                    'visa_issued',
-                    'visa_started',
-                    'visa_expired',
+                    'taxpayer_id_issued_date',
+                    'cert_issued_date',
+                    'visa_issued_date',
+                    'visa_started_date',
+                    'visa_expired_date',
                     'entry_date',
-                    'migr_card_issued',
+                    'migr_card_issued_date',
                     'reg_date',
                     'departure_date',
-                ];
-                $constantFields = [
-                    'status_id',
-                    'gender',
-                    'visa_multiplicity',
-                    'visa_category',
-                    'history',
                 ];
 
                 if (in_array($column, $dateFields)) {
                     $value = $value == '0000-00-00' ? null : $value;
                 }
 
-                if (in_array($column, $constantFields)) {
-                    $value = str_replace('COM_FMSDOCS_', '', $value);
-
-                    if ($column == 'status_id') {
-                        $value = $statuses[$value];
-                    }
+                if ($column == 'status_id') {
+                    $value = $statuses[ucfirst(strtolower($value))];
                 }
 
                 if ($column == 'user_ids') {

@@ -16,23 +16,23 @@ class AddressSeeder extends Seeder
     public function run()
     {
         $columns = [
+            'id',
             'name_ru',
-            'ownership_certificate',
             'description',
             'user_ids',
             'published',
             'history',
         ];
 
-        $oldData = DB::table('robert_fmsdocs_addresses')->get();
+        $oldData = DB::connection('mysqlextra')->table('fmsdocs_addresses')->get();
 
         foreach ($oldData as $oldDatum) {
             $newData = [];
 
             foreach ($columns as $column) {
                 switch ($column) {
-                    case 'status_id':
-                        $key = 'status';
+                    case 'name_ru':
+                        $key = 'name';
                         break;
                     case 'created_at':
                         $key = 'created';
@@ -44,7 +44,13 @@ class AddressSeeder extends Seeder
                         $key = $column;
                 }
 
-                $newData[$column] = $oldDatum->$key;
+                $value = $oldDatum->$key;
+
+                if ($column == 'user_ids') {
+                    $value = str_replace(['208', '209', '214', '215'], ['2', '3', '4', '5'], $value);
+                }
+
+                $newData[$column] = $value;
             }
 
             Address::insert($newData);

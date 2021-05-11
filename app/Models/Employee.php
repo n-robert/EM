@@ -38,7 +38,7 @@ class Employee extends BaseModel
      *
      * @var array
      */
-    protected $appends = ['full_name_ru'];
+    protected $appends = ['default_name', 'full_name_ru'];
 
     /**
      * @var array

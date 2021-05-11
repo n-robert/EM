@@ -17,12 +17,12 @@
 
                             <!-- Navigation Links -->
                             <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                                <jet-nav-link v-for="view in views"
+                                <e-m-nav-link v-for="view in views"
                                               :key="view"
                                               :href="'/' + view.pluralize()"
-                                              :active="$page.currentRouteName === 'gets.' + view + 's'">
+                                              :active="$page.props.currentRouteName === 'gets.' + view.toString().pluralize()">
                                     {{__(view.ucFirst().pluralize())}}
-                                </jet-nav-link>
+                                </e-m-nav-link>
                             </div>
                         </div>
 
@@ -219,7 +219,7 @@
 
             <!-- Page Heading -->
             <header class="bg-white shadow">
-                <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                <div class="max-w-7xl mx-auto py-2 px-4 sm:px-6 lg:px-8">
                     <slot name="header"></slot>
                 </div>
             </header>
@@ -241,7 +241,7 @@
     import JetBanner from '@/Jetstream/Banner'
     import JetDropdown from '@/Jetstream/Dropdown'
     import JetDropdownLink from '@/Jetstream/DropdownLink'
-    import JetNavLink from '@/Jetstream/NavLink'
+    import EMNavLink from '../Pages/EM/NavLink'
     import JetResponsiveNavLink from '@/Jetstream/ResponsiveNavLink'
 
     export default {
@@ -250,7 +250,7 @@
             JetBanner,
             JetDropdown,
             JetDropdownLink,
-            JetNavLink,
+            EMNavLink,
             JetResponsiveNavLink,
         },
 
@@ -259,6 +259,7 @@
             filterFieldIsChecked: 'bg-indigo-500 text-white',
             tabActive: 'py-4 px-8 rounded-t-lg border-t border-r border-l text-indigo-500',
             tabInActive: 'py-4 px-8 border-b hover:text-indigo-500',
+            noTab: 'border-t rounded-t-lg',
             paginationActive: 'bg-indigo-400 text-white',
             paginationNull: 'bg-white text-gray-500',
             leftColumn: 'table-cell text-right p-1 w-60',

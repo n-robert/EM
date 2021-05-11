@@ -16,14 +16,9 @@ class EmployerSeeder extends Seeder
     public function run()
     {
         $columns = [
-            'name_ru',
-            'director',
-            'booker',
+            'id',
             'taxpayer_id',
             'user_ids',
-            'name_ru',
-            'full_name_ru',
-            'type',
             'published',
             'taxpayer_code',
             'active_business_type',
@@ -36,7 +31,6 @@ class EmployerSeeder extends Seeder
             'bic',
             'acc_reg_number',
             'uni_reg_number',
-            'address',
             'phone',
             'prime_reg_number',
             'history',
@@ -45,13 +39,41 @@ class EmployerSeeder extends Seeder
             'uni_reg_date',
         ];
 
-        $oldData = DB::table('robert_fmsdocs_employers')->get();
+        $changedColumns = [
+            'name_ru',
+            'full_name_ru',
+            'director_id',
+            'booker_id',
+            'type_id',
+            'address_id',
+        ];
+        $columns = array_merge($columns, $changedColumns);
+        $oldData = DB::connection('mysqlextra')->table('fmsdocs_employers')->get();
+        $types = DB::table('types')->pluck('id', 'name');
 
         foreach ($oldData as $oldDatum) {
             $newData = [];
 
             foreach ($columns as $column) {
                 switch ($column) {
+                    case 'name_ru':
+                        $key = 'name';
+                        break;
+                    case 'full_name_ru':
+                        $key = 'full_name';
+                        break;
+                    case 'director_id':
+                        $key = 'director';
+                        break;
+                    case 'booker_id':
+                        $key = 'booker';
+                        break;
+                    case 'type_id':
+                        $key = 'type';
+                        break;
+                    case 'address_id':
+                        $key = 'address';
+                        break;
                     case 'created_at':
                         $key = 'created';
                         break;
@@ -62,22 +84,19 @@ class EmployerSeeder extends Seeder
                         $key = $column;
                 }
 
-                $value = $oldDatum->$key;
+                $value = str_replace('COM_FMSDOCS_', '', $oldDatum->$key);
                 $dateFields = [
                     'acc_reg_date',
                     'prime_reg_date',
                     'uni_reg_date',
-                ];
-                $constantFields = [
-                    'type',
                 ];
 
                 if (in_array($column, $dateFields)) {
                     $value = $value == '0000-00-00' ? null : $value;
                 }
 
-                if (in_array($column, $constantFields)) {
-                    $value = str_replace('COM_FMSDOCS_', '', $value);
+                if ($column == 'type_id') {
+                    $value = $types[$value];
                 }
 
                 if ($column == 'user_ids') {

@@ -1,5 +1,11 @@
 <template>
     <app-layout>
+        <template #header>
+            <centered-item :width="centeredItemWidth">
+                <div class="font-bold text-indigo-600">{{__(controllerNames.toString().toPhrase())}}</div>
+            </centered-item>
+        </template>
+
         <centered-item :width="centeredItemWidth">
             <div class="max-w-7xl mx-auto">
                 <dropdown v-if="filters.length !== 0" align="left" width="9/12" :buttonCustomClass="buttonCustomClass">
@@ -37,7 +43,8 @@
                                     <h1 class="mr-4 table-cell">{{getDefaultName(item)}}</h1>
                                 </inertia-link>
 
-                                <form v-if="$page.props.canEdit" :id="'delete-' + item.id" @submit.prevent="deleteItem(item)"
+                                <form v-if="$page.props.canEdit" :id="'delete-' + item.id"
+                                      @submit.prevent="deleteItem(item)"
                                       class="p-2 table-cell">
                                     <fmsdocs-button>{{__('Delete')}}</fmsdocs-button>
                                 </form>
