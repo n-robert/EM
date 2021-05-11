@@ -783,7 +783,7 @@ class PdfFormFillingService
         $occupation = $occupation ? $occupation->nam_ru : '';
 
         $employer = Employer::find($employee->employer_id);
-        $employerType = Type::find($employer->type_id)->name_ru;
+        $employerType = Type::find($employer->type_id)->code;
         $employerAddress = Address::find($employer->address_id)->name_ru;
         $director = Employee::find($employer->director_id);
 
@@ -1034,7 +1034,7 @@ class PdfFormFillingService
         $agent = (isset($docData['agent_id']) && $docData['agent_id']) ? Employee::find($docData['agent_id']) : null;
         $employer = Employer::find($employee->employer_id);
 
-        $employerType = Type::find($employer->type_id)->name_ru;
+        $employerType = Type::find($employer->type_id)->code;
         $accRegInfo = array_filter(
             [
                 $employer->acc_reg_number,

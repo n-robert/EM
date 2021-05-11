@@ -9,8 +9,8 @@ class Employer extends BaseModel
      * @var array
      */
     static $ownSelectOptionsCondtitions = [
-        'LEGAL' => 'type_id IN(SELECT id FROM types WHERE name LIKE "%LEGAL%")',
-        'FMS' => 'type_id IN(SELECT id FROM types WHERE name LIKE "%FMS%")',
+        'LEGAL' => 'type_id IN(SELECT id FROM types WHERE code LIKE "%LEGAL%")',
+        'FMS' => 'type_id IN(SELECT id FROM types WHERE code LIKE "%FMS%")',
     ];
 
     /**

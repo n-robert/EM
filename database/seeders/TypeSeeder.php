@@ -31,7 +31,7 @@ class TypeSeeder extends Seeder
         ];
 
         foreach ($types as $type) {
-            Type::insert(['name_ru' => $type, 'user_ids' => '2,3', 'created_at' => Carbon::now()]);
+            Type::insert(['code' => $type, 'user_ids' => '2,3', 'created_at' => Carbon::now()]);
         }
     }
 }

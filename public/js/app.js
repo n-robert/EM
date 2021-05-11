@@ -3166,6 +3166,44 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -4543,7 +4581,7 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     submit: function submit() {
-      if (!validateRequiredFields(this.requiredFields, this.$el, this.errors)) {
+      if (!this.validateRequiredFields(this.requiredFields, this.$el, this.errors)) {
         return false;
       }
 
@@ -5281,7 +5319,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       var url = '/' + this.controllerName + '/' + action,
           formData = new FormData(this.$refs.itemForm);
 
-      if (!validateRequiredFields(this.requiredFields, this.$el, this.errors)) {
+      if (!this.validateRequiredFields(this.requiredFields, this.$el, this.errors)) {
         return false;
       }
 
@@ -5712,7 +5750,7 @@ __webpack_require__.r(__webpack_exports__);
   props: ['href', 'active'],
   computed: {
     classes: function classes() {
-      return this.active ? 'inline-flex items-center px-1 pt-1 border-b-2 border-indigo-400 text-sm font-medium leading-5 font-bold text-indigo-600 focus:outline-none focus:border-indigo-700 transition duration-150 ease-in-out' : 'inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-indigo-500 hover:font-bold hover:border-indigo-400 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out';
+      return this.active ? 'inline-flex items-center px-1 pt-1 border-b-2 border-indigo-400 text-sm font-medium leading-5 font-bold text-indigo-600 focus:outline-none focus:border-indigo-700 transition duration-150 ease-in-out' : 'inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 hover:text-indigo-600 hover:border-indigo-400 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out';
     }
   }
 });
@@ -7018,8 +7056,7 @@ module.exports = {
       var _this$$page$props$lan;
 
       var replace = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-      var translation = (_this$$page$props$lan = this.$page.props.language[key]) !== null && _this$$page$props$lan !== void 0 ? _this$$page$props$lan : key; //            let translation = key;
-
+      var translation = (_this$$page$props$lan = this.$page.props.language[key]) !== null && _this$$page$props$lan !== void 0 ? _this$$page$props$lan : key;
       Object.keys(replace).forEach(function (k) {
         translation = translation.replace(':' + k, replace[k]);
       });
@@ -7103,6 +7140,18 @@ module.exports = {
         }
       });
       return order;
+    },
+    validateRequiredFields: function validateRequiredFields(requiredFields, el, errors) {
+      requiredFields.forEach(function (id) {
+        var field = el.querySelector('[name="' + id + '"]');
+
+        if (!field.value) {
+          errors[id] = true;
+        } else {
+          delete errors[id];
+        }
+      });
+      return Object.keys(errors).length === 0;
     }
   }
 };
@@ -7143,19 +7192,6 @@ String.prototype.toPascalCase = function () {
 
 toggleVisibility = function toggleVisibility(el, id) {
   document.getElementById(id).style.display = el.checked ? 'block' : 'none';
-};
-
-validateRequiredFields = function validateRequiredFields(requiredFields, el, errors) {
-  requiredFields.forEach(function (id) {
-    var field = el.querySelector('[name="' + id + '"]');
-
-    if (!field.value) {
-      errors[id] = true;
-    } else {
-      delete errors[id];
-    }
-  });
-  return Object.keys(errors).length === 0;
 };
 
 /***/ }),
@@ -35825,7 +35861,9 @@ var render = function() {
                               href: "/" + view.pluralize(),
                               active:
                                 _vm.$page.props.currentRouteName ===
-                                "gets." + view.toString().pluralize()
+                                  "gets." + view ||
+                                _vm.$page.props.currentRouteName ===
+                                  "gets." + view.pluralize()
                             }
                           },
                           [

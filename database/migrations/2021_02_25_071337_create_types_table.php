@@ -26,7 +26,7 @@ class CreateTypesTable extends Migration
         $columns['unique'] = [
             'string' => [
                 '32' => [
-                    'name_ru',
+                    'code',
                 ],
             ],
         ];

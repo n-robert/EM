@@ -108,7 +108,7 @@
         methods: {
             submit()
             {
-                if (!validateRequiredFields(this.requiredFields, this.$el, this.errors)) {
+                if (!this.validateRequiredFields(this.requiredFields, this.$el, this.errors)) {
                     return false;
                 }
 

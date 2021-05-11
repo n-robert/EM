@@ -8,10 +8,10 @@ class Type extends BaseModel
     /**
      * @var string
      */
-    static $defaultName = 'name';
+    static $defaultName = 'code';
 
     /**
      * @var array
      */
-    protected $defaultOrderBy = ['name'];
+    protected $defaultOrderBy = ['code'];
 }

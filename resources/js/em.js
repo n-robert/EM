@@ -6,7 +6,6 @@ module.exports = {
         __(key, replace = {})
         {
             let translation = this.$page.props.language[key] ?? key;
-//            let translation = key;
 
             Object.keys(replace).forEach(function(k) {
                 translation = translation.replace(':' + k, replace[k]);
@@ -92,6 +91,21 @@ module.exports = {
 
             return order;
         },
+
+        validateRequiredFields(requiredFields, el, errors) {
+            requiredFields.forEach(id => {
+                    const field = el.querySelector('[name="' + id + '"]');
+
+                    if (!field.value) {
+                        errors[id] = true;
+                    } else {
+                        delete errors[id];
+                    }
+                },
+            );
+
+            return Object.keys(errors).length === 0;
+        },
     },
 };
 
@@ -127,17 +141,3 @@ toggleVisibility = function(el, id) {
     document.getElementById(id).style.display = el.checked ? 'block' : 'none';
 };
 
-validateRequiredFields = function(requiredFields, el, errors) {
-    requiredFields.forEach(id => {
-            const field = el.querySelector('[name="' + id + '"]');
-
-            if (!field.value) {
-                errors[id] = true;
-            } else {
-                delete errors[id];
-            }
-        },
-    );
-
-    return Object.keys(errors).length === 0;
-};
