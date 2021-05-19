@@ -3,13 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Contracts\ControllerInterface;
+use Illuminate\Routing\Controller;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\URL;
 use Laravel\Jetstream\Jetstream;
 use Illuminate\Support\Str;
 use App\Services\PdfFormFillingService;
@@ -92,8 +93,8 @@ class BaseController extends Controller implements ControllerInterface
             case 'model':
                 $class = 'App\\Models\\' . $class;
                 break;
-            case 'formRequest':
-                $class = 'App\\Http\\Requests\\' . $class . 'FormRequest';
+            case 'requestValidation':
+                $class = 'App\\Http\\Requests\\' . $class . 'RequestValidation';
                 break;
             case 'repository':
                 $class = 'App\\Repositories\\Eloquent\\' . $class . 'Repository';
@@ -110,12 +111,19 @@ class BaseController extends Controller implements ControllerInterface
      */
     public function applyFilter()
     {
+//        dd($this->request->input());
+        $name = $this->request->get('name', '');
         $field = $this->request->get('field', '');
         $value = $this->request->get('value', '');
         $action = $this->request->get('action', '');
 
         if (!$field) {
             return true;
+        }
+
+        // We will transform coming JSON string to an array
+        if (preg_match('~^\[.+\]$~', $value)) {
+            $value = json_decode($value);
         }
 
         try {
@@ -127,7 +135,9 @@ class BaseController extends Controller implements ControllerInterface
                 throw new \Exception(__('Illegal action.'));
             }
 
-            $key = $this->names . '.' . $field . '.' . $value;
+            $key = $this->names . '.';
+            $key .= is_array($value) ? $field . '.' . $name : $field . '.' . $value;
+
             $args =
                 $action == 'remove' ? [$key] :
                     ($action == 'put' ? [$key, $value] : []);
@@ -149,8 +159,8 @@ class BaseController extends Controller implements ControllerInterface
     public function delete()
     {
         try {
-            $id = $this->request->get('id');
-            $this->model->where('id', $id)->delete();
+            $id = $this->request->input('id');
+            $this->model->find($id)->delete();
         } catch (\Exception $e) {
             abort(404, $e->getMessage());
         }
@@ -162,15 +172,14 @@ class BaseController extends Controller implements ControllerInterface
      * Get form fields from XML-file.
      * @param $dir
      * @param $name
-     * @param $doc
      * @param $id
      * @return array
      */
-    public function getFormFields($dir, $name, $doc, $id)
+    public function getFormFields($dir, $name, $id)
     {
         return call_user_func_array(
             [$this->formHandlingService, 'getFormFields'],
-            [$dir, $name, $doc, $id]
+            [$dir, $name, $id]
         );
     }
 
@@ -209,7 +218,8 @@ class BaseController extends Controller implements ControllerInterface
             }
         }
 
-        session([$this->name . '.user_ids' => $item->user_ids]);
+        $userIds = $item->user_ids ?: Auth::id();
+        session([$this->name . '.user_ids' => $userIds]);
 
         $canEdit = Gate::allows('can-edit');
         $page = 'EM/Item';
@@ -217,7 +227,7 @@ class BaseController extends Controller implements ControllerInterface
         $action = $id > 0 ? 'update' : 'store';
         $formFields = call_user_func_array(
             [$this->formHandlingService, 'getFormFields'],
-            ['system', $this->name, $this->name, $id]
+            ['system.item', $this->name, $id]
         );
 
         $requiredFields = $formFields['requiredFields'];
@@ -231,6 +241,7 @@ class BaseController extends Controller implements ControllerInterface
             'requiredFields'  => $requiredFields,
             'controllerName'  => $this->name,
             'controllerNames' => $this->names,
+            'listUrl'         => URL::route('gets.' . $this->names, ['page' => session('page')], false),
         ]);
     }
 
@@ -241,14 +252,14 @@ class BaseController extends Controller implements ControllerInterface
      */
     public function showAll()
     {
-        $items =
+        $query =
             $this->model
                 ->applyFilters()
                 ->applyDefaultOrder()
-                ->select($this->model->listable)
-                ->paginate(
-                    request('perPage')
-                );
+                ->applyCustomClauses()
+                ->select($this->model->listable);
+
+        $items = $query->paginate(request('perPage'));
 
         $page = 'EM/Items';
         $filters = $this->model->getFilters();
@@ -262,8 +273,15 @@ class BaseController extends Controller implements ControllerInterface
 
         $modal['filters'] = session('filtersModal');
         session(['filtersModal' => false]);
+        session(['page' => $this->request->input('page')]);
 
         call_user_func_array([$this->formHandlingService, 'checkDocList'], [$this->name, &$modal, &$docList]);
+
+        $formFields = call_user_func_array(
+            [$this->formHandlingService, 'getFormFields'],
+            ['system.list', $this->names]
+        );
+        unset($formFields['requiredFields']);
 
         return Jetstream::inertia()->render($this->request, $page, [
             'items'           => $items->all(),
@@ -271,6 +289,7 @@ class BaseController extends Controller implements ControllerInterface
             'pagination'      => $pagination,
             'modal'           => $modal,
             'docList'         => $docList,
+            'formFields'      => $formFields,
             'controllerName'  => $this->name,
             'controllerNames' => $this->names,
         ]);
@@ -290,25 +309,26 @@ class BaseController extends Controller implements ControllerInterface
      * Bind request data and save model
      *
      * @param null|Model $model
-     * @return bool|\Illuminate\Http\RedirectResponse
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function save($model = null)
     {
-        $attributes = $this->formRequest->except('type');
+        $attributes = $this->requestValidation->except('type');
 
         if (!$model) {
             $model = $this->model;
-            $model->setAttribute('user_ids', session($this->name . '.user_ids'));
         }
 
-        if ($result = $model->fill($attributes)->save()) {
-            return
-                $this->formRequest->input('type') == 'save' ?
-                    redirect()->route('gets.' . $this->names) :
-                    redirect()->route('gets.' . $this->name, ['id' => $model->id]);
-        }
+        $model->setAttribute('user_ids', session($this->name . '.user_ids'));
 
-        return $result;
+        $model
+            ->fill($attributes)
+            ->save();
+
+        return
+            $this->request->input('type') == 'save' ?
+                redirect()->route('gets.' . $this->names, ['page' => session('page')]) :
+                redirect()->route('gets.' . $this->name, ['id' => $model->id]);
     }
 
     /**

@@ -19,6 +19,10 @@ class AuthUserScope implements Scope
      */
     public function apply(Builder $builder, Model $model)
     {
-        $builder->whereRaw('FIND_IN_SET(' . Auth::id() . ', ' . $model->getTable() . '.user_ids)');
+//        if ($builder->getConnection() == 'pgsql') {
+//            $builder->whereRaw(Auth::id() . ' = ANY(' . $model->getTable() . '.user_ids)');
+//        } else {
+//            $builder->whereRaw('FIND_IN_SET(' . Auth::id() . ', ' . $model->getTable() . '.user_ids)');
+//        }
     }
 }

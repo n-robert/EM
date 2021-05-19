@@ -2,39 +2,58 @@
 
 namespace App\Models;
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
 class Quota extends BaseModel
 {
     /**
      * @var string
      */
-    static $defaultName = 'year_employer';
+    static $defaultName = 'year';
 
     /**
      * @var array
      */
-    public $listable = ['id', 'year', 'employer_id', 'issued_date', 'expired_date', 'details'];
+    public $listable = [
+        'quotas.id',
+        'year',
+        'er.name_ru as employer',
+        'total',
+    ];
 
     /**
      * Repeatable fields.
      *
      * @var array
      */
-    public $repeatable = ['details' => ['country', 'occupation', 'quantity']];
+    public $repeatable = [
+        'details' => [
+            'country'    => null,
+            'occupation' => null,
+            'quantity'   => null
+        ]
+    ];
 
     /**
      * @var array
      */
-    protected $defaultOrderBy = ['year'];
+    protected $defaultOrderBy = ['desc' => 'year'];
 
     /**
-     * Get concatenated name of year and emmployer.
-     *
-     * @return string
+     * @var array
      */
-    public function getYearEmployerAttribute()
-    {
-        return $this->year . ' (' . Employer::find($this->employer_id)->name_ru . ')';
-    }
+    protected $filterFields = [
+        'employer_id'       => [
+            'model' => 'Employer',
+            ['leftJoin' => 'employers|employers.id|employer_id'],
+            ['leftJoin' => 'types|types.id|employers.type_id'],
+            ['whereRaw' => 'types.code LIKE \'%LEGAL%\''],
+        ],
+        'year.valid_quotas' => [
+            ['whereRaw' => 'CAST(year AS INT) >= DATE_PART(\'YEAR\', NOW())']
+        ],
+    ];
 
     /**
      * Transform details field from JSON
@@ -48,6 +67,20 @@ class Quota extends BaseModel
     }
 
     /**
+     * Scope a query to model's custom clauses.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder $builder
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeApplyCustomClauses($builder)
+    {
+        $builder
+            ->join('employers as er', 'er.id', '=', 'employer_id', 'left');
+
+        return $builder;
+    }
+
+    /**
      * Transform details field to JSON
      *
      * @param $value
@@ -55,11 +88,29 @@ class Quota extends BaseModel
      */
     public function setDetailsAttribute($value)
     {
-        array_walk($value, function ($child, $key) use(&$value) {
+        $value = $value ?: [];
+        array_walk($value, function ($child, $key) use (&$value) {
             if (!array_sum(array_filter($child))) {
                 unset($value[$key]);
             }
         });
         $this->attributes['details'] = json_encode($value);
+    }
+
+    /**
+     * Calculate the total
+     *
+     * @return void
+     */
+    public function setTotalAttribute()
+    {
+        $details = request('details') ?? [];
+        $this->attributes['total'] =
+            array_reduce(
+                $details,
+                function ($carry, $item) {
+                    return $carry += $item['quantity'];
+                }
+            );
     }
 }

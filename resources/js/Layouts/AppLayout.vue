@@ -293,9 +293,9 @@
         },
 
         provide: {
-            filterFieldDefaultClass: 'm-1 p-1 rounded cursor-pointer bg-gray hover:bg-indigo-600 hover:text-white text-sm',
+            filterFieldDefaultClass: 'm-1 p-1 rounded cursor-pointer bg-indigo-100 hover:bg-indigo-600 hover:text-white text-sm',
             filterFieldIsChecked: 'bg-indigo-500 text-white',
-            tabActive: 'py-4 px-8 rounded-t-lg border-t border-r border-l text-indigo-500',
+            tabActive: 'py-4 px-8 rounded-t-lg border-t border-r border-l bg-gray-100 text-indigo-500',
             tabInActive: 'py-4 px-8 border-b hover:text-indigo-500',
             noTab: 'border-t rounded-t-lg',
             paginationActive: 'bg-indigo-400 text-white',

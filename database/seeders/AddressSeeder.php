@@ -24,7 +24,8 @@ class AddressSeeder extends Seeder
             'history',
         ];
 
-        $oldData = DB::connection('mysqlextra')->table('fmsdocs_addresses')->get();
+        $oldData = DB::connection('mysqlx')->table('fmsdocs_addresses')->get();
+        Address::truncate();
 
         foreach ($oldData as $oldDatum) {
             $newData = [];
@@ -47,7 +48,7 @@ class AddressSeeder extends Seeder
                 $value = $oldDatum->$key;
 
                 if ($column == 'user_ids') {
-                    $value = str_replace(['208', '209', '214', '215'], ['2', '3', '4', '5'], $value);
+                    $value = '{' . str_replace(['208', '209', '211', '214', '215'], [2, 3, 2, 4, 5], $value) . '}';
                 }
 
                 $newData[$column] = $value;

@@ -1,19 +1,15 @@
 <?php
 
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\Builder;
 
-if (!function_exists('add_columns_from_array'))
-{
+if (!function_exists('add_columns_from_array')) {
     function add_columns_from_array(array &$columns, Blueprint &$table)
     {
-        foreach ($columns as $hasDefaultValue => $group)
-        {
-            foreach ($group as $type => $subGroup)
-            {
-                foreach ($subGroup as $length => $column)
-                {
-                    if (!is_array($column))
-                    {
+        foreach ($columns as $hasDefaultValue => $group) {
+            foreach ($group as $type => $subGroup) {
+                foreach ($subGroup as $length => $column) {
+                    if (!is_array($column)) {
                         $column = [$column];
                         $length = null;
                     }
@@ -23,8 +19,15 @@ if (!function_exists('add_columns_from_array'))
                     array_walk(
                         $column,
                         function ($value) use ($table, $hasDefaultValue, $type, $length, $func, $arg) {
-                            ($hasDefaultValue == 'none') ?
-                                $table->$type($value, $length) : $table->$type($value, $length)->$func($arg);
+                            if ($type == 'int_array') {
+                                $length = $length ?? Builder::$defaultStringLength;
+                                ($hasDefaultValue == 'none') ?
+                                    $table->addColumn($type, $value, compact('length')) :
+                                    $table->addColumn($type, $value, compact('length'))->$func($arg);
+                            } else {
+                                ($hasDefaultValue == 'none') ?
+                                    $table->$type($value, $length) : $table->$type($value, $length)->$func($arg);
+                            }
                         }
                     );
                 }
@@ -33,14 +36,12 @@ if (!function_exists('add_columns_from_array'))
     }
 }
 
-if (!function_exists('get_translations'))
-{
+if (!function_exists('get_translations')) {
     function get_translations()
     {
         $json = resource_path('lang/' . app()->getLocale() . '.json');
 
-        if (!file_exists($json))
-        {
+        if (!file_exists($json)) {
             return [];
         }
 
@@ -48,8 +49,7 @@ if (!function_exists('get_translations'))
     }
 }
 
-if (!function_exists('to_lower_case_array'))
-{
+if (!function_exists('to_lower_case_array')) {
     function to_lower_case_array($str)
     {
         preg_match_all('/[A-Z]+(?=[A-Z][a-z]+[0-9]*|\b)|[A-Z]?[a-z]+[0-9]*|[A-Z]|[0-9]+/', $str, $matches);
@@ -64,32 +64,28 @@ if (!function_exists('to_lower_case_array'))
     }
 }
 
-if (!function_exists('to_phrase'))
-{
+if (!function_exists('to_phrase')) {
     function to_phrase($str)
     {
         return ucfirst(implode(' ', to_lower_case_array($str)));
     }
 }
 
-if (!function_exists('to_snake_case'))
-{
+if (!function_exists('to_snake_case')) {
     function to_snake_case($str)
     {
         return implode('_', to_lower_case_array($str));
     }
 }
 
-if (!function_exists('to_kebab_case'))
-{
+if (!function_exists('to_kebab_case')) {
     function to_kebab_case($str)
     {
         return implode('-', to_lower_case_array($str));
     }
 }
 
-if (!function_exists('to_pascal_case'))
-{
+if (!function_exists('to_pascal_case')) {
     function to_pascal_case($str)
     {
         return
@@ -105,8 +101,7 @@ if (!function_exists('to_pascal_case'))
     }
 }
 
-if (!function_exists('to_camel_case'))
-{
+if (!function_exists('to_camel_case')) {
     function to_camel_case($str)
     {
         $lowerCaseArray = to_lower_case_array($str);
@@ -125,12 +120,10 @@ if (!function_exists('to_camel_case'))
     }
 }
 
-if (!function_exists('to_upper_case'))
-{
+if (!function_exists('to_upper_case')) {
     function to_upper_case($data)
     {
-        if (is_array($data))
-        {
+        if (is_array($data)) {
             return
                 array_map(
                     function ($value) {
@@ -144,16 +137,12 @@ if (!function_exists('to_upper_case'))
     }
 }
 
-if (!function_exists('validate_boolean'))
-{
+if (!function_exists('validate_boolean')) {
     function validate_boolean($var, $bool_only = false)
     {
-        if ($bool_only)
-        {
+        if ($bool_only) {
             return filter_var($var, FILTER_VALIDATE_BOOLEAN);
-        }
-        else
-        {
+        } else {
             $result = filter_var($var, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? $var;
             return $result;
         }

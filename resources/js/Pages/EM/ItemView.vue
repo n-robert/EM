@@ -2,7 +2,7 @@
     <app-layout>
         <template #header>
             <centered-item :width="centeredItemWidth">
-                <div class="font-bold text-indigo-600">{{item.default_name}}</div>
+                <h1 class="font-bold text-indigo-600 text-xl">{{item.default_name}}</h1>
             </centered-item>
         </template>
 

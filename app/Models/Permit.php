@@ -16,36 +16,54 @@ class Permit extends BaseModel
      * @var array
      */
     static $ownSelectOptionsCondtitions = [
-        'Valid' => 'expired_date > CURDATE()',
+        'Valid' => [
+            ['whereRaw' => 'expired_date > NOW()'],
+        ],
     ];
 
     /**
      * @var array
      */
-    public $listable = ['id', 'number', 'employer_id', 'quota_id', 'issued_date', 'expired_date', 'details'];
+    public $listable = [
+        'permits.id',
+        'number',
+        'total',
+        'expired_date',
+        'er.name_ru as employer',
+    ];
 
     /**
      * Repeatable fields.
      *
      * @var array
      */
-    public $repeatable = ['details' => ['country', 'occupation', 'quantity']];
-
-    /**
-     * @var array
-     */
-    protected $filterFields = [
-        'employer_id' => [
-            'model' => 'Employer',
-            'whereRaw' =>'employers.type_id IN(SELECT id FROM types WHERE name_ru LIKE "%LEGAL%")',
-        ],
-//        'expired_date' => ['whereRaw' => 'expired_date > NOW()'],
+    public $repeatable = [
+        'details' => [
+            'country'    => null,
+            'occupation' => null,
+            'quantity'   => null
+        ]
     ];
 
     /**
      * @var array
      */
-    protected $defaultOrderBy = ['number'];
+    protected $filterFields = [
+        'employer_id'                => [
+            'model' => 'Employer',
+            ['leftJoin' => 'employers|employers.id|=|employer_id'],
+            ['leftJoin' => 'types|types.id|=|employers.type_id'],
+            ['whereRaw' => 'types.code LIKE \'%LEGAL%\''],
+        ],
+        'expired_date.valid_permits' => [
+            ['whereRaw' => 'expired_date > NOW()']
+        ],
+    ];
+
+    /**
+     * @var array
+     */
+    protected $defaultOrderBy = ['desc' => 'number'];
 
     /**
      * Transform details field from JSON
@@ -66,12 +84,44 @@ class Permit extends BaseModel
      */
     public function setDetailsAttribute($value)
     {
-        array_walk($value, function ($child, $key) use(&$value) {
+        $value = $value ?: [];
+        array_walk($value, function ($child, $key) use (&$value) {
             if (!array_sum(array_filter($child))) {
                 unset($value[$key]);
             }
         });
         $this->attributes['details'] = json_encode($value);
+    }
+
+    /**
+     * Calculate the total
+     *
+     * @return void
+     */
+    public function setTotalAttribute()
+    {
+        $details = request('details') ?? [];
+        $this->attributes['total'] =
+            array_reduce(
+                $details,
+                function ($carry, $item) {
+                    return $carry += $item['quantity'];
+                }
+            );
+    }
+
+    /**
+     * Scope a query to model's custom clauses.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder $builder
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeApplyCustomClauses($builder)
+    {
+        $builder
+            ->join('employers as er', 'er.id', '=', 'employer_id', 'left');
+
+        return $builder;
     }
 
     /**
@@ -82,10 +132,10 @@ class Permit extends BaseModel
     public static function getOwnSelectOptions(...$args)
     {
         $options = ['id AS value', 'number AS text'];
-        $query = app()->make(static::class)->whereNotEmpty('number');
+        $query = static::query()->whereNotEmpty('number');
 
         if ($args && $conditions = static::$ownSelectOptionsCondtitions[$args[0]]) {
-            return $query->whereRaw($conditions)->get($options);
+            static::applyQueryOptions($conditions, $query);
         }
 
         return $query->get($options);

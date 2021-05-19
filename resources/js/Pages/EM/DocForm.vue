@@ -80,7 +80,7 @@
         {
             return {
                 id: this.name + '-' + this.itemId,
-                getFieldsUri: '/get-options/doc/' + this.controllerName + '/' + this.name + '/' + this.itemId,
+                getFieldsUri: '/get-options/doc.' + this.controllerName + '/' + this.name + '/' + this.itemId,
                 actionUri: '/print/' + this.name + '/' + this.itemId,
                 formFields: {},
                 requiredFields: [],

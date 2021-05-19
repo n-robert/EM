@@ -110,7 +110,7 @@ module.exports = {
 };
 
 String.prototype.toLowerCaseArray = function() {
-    return this.match(/[A-Z]+(?=[A-Z][a-z]+[0-9]*|\b)|[A-Z]?[a-z]+[0-9]*|[A-Z]|[0-9]+/g).map(word => word.toLowerCase());
+    return this.match(/[A-ZА-Я]+(?=[A-ZА-Я][a-zа-я]+[0-9]*|\b)|[A-ZА-Я]?[a-zа-я]+[0-9]*|[A-ZА-Я]|[0-9]+/g).map(word => word.toLowerCase());
 };
 
 String.prototype.pluralize = function() {

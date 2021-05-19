@@ -3220,9 +3220,9 @@ __webpack_require__.r(__webpack_exports__);
     JetResponsiveNavLink: _Jetstream_ResponsiveNavLink__WEBPACK_IMPORTED_MODULE_5__.default
   },
   provide: {
-    filterFieldDefaultClass: 'm-1 p-1 rounded cursor-pointer bg-gray hover:bg-indigo-600 hover:text-white text-sm',
+    filterFieldDefaultClass: 'm-1 p-1 rounded cursor-pointer bg-indigo-100 hover:bg-indigo-600 hover:text-white text-sm',
     filterFieldIsChecked: 'bg-indigo-500 text-white',
-    tabActive: 'py-4 px-8 rounded-t-lg border-t border-r border-l text-indigo-500',
+    tabActive: 'py-4 px-8 rounded-t-lg border-t border-r border-l bg-gray-100 text-indigo-500',
     tabInActive: 'py-4 px-8 border-b hover:text-indigo-500',
     noTab: 'border-t rounded-t-lg',
     paginationActive: 'bg-indigo-400 text-white',
@@ -4347,7 +4347,7 @@ __webpack_require__.r(__webpack_exports__);
   },
   data: function data() {
     return {
-      defaultClass: 'items-center m-1 px-2 py-1 border rounded-md hover:bg-indigo-600 hover:text-white transition ease-in-out duration-150'
+      defaultClass: 'items-center px-2 py-1 border border-gray-300 rounded-md hover:bg-indigo-600 hover:text-white transition ease-in-out duration-150'
     };
   }
 });
@@ -4545,7 +4545,7 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       id: this.name + '-' + this.itemId,
-      getFieldsUri: '/get-options/doc/' + this.controllerName + '/' + this.name + '/' + this.itemId,
+      getFieldsUri: '/get-options/doc.' + this.controllerName + '/' + this.name + '/' + this.itemId,
       actionUri: '/print/' + this.name + '/' + this.itemId,
       formFields: {},
       requiredFields: [],
@@ -4728,11 +4728,10 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
-    FmsdocsButton: _Button__WEBPACK_IMPORTED_MODULE_0__.default
+    EMButton: _Button__WEBPACK_IMPORTED_MODULE_0__.default
   },
   props: {
     align: {
@@ -4747,6 +4746,12 @@ __webpack_require__.r(__webpack_exports__);
       }
     },
     buttonCustomClass: {
+      "default": ''
+    },
+    buttonOpenText: {
+      "default": ''
+    },
+    buttonCloseText: {
       "default": ''
     }
   },
@@ -4858,18 +4863,18 @@ __webpack_require__.r(__webpack_exports__);
   components: {
     FmsdocsInput: _Input__WEBPACK_IMPORTED_MODULE_0__.default
   },
-  props: ['field', 'name', 'item'],
+  props: ['field', 'name', 'item', 'controllerName'],
   data: function data() {
     return {
       isNotFields: ['type', 'show', 'repeatable']
     };
   },
   methods: {
-    addItem: function addItem(key) {
-      this.$emit('addItem', key);
+    addItem: function addItem(fieldSetName) {
+      this.$emit('addItem', fieldSetName);
     },
-    removeItem: function removeItem(key, index) {
-      this.$emit('removeItem', key, index);
+    removeItem: function removeItem(fieldSetName, index) {
+      this.$emit('removeItem', fieldSetName, index);
     }
   }
 });
@@ -4897,18 +4902,18 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: ['element'],
   inject: ['filterFieldDefaultClass', 'filterFieldIsChecked', 'controllerNames'],
   data: function data() {
     return {
-      id: this.element.field.replace(/_id|_/, '') + '-' + this.element.value.toLowerCase()
+      id: this.element.field.replace(/_id|_/, '') + '-' + this.element.value.toString().replace(/["\[\]]/gi, '').toLowerCase()
     };
   },
   methods: {
     submit: function submit() {
-      var form = document.getElementById(this.id);
-      this.$inertia.post('/' + this.controllerNames, new FormData(form));
+      this.$inertia.post('/' + this.controllerNames, new FormData(this.$refs[this.id]));
     }
   }
 });
@@ -5009,6 +5014,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 
 
 
@@ -5022,13 +5028,13 @@ __webpack_require__.r(__webpack_exports__);
   inject: ['leftColumn', 'rightColumn', 'warningClass', 'labelDefaultClass', 'inputDefaultClass', 'fieldWarningClass', 'pDefaultClass'],
   props: {
     name: {
-      defautl: null
+      "default": null
     },
     type: {
       "default": 'text'
     },
     value: {
-      defautl: null
+      "default": null
     },
     options: {
       "default": null
@@ -5037,7 +5043,7 @@ __webpack_require__.r(__webpack_exports__);
       "default": false
     },
     id: {
-      defautl: null
+      "default": null
     },
     onclick: {
       "default": null
@@ -5059,18 +5065,19 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   data: function data() {
-    var _this$value;
-
-    var labelText = this.label || this.name || '',
-        errorMessage = this.__('Field ":fieldName" is required.', {
-      fieldName: this.__(this.name)
-    });
-
+    var labelText = this.label || this.name || '';
     return {
       ru: vuejs_datepicker_dist_locale__WEBPACK_IMPORTED_MODULE_3__.ru,
-      modelValue: this.type === 'date' ? (_this$value = this.value) !== null && _this$value !== void 0 ? _this$value : new Date() : this.type === 'checkbox' ? this.checked : this.value || null,
+      modelValue: this.type === 'checkbox' ? this.checked : this.value || null,
       labelText: labelText.toString().replace(/[^\w\s]/gi, ''),
-      errorMessage: errorMessage
+      clearButton: true,
+      errorMessage: this.__('Field ":fieldName" is required.', {
+        fieldName: this.__(this.name)
+      }),
+      highlighted: {
+        from: new Date().setDate(new Date().getDate() - 1),
+        to: new Date()
+      }
     };
   } //        watch: {
   //            error: {
@@ -5176,6 +5183,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 
 
 
@@ -5186,15 +5195,13 @@ __webpack_require__.r(__webpack_exports__);
     FmsdocsInput: _Input__WEBPACK_IMPORTED_MODULE_2__.default
   },
   inject: ['tabActive', 'tabInActive', 'noTab'],
-  props: ['item', 'repeatable', 'formFields', 'requiredFields'],
+  props: ['item', 'repeatable', 'formFields', 'requiredFields', 'controllerName'],
   data: function data() {
-    var selected = {},
-        i = 0;
+    var selected = {};
 
     for (var key in this.formFields) {
       if (this.formFields.hasOwnProperty(key)) {
-        selected[key] = !i;
-        i++;
+        selected[key] = !!this.formFields[key]['show'];
       }
     }
 
@@ -5205,19 +5212,19 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   methods: {
-    selectTab: function selectTab(key) {
+    selectTab: function selectTab(fieldGroupName) {
       for (var index in this.selected) {
         if (this.selected.hasOwnProperty(index)) {
-          this.selected[index] = index === key;
+          this.selected[index] = index === fieldGroupName;
         }
       }
     },
-    addItem: function addItem(key) {
-      this.$emit('addItem', key);
+    addItem: function addItem(fieldSetName) {
+      this.$emit('addItem', fieldSetName);
       this.fieldSetKey++;
     },
-    removeItem: function removeItem(key, index) {
-      this.$emit('removeItem', key, index);
+    removeItem: function removeItem(fieldSetName, index) {
+      this.$emit('removeItem', fieldSetName, index);
       this.fieldSetKey++;
     }
   }
@@ -5281,6 +5288,9 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 //
 //
 //
+//
+//
+//
 
 
 
@@ -5293,7 +5303,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
     Item: _Item__WEBPACK_IMPORTED_MODULE_2__.default,
     FmsdocsButton: _Button__WEBPACK_IMPORTED_MODULE_3__.default
   },
-  props: ['item', 'repeatable', 'action', 'formFields', 'requiredFields', 'controllerName', 'controllerNames'],
+  props: ['item', 'repeatable', 'action', 'formFields', 'requiredFields', 'controllerName', 'controllerNames', 'listUrl'],
   data: function data() {
     var selected = {},
         i = 0,
@@ -5330,7 +5340,15 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
     visit: function visit(url) {
       this.$inertia.visit(url);
     },
-    addItem: function addItem(key) {
+    addItem: function addItem(fieldSetName) {
+      this.updateFieldsetList(fieldSetName);
+      this.item[fieldSetName].push(this.newItems[fieldSetName]);
+    },
+    removeItem: function removeItem(fieldSetName, index) {
+      this.updateFieldsetList(fieldSetName);
+      this.item[fieldSetName].splice(index, 1);
+    },
+    updateFieldsetList: function updateFieldsetList(fieldSetName) {
       var formData = new FormData(this.$refs.itemForm);
       var keyParams = [],
           k;
@@ -5342,7 +5360,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
         for (_iterator.s(); !(_step = _iterator.n()).done;) {
           var pair = _step.value;
 
-          if (pair[0].startsWith(key)) {
+          if (pair[0].startsWith(fieldSetName)) {
             if (pair[0].indexOf('_date') !== -1) {
               pair[1] = this.formatDate(pair[1]);
             }
@@ -5357,18 +5375,12 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       }
 
       keyParams = qs__WEBPACK_IMPORTED_MODULE_4___default().parse(keyParams.join('&'));
-      keyParams = keyParams[key];
+      keyParams = keyParams[fieldSetName];
 
-      if (this.item[key] !== undefined && keyParams !== undefined) {
-        if (keyParams.length === this.item[key].length) {
-          this.item[key] = keyParams;
-        }
+      if (this.item[fieldSetName] !== undefined && keyParams !== undefined) {
+        // if (keyParams.length === this.item[fieldSetName].length) {
+        this.item[fieldSetName] = keyParams; // }
       }
-
-      this.item[key].push(this.newItems[key]);
-    },
-    removeItem: function removeItem(key, index) {
-      this.item[key].splice(index, 1);
     }
   }
 });
@@ -5532,6 +5544,46 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -5551,7 +5603,7 @@ __webpack_require__.r(__webpack_exports__);
     FilterByField: _FilterByField__WEBPACK_IMPORTED_MODULE_6__.default,
     Dropdown: _Dropdown__WEBPACK_IMPORTED_MODULE_7__.default
   },
-  props: ['items', 'filters', 'pagination', 'modal', 'docList', 'controllerName', 'controllerNames'],
+  props: ['items', 'filters', 'pagination', 'modal', 'docList', 'formFields', 'controllerName', 'controllerNames'],
   provide: function provide() {
     return {
       controllerName: this.controllerName,
@@ -5564,17 +5616,16 @@ __webpack_require__.r(__webpack_exports__);
         md: 'full',
         xl: '3/4'
       },
-      buttonCustomClass: 'inline-flex text-white bg-indigo-400 hover:text-white hover:bg-indigo-600'
+      buttonCustomClass: 'inline-flex text-white bg-indigo-400 hover:text-white hover:bg-indigo-600',
+      needAdditionalButton: this.items.length > 7,
+      itemCount: [this.pagination.firstItem + '-' + this.pagination.lastItem, this.__('from'), this.pagination.total].join(' ')
     };
   },
   methods: {
-    getDefaultName: function getDefaultName(item) {
-      return this.controllerName === 'employee' ? item.full_name_ru : item.default_name;
-    },
     deleteItem: function deleteItem(item) {
       var form = document.getElementById('delete-' + item.id),
           confirm = window.confirm(this.__('This action will permanently delete ":account" from database. Are you sure?', {
-        account: this.getDefaultName(item)
+        account: item.default_name
       }));
       var formData = new FormData(form);
       formData.append('id', item.id);
@@ -7157,7 +7208,7 @@ module.exports = {
 };
 
 String.prototype.toLowerCaseArray = function () {
-  return this.match(/[A-Z]+(?=[A-Z][a-z]+[0-9]*|\b)|[A-Z]?[a-z]+[0-9]*|[A-Z]|[0-9]+/g).map(function (word) {
+  return this.match(/[A-ZА-Я]+(?=[A-ZА-Я][a-zа-я]+[0-9]*|\b)|[A-ZА-Я]?[a-zа-я]+[0-9]*|[A-ZА-Я]|[0-9]+/g).map(function (word) {
     return word.toLowerCase();
   });
 };
@@ -38497,7 +38548,7 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c(
     "div",
-    { staticClass: "p-2 text-center mx-auto", class: _vm.widthClass },
+    { staticClass: "space-y-4 text-center mx-auto", class: _vm.widthClass },
     [_vm._t("default")],
     2
   )
@@ -38914,7 +38965,7 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c(
     "div",
-    { staticClass: "relative" },
+    { staticClass: "relative m-2" },
     [
       _c(
         "div",
@@ -38927,17 +38978,17 @@ var render = function() {
           }
         },
         [
-          _vm._t("trigger", [
-            _c("fmsdocs-button", {
-              attrs: {
-                type: "button",
-                open: _vm.open,
-                originalText: _vm.__("Open filters"),
-                alternativeText: _vm.__("Close filters"),
-                "custom-class": _vm.buttonCustomClass
-              }
-            })
-          ])
+          _vm._t("trigger"),
+          _vm._v(" "),
+          _c("e-m-button", {
+            attrs: {
+              type: "button",
+              open: _vm.open,
+              originalText: _vm.buttonOpenText,
+              alternativeText: _vm.buttonCloseText,
+              "custom-class": _vm.buttonCustomClass
+            }
+          })
         ],
         2
       ),
@@ -39063,7 +39114,7 @@ var render = function() {
           _vm._l(_vm.item[_vm.name], function(subItem, subKey) {
             return _c(
               "div",
-              { staticClass: "border rounded-md bg-gray-100" },
+              { staticClass: "border rounded-md bg-gray-200" },
               [
                 _vm._l(_vm.field, function(subField, subName) {
                   return !_vm.isNotFields.includes(subName)
@@ -39098,7 +39149,7 @@ var render = function() {
                 _c("fmsdocs-input", {
                   attrs: {
                     type: "button",
-                    value: _vm.__("Remove"),
+                    value: _vm.__("Remove " + _vm.name),
                     hasLabel: "false"
                   },
                   nativeOn: {
@@ -39113,7 +39164,11 @@ var render = function() {
           }),
           _vm._v(" "),
           _c("fmsdocs-input", {
-            attrs: { type: "button", value: _vm.__("Add"), hasLabel: "false" },
+            attrs: {
+              type: "button",
+              value: _vm.__("Add " + _vm.name),
+              hasLabel: "false"
+            },
             nativeOn: {
               click: function($event) {
                 return _vm.addItem(_vm.name)
@@ -39151,7 +39206,7 @@ var render = function() {
   return _c(
     "form",
     {
-      attrs: { id: _vm.id },
+      ref: _vm.id,
       on: {
         submit: function($event) {
           $event.preventDefault()
@@ -39161,13 +39216,18 @@ var render = function() {
     },
     [
       _c("input", {
-        attrs: { type: "hidden", name: "value" },
-        domProps: { value: _vm.element.value }
+        attrs: { type: "hidden", name: "name" },
+        domProps: { value: _vm.element.name }
       }),
       _vm._v(" "),
       _c("input", {
         attrs: { type: "hidden", name: "field" },
         domProps: { value: _vm.element.field }
+      }),
+      _vm._v(" "),
+      _c("input", {
+        attrs: { type: "hidden", name: "value" },
+        domProps: { value: _vm.element.value }
       }),
       _vm._v(" "),
       _c("input", {
@@ -39182,7 +39242,7 @@ var render = function() {
           (_obj[_vm.filterFieldIsChecked] = _vm.element.checked),
           _obj),
         attrs: { type: "submit", onclick: "this.blur();" },
-        domProps: { value: _vm.element.name }
+        domProps: { value: _vm.__(_vm.element.name) }
       })
     ]
   )
@@ -39232,7 +39292,7 @@ var render = function() {
                 attrs: {
                   text:
                     _vm.hasLabel && _vm.hasLabel !== "false"
-                      ? _vm.__(_vm.labelText) + ": "
+                      ? _vm.__(_vm.labelText).toPhrase() + ": "
                       : "",
                   for: _vm.name
                 }
@@ -39268,7 +39328,6 @@ var render = function() {
                         id: _vm.id,
                         disabled: !_vm.$page.props.canEdit
                       },
-                      domProps: { value: _vm.value },
                       on: {
                         change: function($event) {
                           var $$selectedVal = Array.prototype.filter
@@ -39296,18 +39355,20 @@ var render = function() {
                   )
                 : _vm.type === "date"
                 ? _c("datepicker", {
-                    staticClass: "form-input",
-                    class:
-                      _vm.isRequired &&
-                      (!_vm.modelValue || _vm.$page.props.errors[_vm.name])
-                        ? _vm.fieldWarningClass
-                        : _vm.inputDefaultClass,
                     attrs: {
                       placeholder: _vm.__("Select Date"),
                       name: _vm.name,
                       id: _vm.id,
                       language: _vm.ru,
-                      format: _vm.$page.props.defaultDateFormat
+                      format: _vm.$page.props.defaultDateFormat,
+                      "clear-button": _vm.clearButton,
+                      "input-class": "form-input",
+                      highlighted: _vm.highlighted,
+                      "input-class":
+                        _vm.isRequired &&
+                        (!_vm.modelValue || _vm.$page.props.errors[_vm.name])
+                          ? _vm.fieldWarningClass
+                          : _vm.inputDefaultClass
                     },
                     model: {
                       value: _vm.modelValue,
@@ -39348,7 +39409,7 @@ var render = function() {
                 ? _c("fmsdocs-button", {
                     attrs: {
                       type: _vm.type,
-                      onclick: [_vm.onclick ? _vm.onclick : "this.blur();"],
+                      onclick: _vm.onclick,
                       open: _vm.open,
                       originalText: _vm.__(_vm.value),
                       disabled: !_vm.$page.props.canEdit,
@@ -39380,9 +39441,8 @@ var render = function() {
                         type: "checkbox"
                       },
                       domProps: {
-                        value: _vm.value,
                         checked: Array.isArray(_vm.modelValue)
-                          ? _vm._i(_vm.modelValue, _vm.value) > -1
+                          ? _vm._i(_vm.modelValue, null) > -1
                           : _vm.modelValue
                       },
                       on: {
@@ -39391,7 +39451,7 @@ var render = function() {
                             $$el = $event.target,
                             $$c = $$el.checked ? true : false
                           if (Array.isArray($$a)) {
-                            var $$v = _vm.value,
+                            var $$v = null,
                               $$i = _vm._i($$a, $$v)
                             if ($$el.checked) {
                               $$i < 0 && (_vm.modelValue = $$a.concat([$$v]))
@@ -39430,13 +39490,10 @@ var render = function() {
                         onclick: _vm.onclick,
                         type: "radio"
                       },
-                      domProps: {
-                        value: _vm.value,
-                        checked: _vm._q(_vm.modelValue, _vm.value)
-                      },
+                      domProps: { checked: _vm._q(_vm.modelValue, null) },
                       on: {
                         change: function($event) {
-                          _vm.modelValue = _vm.value
+                          _vm.modelValue = null
                         }
                       }
                     })
@@ -39462,7 +39519,7 @@ var render = function() {
                         onclick: _vm.onclick,
                         type: _vm.type
                       },
-                      domProps: { value: _vm.value, value: _vm.modelValue },
+                      domProps: { value: _vm.modelValue },
                       on: {
                         input: function($event) {
                           if ($event.target.composing) {
@@ -39496,9 +39553,8 @@ var render = function() {
                       type: "checkbox"
                     },
                     domProps: {
-                      value: _vm.value,
                       checked: Array.isArray(_vm.modelValue)
-                        ? _vm._i(_vm.modelValue, _vm.value) > -1
+                        ? _vm._i(_vm.modelValue, null) > -1
                         : _vm.modelValue
                     },
                     on: {
@@ -39507,7 +39563,7 @@ var render = function() {
                           $$el = $event.target,
                           $$c = $$el.checked ? true : false
                         if (Array.isArray($$a)) {
-                          var $$v = _vm.value,
+                          var $$v = null,
                             $$i = _vm._i($$a, $$v)
                           if ($$el.checked) {
                             $$i < 0 && (_vm.modelValue = $$a.concat([$$v]))
@@ -39546,13 +39602,10 @@ var render = function() {
                       onclick: _vm.onclick,
                       type: "radio"
                     },
-                    domProps: {
-                      value: _vm.value,
-                      checked: _vm._q(_vm.modelValue, _vm.value)
-                    },
+                    domProps: { checked: _vm._q(_vm.modelValue, null) },
                     on: {
                       change: function($event) {
-                        _vm.modelValue = _vm.value
+                        _vm.modelValue = null
                       }
                     }
                   })
@@ -39578,7 +39631,7 @@ var render = function() {
                       onclick: _vm.onclick,
                       type: _vm.type
                     },
-                    domProps: { value: _vm.value, value: _vm.modelValue },
+                    domProps: { value: _vm.modelValue },
                     on: {
                       input: function($event) {
                         if ($event.target.composing) {
@@ -39596,7 +39649,7 @@ var render = function() {
                       "\n                " +
                         _vm._s(
                           _vm.$page.props.errors[_vm.name]
-                            ? _vm.$page.props.errors[_vm.name].join("\r\n")
+                            ? _vm.$page.props.errors[_vm.name]
                             : _vm.errorMessage
                         ) +
                         "\n            "
@@ -39632,160 +39685,172 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "p-2 bg-white shadow-xl sm:rounded-lg" }, [
-    _c(
-      "ul",
-      { staticClass: "flex w-full" },
-      _vm._l(_vm.formFields, function(fieldGroup, name) {
-        return fieldGroup.type === "fieldgroup"
-          ? _c(
-              "li",
-              {
-                staticClass: "cursor-pointer w-full",
-                class: _vm.selected[name] ? _vm.tabActive : _vm.tabInActive,
-                on: {
-                  click: function($event) {
-                    return _vm.selectTab(name)
+  return _c(
+    "div",
+    { staticClass: "p-2 m-4 bg-white shadow-xl sm:rounded-lg" },
+    [
+      _c(
+        "ul",
+        { staticClass: "flex w-full" },
+        _vm._l(_vm.formFields, function(fieldGroup, name) {
+          return fieldGroup.type === "fieldgroup"
+            ? _c(
+                "li",
+                {
+                  staticClass: "cursor-pointer w-full",
+                  class: _vm.selected[name] ? _vm.tabActive : _vm.tabInActive,
+                  on: {
+                    click: function($event) {
+                      return _vm.selectTab(name)
+                    }
                   }
-                }
-              },
+                },
+                [
+                  _c("span", [
+                    _vm._v(
+                      "\n                " +
+                        _vm._s(
+                          _vm
+                            .__(name)
+                            .toString()
+                            .toPhrase()
+                        ) +
+                        "\n            "
+                    )
+                  ])
+                ]
+              )
+            : _vm._e()
+        }),
+        0
+      ),
+      _vm._v(" "),
+      _c(
+        "div",
+        {
+          staticClass:
+            "p-4 table w-full border-r border-b border-l rounded-b-lg bg-gray-100",
+          class: _vm.selected["id"] ? _vm.noTab : ""
+        },
+        [
+          _vm._l(_vm.formFields, function(element, key) {
+            return _c(
+              "div",
               [
-                _c("span", [
-                  _vm._v(
-                    "\n                " +
-                      _vm._s(_vm.__(name.toString().toPhrase())) +
-                      "\n            "
-                  )
-                ])
-              ]
-            )
-          : _vm._e()
-      }),
-      0
-    ),
-    _vm._v(" "),
-    _c(
-      "div",
-      {
-        staticClass: "p-4 table w-full border-r border-b border-l rounded-b-lg",
-        class: _vm.selected["id"] ? _vm.noTab : ""
-      },
-      [
-        _vm._l(_vm.formFields, function(element, key) {
-          return _c(
-            "div",
-            [
-              element.type === "fieldgroup"
-                ? _c(
-                    "tab",
-                    { key: key, attrs: { selected: _vm.selected[key] } },
-                    _vm._l(element, function(field, name) {
-                      return !_vm.isNotFields.includes(name)
-                        ? _c(
-                            "div",
-                            { staticClass: "table-row", class: name },
-                            [
-                              field.type === "fieldset"
-                                ? _c("field-set", {
-                                    directives: [
-                                      {
-                                        name: "show",
-                                        rawName: "v-show",
-                                        value: field.show,
-                                        expression: "field.show"
-                                      }
-                                    ],
-                                    key: _vm.fieldSetKey,
-                                    attrs: {
-                                      field: field,
-                                      name: name,
-                                      item: _vm.item
-                                    },
-                                    on: {
-                                      addItem: _vm.addItem,
-                                      removeItem: _vm.removeItem
-                                    }
-                                  })
-                                : _c("fmsdocs-input", {
-                                    attrs: {
-                                      name: field.name,
-                                      type: field.type,
-                                      value:
-                                        _vm.item[field.name] || field.value,
-                                      options: field.options,
-                                      onclick: field.onclick,
-                                      label: field.label,
-                                      hasLabel: field.hasLabel,
-                                      id: field.name.toString().toKebabCase(),
-                                      isRequired: field.required
-                                    }
-                                  })
-                            ],
-                            1
-                          )
-                        : _vm._e()
-                    }),
-                    0
-                  )
-                : _c("div", { staticClass: "table-row-group" }, [
-                    _c(
-                      "div",
-                      { staticClass: "table-row" },
-                      [
-                        element.type === "fieldset"
-                          ? _c("field-set", {
-                              directives: [
-                                {
-                                  name: "show",
-                                  rawName: "v-show",
-                                  value: element.show,
-                                  expression: "element.show"
-                                }
-                              ],
-                              key: _vm.fieldSetKey,
-                              attrs: {
-                                field: element,
-                                name: key,
-                                item: _vm.item
-                              },
-                              on: {
-                                addItem: _vm.addItem,
-                                removeItem: _vm.removeItem
-                              }
-                            })
-                          : _c(
+                element.type === "fieldgroup"
+                  ? _c(
+                      "tab",
+                      { key: key, attrs: { selected: _vm.selected[key] } },
+                      _vm._l(element, function(field, name) {
+                        return !_vm.isNotFields.includes(name)
+                          ? _c(
                               "div",
+                              { staticClass: "table-row", class: name },
                               [
-                                _c("fmsdocs-input", {
-                                  attrs: {
-                                    name: element.name,
-                                    type: element.type,
-                                    value:
-                                      _vm.item[element.name] || element.value,
-                                    options: element.options,
-                                    label: element.label,
-                                    hasLabel: element.hasLabel,
-                                    id: element.name.toString().toKebabCase(),
-                                    isRequired: element.required
-                                  }
-                                })
+                                field.type === "fieldset"
+                                  ? _c("field-set", {
+                                      directives: [
+                                        {
+                                          name: "show",
+                                          rawName: "v-show",
+                                          value: field.show,
+                                          expression: "field.show"
+                                        }
+                                      ],
+                                      key: _vm.fieldSetKey,
+                                      attrs: {
+                                        field: field,
+                                        name: name,
+                                        item: _vm.item,
+                                        controllerName: _vm.controllerName
+                                      },
+                                      on: {
+                                        addItem: _vm.addItem,
+                                        removeItem: _vm.removeItem
+                                      }
+                                    })
+                                  : _c("fmsdocs-input", {
+                                      attrs: {
+                                        name: field.name,
+                                        type: field.type,
+                                        value:
+                                          _vm.item[field.name] || field.value,
+                                        options: field.options,
+                                        onclick: field.onclick,
+                                        label: field.label,
+                                        hasLabel: field.hasLabel,
+                                        id: field.name.toString().toKebabCase(),
+                                        isRequired: field.required
+                                      }
+                                    })
                               ],
                               1
                             )
-                      ],
-                      1
+                          : _vm._e()
+                      }),
+                      0
                     )
-                  ])
-            ],
-            1
-          )
-        }),
-        _vm._v(" "),
-        _vm._t("default")
-      ],
-      2
-    )
-  ])
+                  : _c("div", { staticClass: "table-row-group" }, [
+                      _c(
+                        "div",
+                        { staticClass: "table-row" },
+                        [
+                          element.type === "fieldset"
+                            ? _c("field-set", {
+                                directives: [
+                                  {
+                                    name: "show",
+                                    rawName: "v-show",
+                                    value: element.show,
+                                    expression: "element.show"
+                                  }
+                                ],
+                                key: _vm.fieldSetKey,
+                                attrs: {
+                                  field: element,
+                                  name: key,
+                                  item: _vm.item,
+                                  controllerName: _vm.controllerName
+                                },
+                                on: {
+                                  addItem: _vm.addItem,
+                                  removeItem: _vm.removeItem
+                                }
+                              })
+                            : _c(
+                                "div",
+                                [
+                                  _c("fmsdocs-input", {
+                                    attrs: {
+                                      name: element.name,
+                                      type: element.type,
+                                      value:
+                                        _vm.item[element.name] || element.value,
+                                      options: element.options,
+                                      label: element.label,
+                                      hasLabel: element.hasLabel,
+                                      id: element.name.toString().toKebabCase(),
+                                      isRequired: element.required
+                                    }
+                                  })
+                                ],
+                                1
+                              )
+                        ],
+                        1
+                      )
+                    ])
+              ],
+              1
+            )
+          }),
+          _vm._v(" "),
+          _vm._t("default")
+        ],
+        2
+      )
+    ]
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -39819,8 +39884,15 @@ var render = function() {
           fn: function() {
             return [
               _c("centered-item", { attrs: { width: _vm.centeredItemWidth } }, [
-                _c("div", { staticClass: "font-bold text-indigo-600" }, [
-                  _vm._v(_vm._s(_vm.item.default_name))
+                _c("h1", { staticClass: "font-bold text-indigo-600 text-xl" }, [
+                  _vm._v(
+                    "\n                " +
+                      _vm._s(
+                        _vm.item.default_name ||
+                          _vm.__("New " + _vm.controllerName)
+                      ) +
+                      "\n            "
+                  )
                 ])
               ])
             ]
@@ -39851,7 +39923,8 @@ var render = function() {
                   item: _vm.item,
                   repeatable: _vm.repeatable,
                   formFields: _vm.formFields,
-                  requiredFields: _vm.requiredFields
+                  requiredFields: _vm.requiredFields,
+                  controllerName: _vm.controllerName
                 },
                 on: { addItem: _vm.addItem, removeItem: _vm.removeItem }
               },
@@ -39862,7 +39935,7 @@ var render = function() {
                     attrs: { type: "button" },
                     nativeOn: {
                       click: function($event) {
-                        return _vm.visit("/" + _vm.controllerNames)
+                        return _vm.visit(_vm.listUrl)
                       }
                     }
                   },
@@ -39955,7 +40028,7 @@ var render = function() {
           fn: function() {
             return [
               _c("centered-item", { attrs: { width: _vm.centeredItemWidth } }, [
-                _c("div", { staticClass: "font-bold text-indigo-600" }, [
+                _c("h1", { staticClass: "font-bold text-indigo-600 text-xl" }, [
                   _vm._v(_vm._s(_vm.item.default_name))
                 ])
               ])
@@ -40009,7 +40082,7 @@ var render = function() {
           fn: function() {
             return [
               _c("centered-item", { attrs: { width: _vm.centeredItemWidth } }, [
-                _c("div", { staticClass: "font-bold text-indigo-600" }, [
+                _c("h1", { staticClass: "font-bold text-indigo-600 text-xl" }, [
                   _vm._v(
                     _vm._s(_vm.__(_vm.controllerNames.toString().toPhrase()))
                   )
@@ -40033,7 +40106,9 @@ var render = function() {
                   attrs: {
                     align: "left",
                     width: "9/12",
-                    buttonCustomClass: _vm.buttonCustomClass
+                    buttonCustomClass: _vm.buttonCustomClass,
+                    buttonOpenText: _vm.__("Open filters"),
+                    buttonCloseText: _vm.__("Close filters")
                   },
                   scopedSlots: _vm._u(
                     [
@@ -40054,9 +40129,11 @@ var render = function() {
                                 staticClass: "p-2 my-4 border rounded-lg w-full"
                               },
                               [
-                                _c("div", { staticClass: "font-bold" }, [
-                                  _vm._v(_vm._s(_vm.__(field)))
-                                ]),
+                                _c(
+                                  "div",
+                                  { staticClass: "font-bold text-indigo-600" },
+                                  [_vm._v(_vm._s(_vm.__(field).ucFirst()))]
+                                ),
                                 _vm._v(" "),
                                 _vm._l(elements, function(element) {
                                   return _c(
@@ -40080,7 +40157,7 @@ var render = function() {
                     ],
                     null,
                     false,
-                    2641904580
+                    3443933358
                   )
                 })
               : _vm._e(),
@@ -40088,181 +40165,313 @@ var render = function() {
             _vm.pagination.hasPages
               ? _c(
                   "div",
-                  { staticClass: "py-2" },
+                  { staticClass: "m-2" },
                   [_c("pagination", { attrs: { pagination: _vm.pagination } })],
                   1
                 )
               : _vm._e(),
             _vm._v(" "),
-            _c("div", { staticClass: "p-2 bg-white shadow-xl sm:rounded-lg" }, [
-              _c(
-                "div",
-                { staticClass: "p-2 mt-3" },
-                [
-                  _vm.pagination.hasPages
-                    ? _c(
-                        "inertia-link",
+            _c(
+              "div",
+              { staticClass: "p-2 m-1 bg-white shadow-xl sm:rounded-lg" },
+              [
+                _c(
+                  "div",
+                  { staticClass: "p-2" },
+                  [
+                    _c("div", { staticClass: "text-right text-xs pr-5" }, [
+                      _vm._v(
+                        "\n                        " +
+                          _vm._s(_vm.itemCount) +
+                          "\n                    "
+                      )
+                    ]),
+                    _vm._v(" "),
+                    _vm.needAdditionalButton
+                      ? _c(
+                          "inertia-link",
+                          {
+                            staticClass:
+                              "px-4 py-2 border border-gray-300 rounded-md text-white bg-indigo-400\n                                  hover:text-white hover:bg-indigo-600",
+                            attrs: { href: "/" + _vm.controllerName + "/new" }
+                          },
+                          [
+                            _vm._v(
+                              "\n                        " +
+                                _vm._s(_vm.__("New " + _vm.controllerName)) +
+                                "\n                    "
+                            )
+                          ]
+                        )
+                      : _vm._e()
+                  ],
+                  1
+                ),
+                _vm._v(" "),
+                _c(
+                  "div",
+                  { staticClass: "p-4 table w-full" },
+                  [
+                    _c(
+                      "div",
+                      {
+                        staticClass:
+                          "even:bg-indigo-100 table-row-group font-bold"
+                      },
+                      [
+                        _c(
+                          "div",
+                          { staticClass: "table-row" },
+                          [
+                            _vm._l(_vm.formFields, function(field) {
+                              return _c(
+                                "div",
+                                { staticClass: "p-2 align-middle table-cell" },
+                                [
+                                  field.name === "default_name"
+                                    ? _c(
+                                        "div",
+                                        { staticClass: "pl-6 text-left" },
+                                        [
+                                          _vm._v(
+                                            "\n                                    " +
+                                              _vm._s(
+                                                _vm.__(field.label).ucFirst()
+                                              ) +
+                                              "\n                                "
+                                          )
+                                        ]
+                                      )
+                                    : _c("div", [
+                                        _vm._v(
+                                          _vm._s(_vm.__(field.label).ucFirst())
+                                        )
+                                      ])
+                                ]
+                              )
+                            }),
+                            _vm._v(" "),
+                            _c("div", {
+                              staticClass: "p-2 align-middle table-cell"
+                            }),
+                            _vm._v(" "),
+                            Object.keys(_vm.docList).length
+                              ? _c("div", {
+                                  staticClass: "p-2 align-middle table-cell"
+                                })
+                              : _vm._e()
+                          ],
+                          2
+                        )
+                      ]
+                    ),
+                    _vm._v(" "),
+                    _vm._l(_vm.items, function(item) {
+                      return _c(
+                        "div",
                         {
                           staticClass:
-                            "px-4 py-2 border border-gray-300 rounded-md text-white bg-indigo-400\n                                  hover:text-white hover:bg-indigo-600",
-                          attrs: { href: "/" + _vm.controllerName + "/new" }
+                            "even:bg-indigo-100 text-sm table-row-group"
                         },
                         [
-                          _vm._v(
-                            "\n                        " +
-                              _vm._s(_vm.__("New " + _vm.controllerName)) +
-                              "\n                    "
+                          _c(
+                            "div",
+                            { staticClass: "table-row" },
+                            [
+                              _vm._l(_vm.formFields, function(field) {
+                                return _c(
+                                  "div",
+                                  {
+                                    staticClass: "p-2 align-middle table-cell"
+                                  },
+                                  [
+                                    field.name === "default_name"
+                                      ? _c(
+                                          "h2",
+                                          {
+                                            staticClass:
+                                              "pl-6 py-1 text-indigo-800 hover:text-indigo-500 text-left"
+                                          },
+                                          [
+                                            _c(
+                                              "inertia-link",
+                                              {
+                                                attrs: {
+                                                  href:
+                                                    "/" +
+                                                    _vm.controllerName +
+                                                    "/" +
+                                                    item.id
+                                                }
+                                              },
+                                              [
+                                                _vm._v(
+                                                  "\n                                        " +
+                                                    _vm._s(item.default_name) +
+                                                    "\n                                    "
+                                                )
+                                              ]
+                                            )
+                                          ],
+                                          1
+                                        )
+                                      : _c("div", [
+                                          _vm._v(
+                                            "\n                                    " +
+                                              _vm._s(
+                                                field.name.endsWith("_date")
+                                                  ? _vm.formatDate(
+                                                      item[field.name]
+                                                    )
+                                                  : _vm.__(item[field.name])
+                                              ) +
+                                              "\n                                "
+                                          )
+                                        ])
+                                  ]
+                                )
+                              }),
+                              _vm._v(" "),
+                              _vm.$page.props.canEdit
+                                ? _c(
+                                    "form",
+                                    {
+                                      staticClass:
+                                        "p-2 align-middle table-cell",
+                                      attrs: { id: "delete-" + item.id },
+                                      on: {
+                                        submit: function($event) {
+                                          $event.preventDefault()
+                                          return _vm.deleteItem(item)
+                                        }
+                                      }
+                                    },
+                                    [
+                                      _c("fmsdocs-button", [
+                                        _vm._v(_vm._s(_vm.__("Delete")))
+                                      ])
+                                    ],
+                                    1
+                                  )
+                                : _vm._e(),
+                              _vm._v(" "),
+                              Object.keys(_vm.docList).length
+                                ? _c(
+                                    "div",
+                                    {
+                                      staticClass: "p-2 align-middle table-cell"
+                                    },
+                                    [
+                                      _c(
+                                        "fmsdocs-button",
+                                        {
+                                          attrs: { type: "button" },
+                                          nativeOn: {
+                                            click: function($event) {
+                                              return _vm.openModalFromItems(
+                                                item.id
+                                              )
+                                            }
+                                          }
+                                        },
+                                        [
+                                          _vm._v(
+                                            "\n                                    " +
+                                              _vm._s(
+                                                _vm.__("Print documents")
+                                              ) +
+                                              "\n                                "
+                                          )
+                                        ]
+                                      )
+                                    ],
+                                    1
+                                  )
+                                : _vm._e(),
+                              _vm._v(" "),
+                              _vm.modal[item.id]
+                                ? _c("dialog-modal", {
+                                    attrs: {
+                                      show: _vm.modal[item.id],
+                                      id: item.id
+                                    },
+                                    on: {
+                                      closeModalFromDialog:
+                                        _vm.closeModalFromItems
+                                    },
+                                    scopedSlots: _vm._u(
+                                      [
+                                        {
+                                          key: "content",
+                                          fn: function() {
+                                            return [
+                                              _c("doc-list", {
+                                                attrs: {
+                                                  modal: _vm.modal,
+                                                  item: item,
+                                                  docList: _vm.docList
+                                                },
+                                                on: {
+                                                  openModalFromDocList:
+                                                    _vm.openModalFromItems,
+                                                  closeModalFromDocList:
+                                                    _vm.closeModalFromItems,
+                                                  addFieldStateFromDocList:
+                                                    _vm.addFieldToDocList
+                                                }
+                                              })
+                                            ]
+                                          },
+                                          proxy: true
+                                        }
+                                      ],
+                                      null,
+                                      true
+                                    )
+                                  })
+                                : _vm._e()
+                            ],
+                            2
                           )
                         ]
                       )
-                    : _vm._e()
-                ],
-                1
-              ),
-              _vm._v(" "),
-              _c(
-                "div",
-                { staticClass: "p-4 table w-full" },
-                _vm._l(_vm.items, function(item) {
-                  return _c(
-                    "div",
-                    { staticClass: "even:bg-gray-200 table-row-group" },
-                    [
-                      _c(
-                        "div",
-                        { staticClass: "table-row" },
-                        [
-                          _c(
-                            "inertia-link",
-                            {
-                              staticClass: "p-2 hover:text-indigo-500",
-                              attrs: {
-                                href: "/" + _vm.controllerName + "/" + item.id
-                              }
-                            },
-                            [
-                              _c("h1", { staticClass: "mr-4 table-cell" }, [
-                                _vm._v(_vm._s(_vm.getDefaultName(item)))
-                              ])
-                            ]
-                          ),
-                          _vm._v(" "),
-                          _vm.$page.props.canEdit
-                            ? _c(
-                                "form",
-                                {
-                                  staticClass: "p-2 table-cell",
-                                  attrs: { id: "delete-" + item.id },
-                                  on: {
-                                    submit: function($event) {
-                                      $event.preventDefault()
-                                      return _vm.deleteItem(item)
-                                    }
-                                  }
-                                },
-                                [
-                                  _c("fmsdocs-button", [
-                                    _vm._v(_vm._s(_vm.__("Delete")))
-                                  ])
-                                ],
-                                1
-                              )
-                            : _vm._e(),
-                          _vm._v(" "),
-                          Object.keys(_vm.docList).length
-                            ? _c(
-                                "fmsdocs-button",
-                                {
-                                  staticClass: "p-2 table-cell",
-                                  attrs: { type: "button" },
-                                  nativeOn: {
-                                    click: function($event) {
-                                      return _vm.openModalFromItems(item.id)
-                                    }
-                                  }
-                                },
-                                [
-                                  _vm._v(
-                                    "\n                                " +
-                                      _vm._s(_vm.__("Print documents")) +
-                                      "\n                            "
-                                  )
-                                ]
-                              )
-                            : _vm._e(),
-                          _vm._v(" "),
-                          _vm.modal[item.id]
-                            ? _c("dialog-modal", {
-                                attrs: {
-                                  show: _vm.modal[item.id],
-                                  id: item.id
-                                },
-                                on: {
-                                  closeModalFromDialog: _vm.closeModalFromItems
-                                },
-                                scopedSlots: _vm._u(
-                                  [
-                                    {
-                                      key: "content",
-                                      fn: function() {
-                                        return [
-                                          _c("doc-list", {
-                                            attrs: {
-                                              modal: _vm.modal,
-                                              item: item,
-                                              docList: _vm.docList
-                                            },
-                                            on: {
-                                              openModalFromDocList:
-                                                _vm.openModalFromItems,
-                                              closeModalFromDocList:
-                                                _vm.closeModalFromItems,
-                                              addFieldStateFromDocList:
-                                                _vm.addFieldToDocList
-                                            }
-                                          })
-                                        ]
-                                      },
-                                      proxy: true
-                                    }
-                                  ],
-                                  null,
-                                  true
-                                )
-                              })
-                            : _vm._e()
-                        ],
-                        1
-                      )
-                    ]
-                  )
-                }),
-                0
-              ),
-              _vm._v(" "),
-              _c(
-                "div",
-                { staticClass: "p-2" },
-                [
-                  _c(
-                    "inertia-link",
-                    {
-                      staticClass:
-                        "px-4 py-2 border border-gray-300 rounded-md text-white bg-indigo-400\n                                  hover:text-white hover:bg-indigo-600",
-                      attrs: { href: "/" + _vm.controllerName + "/new" }
-                    },
-                    [
+                    })
+                  ],
+                  2
+                ),
+                _vm._v(" "),
+                _c(
+                  "div",
+                  { staticClass: "p-2" },
+                  [
+                    _c(
+                      "inertia-link",
+                      {
+                        staticClass:
+                          "px-4 py-2 border border-gray-300 rounded-md text-white bg-indigo-400\n                                  hover:text-white hover:bg-indigo-600",
+                        attrs: { href: "/" + _vm.controllerName + "/new" }
+                      },
+                      [
+                        _vm._v(
+                          "\n                        " +
+                            _vm._s(_vm.__("New " + _vm.controllerName)) +
+                            "\n                    "
+                        )
+                      ]
+                    ),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "text-right text-xs pr-5" }, [
                       _vm._v(
                         "\n                        " +
-                          _vm._s(_vm.__("New " + _vm.controllerName)) +
+                          _vm._s(_vm.itemCount) +
                           "\n                    "
                       )
-                    ]
-                  )
-                ],
-                1
-              )
-            ])
+                    ])
+                  ],
+                  1
+                )
+              ]
+            )
           ],
           1
         ),

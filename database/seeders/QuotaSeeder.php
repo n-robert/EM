@@ -26,7 +26,8 @@ class QuotaSeeder extends Seeder
             'history',
         ];
 
-        $oldData = DB::connection('mysqlextra')->table('fmsdocs_quotas')->get();
+        $oldData = DB::connection('mysqlx')->table('fmsdocs_quotas')->get();
+        Quota::truncate();
 
         foreach ($oldData as $oldDatum) {
             $newData = [];
@@ -50,6 +51,7 @@ class QuotaSeeder extends Seeder
                 }
 
                 $value = $oldDatum->$key;
+
                 $dateFields = [
                     'issued_date',
                     'expired_date',
@@ -60,7 +62,11 @@ class QuotaSeeder extends Seeder
                 }
 
                 if ($column == 'user_ids') {
-                    $value = str_replace(['208', '209', '214', '215'], ['2', '3', '4', '5'], $value);
+                    $value = '{' . str_replace(['208', '209', '211', '214', '215'], [2, 3, 2, 4, 5], $value) . '}';
+                }
+
+                if (str_ends_with($column, '_id')) {
+                    $value = intval($value);
                 }
 
                 if ($column == 'details') {
@@ -80,6 +86,14 @@ class QuotaSeeder extends Seeder
 
                 $newData[$column] = $value;
             }
+
+            $newData['total'] =
+                array_reduce(
+                    json_decode($newData['details']),
+                    function ($carry, $item) {
+                        return $carry += $item->quantity;
+                    }
+                );
 
             Quota::insert($newData);
         }

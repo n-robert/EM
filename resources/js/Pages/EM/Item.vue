@@ -1,5 +1,5 @@
 <template>
-    <div class="p-2 bg-white shadow-xl sm:rounded-lg">
+    <div class="p-2 m-4 bg-white shadow-xl sm:rounded-lg">
         <ul class="flex w-full">
             <li v-for="(fieldGroup, name) in formFields"
                 v-if="fieldGroup.type === 'fieldgroup'"
@@ -7,12 +7,12 @@
                 @click="selectTab(name)"
                 class="cursor-pointer w-full">
                 <span>
-                    {{__(name.toString().toPhrase())}}
+                    {{__(name).toString().toPhrase()}}
                 </span>
             </li>
         </ul>
 
-        <div class="p-4 table w-full border-r border-b border-l rounded-b-lg" :class="selected['id'] ? noTab : ''">
+        <div class="p-4 table w-full border-r border-b border-l rounded-b-lg bg-gray-100" :class="selected['id'] ? noTab : ''">
             <div v-for="(element, key) in formFields">
                 <tab v-if="element.type === 'fieldgroup'"
                      :key="key"
@@ -28,6 +28,7 @@
                                 :name="name"
                                 :item="item"
                                 :key="fieldSetKey"
+                                :controllerName="controllerName"
                                 @addItem="addItem"
                                 @removeItem="removeItem"></field-set>
 
@@ -53,6 +54,7 @@
                                 :name="key"
                                 :item="item"
                                 :key="fieldSetKey"
+                                :controllerName="controllerName"
                                 @addItem="addItem"
                                 @removeItem="removeItem"></field-set>
 
@@ -98,15 +100,15 @@
             'repeatable',
             'formFields',
             'requiredFields',
+            'controllerName',
         ],
 
         data() {
-            let selected = {}, i = 0;
+            let selected = {};
 
             for (const key in this.formFields) {
                 if (this.formFields.hasOwnProperty(key)) {
-                    selected[key] = !i;
-                    i++;
+                    selected[key] = !!this.formFields[key]['show'];
                 }
             }
 
@@ -118,21 +120,21 @@
         },
 
         methods: {
-            selectTab(key) {
+            selectTab(fieldGroupName) {
                 for (const index in this.selected) {
                     if (this.selected.hasOwnProperty(index)) {
-                        this.selected[index] = (index === key);
+                        this.selected[index] = (index === fieldGroupName);
                     }
                 }
             },
 
-            addItem(key) {
-                this.$emit('addItem', key);
+            addItem(fieldSetName) {
+                this.$emit('addItem', fieldSetName);
                 this.fieldSetKey++;
             },
 
-            removeItem(key, index) {
-                this.$emit('removeItem', key, index);
+            removeItem(fieldSetName, index) {
+                this.$emit('removeItem', fieldSetName, index);
                 this.fieldSetKey++;
             },
         },

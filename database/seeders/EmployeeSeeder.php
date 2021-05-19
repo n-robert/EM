@@ -16,6 +16,7 @@ class EmployeeSeeder extends Seeder
     public function run()
     {
         $columns = [
+            'id',
             'passport_number',
             'user_ids',
             'last_name_ru',
@@ -88,8 +89,9 @@ class EmployeeSeeder extends Seeder
         ];
 
         $columns = array_merge($columns, $changedColumns);
-        $oldData = DB::connection('mysqlextra')->table('fmsdocs_employees')->get();
-        $statuses = DB::table('statuses')->pluck('id', 'name_en');
+        $oldData = DB::connection('mysqlx')->table('fmsdocs_employees')->get();
+        $statuses = DB::connection('mysql')->table('statuses')->pluck('id', 'name_en');
+        Employee::truncate();
 
         foreach ($oldData as $oldDatum) {
             $newData = [];
@@ -144,7 +146,11 @@ class EmployeeSeeder extends Seeder
                 }
 
                 if ($column == 'user_ids') {
-                    $value = str_replace(['208', '209', '214', '215'], ['2', '3', '4', '5'], $value);
+                    $value = '{' . str_replace(['208', '209', '211', '214', '215'], [2, 3, 2, 4, 5], $value) . '}';
+                }
+
+                if (str_ends_with($column, '_id')) {
+                    $value = intval($value);
                 }
 
                 $newData[$column] = $value;

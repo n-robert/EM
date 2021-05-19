@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<root>
+    <field
+            name="default_name"
+            label="year"/>
+    <field
+            name="employer"/>
+    <field
+            name="total"/>
+</root>

@@ -6,7 +6,9 @@ use App\Contracts\ModelInterface;
 use App\Services\XmlFormHandlingService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 use App\Scopes\AuthUserScope;
 
@@ -58,21 +60,28 @@ class BaseModel extends Model implements ModelInterface
      *
      * @var array|bool
      */
-    protected $guarded = ['id', 'user_ids'];
+    protected $guarded = [
+        'id',
+        'user_ids',
+        'password',
+    ];
 
     /**
      * The attributes that should be hidden for arrays.
      *
      * @var array
      */
-    protected $hidden = ['user_ids'];
+    protected $hidden = [
+        'user_ids',
+        'password',
+    ];
 
     /**
      * The accessors to append to the model's array form.
      *
      * @var array
      */
-    protected $appends = ['default_name'];
+    protected $appends = [];
 
     /**
      * @var array
@@ -106,7 +115,6 @@ class BaseModel extends Model implements ModelInterface
         }
 
         $this->appends = array_merge($this->appends, static::$baseAppends);
-//        App::bind(ModelInterface::class, static::class);
     }
 
     /**
@@ -162,16 +170,6 @@ class BaseModel extends Model implements ModelInterface
     }
 
     /**
-     * The "booted" method of the model.
-     *
-     * @return void
-     */
-    protected static function booted()
-    {
-        static::addGlobalScope(new AuthUserScope());
-    }
-
-    /**
      * Get options for form select.
      * @return array
      */
@@ -187,6 +185,16 @@ class BaseModel extends Model implements ModelInterface
     }
 
     /**
+     * The "booted" method of the model.
+     *
+     * @return void
+     */
+    protected static function booted()
+    {
+        static::addGlobalScope(new AuthUserScope());
+    }
+
+    /**
      * Scope a query to applied filters.
      *
      * @param  \Illuminate\Database\Eloquent\Builder $builder
@@ -194,7 +202,9 @@ class BaseModel extends Model implements ModelInterface
      */
     public function scopeApplyFilters($builder)
     {
+//        Session::remove($this->names);
         $filters = session($this->names);
+//        dd($filters);
 
         if ($filters && $filters = array_filter($filters)) {
             array_walk($filters, function ($value, $key) use ($builder) {
@@ -214,14 +224,28 @@ class BaseModel extends Model implements ModelInterface
     public function scopeApplyDefaultOrder($builder)
     {
         if ($this->defaultOrderBy) {
-            array_map(
-                function ($value) use ($builder) {
-                    $builder->orderBy($value);
-                },
-                $this->defaultOrderBy
+            array_walk(
+                $this->defaultOrderBy,
+                function ($value, $direction) use ($builder) {
+                    $direction =
+                        (is_string($direction) && in_array($direction, ['asc', 'desc'])) ?
+                            $direction : 'asc';
+                    $builder->orderBy($value, $direction);
+                }
             );
         }
 
+        return $builder;
+    }
+
+    /**
+     * Scope a query to model's custom clauses.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder $builder
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeApplyCustomClauses($builder)
+    {
         return $builder;
     }
 
@@ -233,12 +257,14 @@ class BaseModel extends Model implements ModelInterface
     public function getDefaultNameAttribute()
     {
         return
-            $this->getAttribute(static::$defaultName) ?:
+            array_key_exists(static::$defaultName, $this->getAttributes()) ?
+                $this->getAttribute(static::$defaultName) :
                 call_user_func([$this, 'get' . to_pascal_case(static::$defaultName) . 'Attribute']);
     }
 
     /**
      * Get pagination data for items
+     *
      * @param \Illuminate\Pagination\LengthAwarePaginator $items
      * @return array
      */
@@ -250,6 +276,9 @@ class BaseModel extends Model implements ModelInterface
         $pagination['next'] = array_pop($pagination['links']);
         $pagination['onFirstPage'] = $items->onFirstPage();
         $pagination['hasPages'] = $items->hasPages();
+        $pagination['total'] = $items->total();
+        $pagination['firstItem'] = $items->firstItem();
+        $pagination['lastItem'] = $items->lastItem();
 
         return $pagination;
     }
@@ -263,29 +292,51 @@ class BaseModel extends Model implements ModelInterface
     {
         $filters = [];
 
-        if (!$this->filterFields) {
+        if (!$this->filterFields || !array_filter($this->filterFields)) {
             return $filters;
         }
 
         foreach ($this->filterFields as $field => $options) {
-            $tmp = $this->names . '.' . $field;
+            // If field has alias after '.', then we will extract them apart
+            // and we will assume that the field value will be an array
+            if ($hasAlias = strpos($field, '.') !== false) {
+                $tmpField = explode('.', $field);
+                $field = $tmpField[0];
+                $alias = $tmpField[1] ?? $field;
+                $aliasValue = [];
+            }
+
+            $tmpKey = $this->names . '.' . $field;
             $items = $this->getFilterFieldItems($field, $options);
 
             if (!$items) {
                 continue;
             }
-//            dd($items->all());
-//            $component = str_replace(['_', 'Id'], '', ucwords($field, '_'));
+
 
             foreach ($items as $item) {
                 $item = $item instanceof Model ? $item->getAttributes() : (array)$item;
                 $value = $item['value'];
-                $key = $tmp . '.' . $value;
+                $key = $tmpKey . '.' . $value;
 
-                $filters[$field][$value] = $item;
-                $filters[$field][$value]['field'] = $field;
-                $filters[$field][$value]['checked'] = session($key) ? 'checked' : '';
-                $filters[$field][$value]['action'] = session($key) ? 'remove' : 'put';
+                if ($hasAlias) {
+                    $aliasValue[] = $value;
+                } else {
+                    $filters[$field][$value] = $item;
+                    $filters[$field][$value]['field'] = $field;
+                    $filters[$field][$value]['checked'] = session($key) ? 'checked' : '';
+                    $filters[$field][$value]['action'] = session($key) ? 'remove' : 'put';
+                }
+            }
+
+            // We assign attributes to alias only by the end of loop
+            if ($hasAlias) {
+                $key = $tmpKey . '.' . $alias;
+                $filters[$field][$alias]['name'] = $alias;
+                $filters[$field][$alias]['value'] = json_encode($aliasValue);
+                $filters[$field][$alias]['field'] = $field;
+                $filters[$field][$alias]['checked'] = session($key) ? 'checked' : '';
+                $filters[$field][$alias]['action'] = session($key) ? 'remove' : 'put';
             }
         }
 //        dd($filters);
@@ -293,38 +344,76 @@ class BaseModel extends Model implements ModelInterface
     }
 
     /**
-     * @param string $field
-     * @return Collection
+     * Get items for filter field
+     *
+     * @param $field
+     * @param $options
+     * @return mixed
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function getFilterFieldItems($field, $options)
     {
-        $valueField = $this->names . '.' . $field;
-        $query = $this->distinct($valueField);
+        $valueField = $nameField = $this->names . '.' . $field;
         $query =
             str_ends_with($field, '_date') ?
-                $query->whereNotNull($valueField) :
-                $query->whereNotEmpty($valueField);
+                static::whereNotNull($valueField) :
+                static::whereNotEmpty($valueField);
 
+        static::applyQueryOptions($options, $query, $nameField);
+
+        $items =
+            $query
+                ->distinct($valueField)
+                ->select([$valueField . ' AS value', $nameField . ' AS name'])
+                ->get();
+
+        return $items;
+    }
+
+    /**
+     * Apply additional options to query
+     *
+     * @param $options
+     * @param $query
+     * @param string $field
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     */
+    public static function applyQueryOptions($options, &$query, &$field = '')
+    {
         if (isset($options['model'])) {
             $model = app()->make(__NAMESPACE__ . '\\' . $options['model']);
-            $table = $model->names;
-            $nameField = $table . '.' . $model::$defaultName;
-            $query =
-                $query
-                    ->leftJoin($table, $table . '.id', '=', $valueField)
-                    ->whereNotEmpty($nameField);
-        } else {
-            $table = $this->names;
-            $nameField = $table . '.' . $field;
+            $table = $model->getTable();
+            $field = $table . '.' . $model::$defaultName;
+            unset($options['model']);
         }
 
-        if (isset($options['whereRaw'])) {
-            $query = $query->whereRaw($options['whereRaw']);
+        if (!empty($options)) {
+            array_walk_recursive($options, function ($args, $method) use(&$query) {
+                $args = preg_split('~\s*\|\s*~', $args);
+                $query = $query->$method(...$args);
+            });
         }
+    }
 
-        $query = $query->select([$valueField . ' AS value', $nameField . ' AS name']);
+    /**
+     * Transform details field to JSON
+     *
+     * @return mixed
+     */
+    public function getUserIdsAttribute()
+    {
+        return str_replace(['{', '}'], '', $this->attributes['user_ids']);
+    }
 
-        return $items = $query->get();
+    /**
+     * Transform details field to JSON
+     *
+     * @param $value
+     * @return void
+     */
+    public function setUserIdsAttribute($value)
+    {
+        $this->attributes['user_ids'] = '{' . $value . '}';
     }
 
     /**
@@ -340,5 +429,38 @@ class BaseModel extends Model implements ModelInterface
             method_exists($this, $method) ?
                 $this->$method(...$parameters) :
                 parent::__call($method, $parameters);
+    }
+
+    /**
+     * Delete the model from the database.
+     *
+     * @return bool|null|int
+     *
+     * @throws \LogicException
+     */
+    public function delete()
+    {
+        if ($result = parent::delete() && $this->getConnectionName() == 'pgsql') {
+            $result = $this->on('mysql')->toBase()->delete($this->getKey());
+        }
+
+        return $result;
+    }
+
+    /**
+     * Save the model to the database.
+     *
+     * @param  array  $options
+     * @return bool
+     */
+    public function save(array $options = [])
+    {
+        if ($result = parent::save($options) && $this->getConnectionName() == 'pgsql') {
+            $attributes = $this->getAttributes();
+            $attributes['user_ids'] = str_replace(['{', '}'], '', $attributes['user_ids']);
+            $result = $this->on('mysql')->upsert($attributes, [$this->getKeyName()]);
+        }
+
+        return $result;
     }
 }

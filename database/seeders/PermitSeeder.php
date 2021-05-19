@@ -21,14 +21,14 @@ class PermitSeeder extends Seeder
             'issued_date',
             'expired_date',
             'employer_id',
-            'quota_id',
             'details',
             'user_ids',
             'published',
             'history',
         ];
 
-        $oldData = DB::connection('mysqlextra')->table('fmsdocs_permits')->get();
+        $oldData = DB::connection('mysqlx')->table('fmsdocs_permits')->get();
+        Permit::truncate();
 
         foreach ($oldData as $oldDatum) {
             $newData = [];
@@ -62,7 +62,11 @@ class PermitSeeder extends Seeder
                 }
 
                 if ($column == 'user_ids') {
-                    $value = str_replace(['208', '209', '214', '215'], ['2', '3', '4', '5'], $value);
+                    $value = '{' . str_replace(['208', '209', '211', '214', '215'], [2, 3, 2, 4, 5], $value) . '}';
+                }
+
+                if (str_ends_with($column, '_id')) {
+                    $value = intval($value);
                 }
 
                 if ($column == 'details') {
@@ -82,6 +86,14 @@ class PermitSeeder extends Seeder
 
                 $newData[$column] = $value;
             }
+
+            $newData['total'] =
+                array_reduce(
+                    json_decode($newData['details']),
+                    function ($carry, $item) {
+                        return $carry += $item->quantity;
+                    }
+                );
 
             Permit::insert($newData);
         }

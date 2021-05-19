@@ -2,7 +2,9 @@
     <app-layout>
         <template #header>
             <centered-item :width="centeredItemWidth">
-                <div class="font-bold text-indigo-600">{{item.default_name}}</div>
+                <h1 class="font-bold text-indigo-600 text-xl">
+                    {{item.default_name || __('New ' + controllerName)}}
+                </h1>
             </centered-item>
         </template>
 
@@ -12,9 +14,10 @@
                       :repeatable="repeatable"
                       :formFields="formFields"
                       :requiredFields="requiredFields"
+                      :controllerName="controllerName"
                       @addItem="addItem"
                       @removeItem="removeItem">
-                    <fmsdocs-button type="button" @click.native="visit('/' + controllerNames)">
+                    <fmsdocs-button type="button" @click.native="visit(listUrl)">
                         {{__('Cancel')}}
                     </fmsdocs-button>
 
@@ -54,10 +57,10 @@
             'requiredFields',
             'controllerName',
             'controllerNames',
+            'listUrl',
         ],
 
-        data()
-        {
+        data() {
             let selected = {}, i = 0, newItems = {};
 
             for (const key in this.repeatable) {
@@ -77,9 +80,8 @@
         },
 
         methods: {
-            submit(action, type)
-            {
-               let
+            submit(action, type) {
+                let
                     url = '/' + this.controllerName + '/' + action,
                     formData = new FormData(this.$refs.itemForm)
                 ;
@@ -93,17 +95,26 @@
                 this.$inertia.post(url, formData);
             },
 
-            visit(url)
-            {
+            visit(url) {
                 this.$inertia.visit(url);
             },
 
-            addItem(key) {
+            addItem(fieldSetName) {
+                this.updateFieldsetList(fieldSetName);
+                this.item[fieldSetName].push(this.newItems[fieldSetName]);
+            },
+
+            removeItem(fieldSetName, index) {
+                this.updateFieldsetList(fieldSetName);
+                this.item[fieldSetName].splice(index, 1);
+            },
+
+            updateFieldsetList(fieldSetName) {
                 const formData = new FormData(this.$refs.itemForm);
                 let keyParams = [], k;
 
-                for(const pair of formData.entries()) {
-                    if (pair[0].startsWith(key)) {
+                for (const pair of formData.entries()) {
+                    if (pair[0].startsWith(fieldSetName)) {
                         if (pair[0].indexOf('_date') !== -1) {
                             pair[1] = this.formatDate(pair[1]);
                         }
@@ -113,19 +124,13 @@
                 }
 
                 keyParams = qs.parse(keyParams.join('&'));
-                keyParams = keyParams[key];
+                keyParams = keyParams[fieldSetName];
 
-                if (this.item[key] !== undefined && keyParams !== undefined) {
-                    if (keyParams.length === this.item[key].length) {
-                        this.item[key] = keyParams;
-                    }
+                if (this.item[fieldSetName] !== undefined && keyParams !== undefined) {
+                    // if (keyParams.length === this.item[fieldSetName].length) {
+                    this.item[fieldSetName] = keyParams;
+                    // }
                 }
-
-                this.item[key].push(this.newItems[key]);
-            },
-
-            removeItem(key, index) {
-                this.item[key].splice(index, 1);
             },
         },
     };

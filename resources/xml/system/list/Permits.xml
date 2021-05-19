@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<root>
+    <field
+            name="default_name"
+            label="Permit number"/>
+    <field
+            name="employer"/>
+    <field
+            name="total"/>
+    <field
+            name="expired_date"/>
+</root>

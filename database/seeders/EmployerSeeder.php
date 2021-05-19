@@ -48,8 +48,9 @@ class EmployerSeeder extends Seeder
             'address_id',
         ];
         $columns = array_merge($columns, $changedColumns);
-        $oldData = DB::connection('mysqlextra')->table('fmsdocs_employers')->get();
-        $types = DB::table('types')->pluck('id', 'name');
+        $oldData = DB::connection('mysqlx')->table('fmsdocs_employers')->get();
+        $types = DB::connection('mysql')->table('types')->pluck('id', 'code');
+        Employer::truncate();
 
         foreach ($oldData as $oldDatum) {
             $newData = [];
@@ -100,7 +101,11 @@ class EmployerSeeder extends Seeder
                 }
 
                 if ($column == 'user_ids') {
-                    $value = str_replace(['208', '209', '214', '215'], ['2', '3', '4', '5'], $value);
+                    $value = '{' . str_replace(['208', '209', '211', '214', '215'], [2, 3, 2, 4, 5], $value) . '}';
+                }
+
+                if (str_ends_with($column, '_id')) {
+                    $value = intval($value);
                 }
 
                 $newData[$column] = $value;

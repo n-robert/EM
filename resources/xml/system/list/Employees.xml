@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<root>
+    <field
+            name="default_name"
+            label="Person full name"/>
+    <field
+            name="status"/>
+    <field
+            name="occupation"/>
+</root>

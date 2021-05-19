@@ -22,8 +22,7 @@ class XmlFormHandlingService
             is_object($firstItem) &&
             isset($firstItem->value) &&
             isset($firstItem->text)
-        )
-        {
+        ) {
             return $data->sortBy('text');
         }
 
@@ -56,10 +55,8 @@ class XmlFormHandlingService
         if (
             isset($docPath[$name]) &&
             $docs = app('files')->files($docPath[$name])
-        )
-        {
-            foreach ($docs as $doc)
-            {
+        ) {
+            foreach ($docs as $doc) {
                 $docName = $doc->getBasename('.' . $doc->getExtension());
                 $modal[$docName] = false;
                 $docList[$docName] = new \stdClass();
@@ -71,16 +68,20 @@ class XmlFormHandlingService
      * Get form fields from XML-file.
      * @param $dir
      * @param $name
-     * @param $doc
      * @param $id
      * @return array
      */
-    public static function getFormFields($dir, $name, $doc, $id)
+    public static function getFormFields($dir, $name, $id = 0)
     {
-        $path =
-            $dir == 'system' ?
-                config('app.xml_form_path')[$dir] : config('app.xml_form_path')[$dir][$name];
-        $xmlFile = $path . to_pascal_case($doc) . '.xml';
+        $dir = explode('.', $dir);
+        $path = array_reduce(
+            $dir,
+            function ($carry, $item) {
+                return $carry = $carry[$item];
+            },
+            config('app.xml_form_path')
+        );
+        $xmlFile = $path . to_pascal_case($name) . '.xml';
 
         return XmlFormHandlingService::parseFormFields($xmlFile, $id);
     }
@@ -92,56 +93,53 @@ class XmlFormHandlingService
      * @param int $id
      * @return array
      */
-    public static function parseFormFields($xmlFile, $id)
+    public static function parseFormFields($xmlFile, $id = 0)
     {
         $formFields = [
             'requiredFields' => [],
         ];
         $fileSystem = app('files');
 
-        if (!$fileSystem->missing($xmlFile))
-        {
+        if (!$fileSystem->missing($xmlFile)) {
             $xmlString = $fileSystem->get($xmlFile);
             $root = new \SimpleXMLElement($xmlString);
 
-            if ($root->getName() != 'form')
-            {
+            if ($root->getName() != 'root') {
                 return $formFields;
             }
 
-            foreach ($root->attributes() as $key => $value)
-            {
+            foreach ($root->attributes() as $key => $value) {
                 $formFields[(string)$key]['value'] = validate_boolean((string)$value);
                 $formFields[(string)$key]['type'] = 'hidden';
             }
 
             $fields = $root->xpath('descendant-or-self::field');
 
-            foreach ($fields as $field)
-            {
+            foreach ($fields as $field) {
                 $hasAncestor = false;
                 $fieldAttributes = $field->attributes();
                 $fieldName = preg_replace('~[^\w\s]~', '', (string)$fieldAttributes['name']);
                 $tmpField = [];
 
-                foreach ($fieldAttributes as $key => $value)
-                {
+                foreach ($fieldAttributes as $key => $value) {
                     $key = (string)$key;
                     $value = validate_boolean((string)$value);
                     $tmpField[$key] = $value;
+                    $tmpField['label'] = $tmpField['label'] ?? $tmpField['name'];
 
-                    if ($key == 'required' && $value === true)
-                    {
+                    if ($key == 'required' && $value === true) {
                         $formFields['requiredFields'][] = $fieldName;
                     }
                 }
 
-                static::parseFieldByModel($fieldAttributes, $id, $tmpField);
+                if ($id) {
+                    static::parseFieldByModel($fieldAttributes, $id, $tmpField);
+                }
+
                 static::parseFieldByOptions($field, $fieldAttributes, $tmpField);
                 static::addFieldToCollection($field, $fieldName, $formFields, $tmpField, $hasAncestor);
 
-                if (!$hasAncestor)
-                {
+                if (!$hasAncestor) {
                     $formFields[$fieldName] = $tmpField;
                 }
             }
@@ -160,14 +158,10 @@ class XmlFormHandlingService
      */
     public static function parseFieldByModel($fieldAttributes, $id, &$tmp)
     {
-        if ($fieldAttributes['model'])
-        {
-            if ($fieldAttributes['type'] == 'select')
-            {
+        if ($fieldAttributes['model']) {
+            if ($fieldAttributes['type'] == 'select') {
                 $tmp['options'] = BaseModel::getSingleSelectOptions($fieldAttributes['model']);
-            }
-            else
-            {
+            } else {
                 $tmp['value'] = BaseModel::getSinglePropertyValue($fieldAttributes['model'], $id);
             }
         }
@@ -185,10 +179,8 @@ class XmlFormHandlingService
     {
         $options = $field->xpath('descendant::option');
 
-        if ($options && $fieldAttributes['type'] == 'select')
-        {
-            foreach ($options as $option)
-            {
+        if ($options && $fieldAttributes['type'] == 'select') {
+            foreach ($options as $option) {
                 $optionAttributes = $option->attributes();
                 $tmpOption = new \stdClass();
                 $tmpOption->value = (string)$optionAttributes['value'];
@@ -224,8 +216,7 @@ class XmlFormHandlingService
         $fieldSetRepeatable = null;
         $tmpSet = [];
 
-        if ($hasFieldSet)
-        {
+        if ($hasFieldSet) {
             $fieldSetName = strval($hasFieldSet[0]);
             $tmpSet[$fieldName] = $tmpField;
             $fieldSetShow = $field->xpath('ancestor::fieldset[@name]/@show');
@@ -234,31 +225,26 @@ class XmlFormHandlingService
             $fieldSetRepeatable = $fieldSetRepeatable ? validate_boolean((string)$fieldSetRepeatable[0], true) : false;
         }
 
-        if ($hasFieldGroup)
-        {
+        if ($hasFieldGroup) {
             $fieldGroupName = strval($hasFieldGroup[0]);
             $fieldGroupShow = $field->xpath('ancestor::fieldgroup[@name]/@show');
             $fieldGroupShow = $fieldGroupShow ? validate_boolean((string)$fieldGroupShow[0], true) : false;
             $formFields[$fieldGroupName]['type'] = 'fieldgroup';
             $formFields[$fieldGroupName]['show'] = $fieldGroupShow;
 
-            if ($tmpSet)
-            {
+            if ($tmpSet) {
                 $formFields[$fieldGroupName][$fieldSetName]['type'] = 'fieldset';
                 $formFields[$fieldGroupName][$fieldSetName]['show'] = $fieldSetShow;
                 $formFields[$fieldGroupName][$fieldSetName]['repeatable'] = $fieldSetRepeatable;
                 $formFields[$fieldGroupName][$fieldSetName] =
                     array_merge_recursive($formFields[$fieldGroupName][$fieldSetName], $tmpSet);
                 $tmpSet = [];
-            }
-            else
-            {
+            } else {
                 $formFields[$fieldGroupName][$fieldName] = $tmpField;
             }
         }
 
-        if ($tmpSet)
-        {
+        if ($tmpSet) {
             $formFields[$fieldSetName]['type'] = 'fieldset';
             $formFields[$fieldSetName]['show'] = $fieldSetShow;
             $formFields[$fieldSetName]['repeatable'] = $fieldSetRepeatable;

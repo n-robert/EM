@@ -2,18 +2,23 @@
     <app-layout>
         <template #header>
             <centered-item :width="centeredItemWidth">
-                <div class="font-bold text-indigo-600">{{__(controllerNames.toString().toPhrase())}}</div>
+                <h1 class="font-bold text-indigo-600 text-xl">{{__(controllerNames.toString().toPhrase())}}</h1>
             </centered-item>
         </template>
 
         <centered-item :width="centeredItemWidth">
             <div class="max-w-7xl mx-auto">
-                <dropdown v-if="filters.length !== 0" align="left" width="9/12" :buttonCustomClass="buttonCustomClass">
+                <dropdown
+                        v-if="filters.length !== 0"
+                        align="left" width="9/12"
+                        :buttonCustomClass="buttonCustomClass"
+                        :buttonOpenText="__('Open filters')"
+                        :buttonCloseText="__('Close filters')">
                     <template #trigger></template>
 
                     <template #content>
                         <div v-for="(elements, field) in filters" class="p-2 my-4 border rounded-lg w-full">
-                            <div class="font-bold">{{__(field)}}</div>
+                            <div class="font-bold text-indigo-600">{{__(field).ucFirst()}}</div>
 
                             <div v-for="element in elements" class="inline-flex">
                                 <filter-by-field :element="element"></filter-by-field>
@@ -22,13 +27,17 @@
                     </template>
                 </dropdown>
 
-                <div v-if="pagination.hasPages" class="py-2">
+                <div v-if="pagination.hasPages" class="m-2">
                     <pagination :pagination="pagination"></pagination>
                 </div>
 
-                <div class="p-2 bg-white shadow-xl sm:rounded-lg">
-                    <div class="p-2 mt-3">
-                        <inertia-link v-if="pagination.hasPages" :href="'/' + controllerName + '/new'"
+                <div class="p-2 m-1 bg-white shadow-xl sm:rounded-lg">
+                    <div class="p-2">
+                        <div class="text-right text-xs pr-5">
+                            {{itemCount}}
+                        </div>
+
+                        <inertia-link v-if="needAdditionalButton" :href="'/' + controllerName + '/new'"
                                       class="px-4 py-2 border border-gray-300 rounded-md text-white bg-indigo-400
                                       hover:text-white hover:bg-indigo-600">
                             {{__('New ' + controllerName)}}
@@ -36,24 +45,51 @@
                     </div>
 
                     <div class="p-4 table w-full">
-                        <div v-for="item in items" class="even:bg-gray-200 table-row-group">
+                        <div class="even:bg-indigo-100 table-row-group font-bold">
                             <div class="table-row">
-                                <inertia-link :href="'/' + controllerName + '/' + item.id"
-                                              class="p-2 hover:text-indigo-500">
-                                    <h1 class="mr-4 table-cell">{{getDefaultName(item)}}</h1>
-                                </inertia-link>
+                                <div v-for="field in formFields" class="p-2 align-middle table-cell">
+                                    <div v-if="field.name === 'default_name'" class="pl-6 text-left">
+                                        {{__(field.label).ucFirst()}}
+                                    </div>
 
-                                <form v-if="$page.props.canEdit" :id="'delete-' + item.id"
+                                    <div v-else>{{__(field.label).ucFirst()}}</div>
+                                </div>
+
+                                <div class="p-2 align-middle table-cell"></div>
+                                <div v-if="Object.keys(docList).length" class="p-2 align-middle table-cell"></div>
+                            </div>
+                        </div>
+
+                        <div v-for="item in items" class="even:bg-indigo-100 text-sm table-row-group">
+                            <div class="table-row">
+                                <div v-for="field in formFields" class="p-2 align-middle table-cell">
+                                    <h2 v-if="field.name === 'default_name'"
+                                        class="pl-6 py-1 text-indigo-800 hover:text-indigo-500 text-left">
+                                        <inertia-link :href="'/' + controllerName + '/' + item.id">
+                                            {{item.default_name}}
+                                        </inertia-link>
+                                    </h2>
+
+                                    <div v-else>
+                                        {{field.name.endsWith('_date') ? formatDate(item[field.name]) :
+                                        __(item[field.name])}}
+                                    </div>
+                                </div>
+
+                                <form v-if="$page.props.canEdit"
+                                      :id="'delete-' + item.id"
                                       @submit.prevent="deleteItem(item)"
-                                      class="p-2 table-cell">
+                                      class="p-2 align-middle table-cell">
                                     <fmsdocs-button>{{__('Delete')}}</fmsdocs-button>
                                 </form>
 
-                                <fmsdocs-button v-if="Object.keys(docList).length" :type="'button'"
-                                                @click.native="openModalFromItems(item.id)"
-                                                class="p-2 table-cell">
-                                    {{__('Print documents')}}
-                                </fmsdocs-button>
+                                <div v-if="Object.keys(docList).length"
+                                     class="p-2 align-middle table-cell">
+                                    <fmsdocs-button :type="'button'"
+                                                    @click.native="openModalFromItems(item.id)">
+                                        {{__('Print documents')}}
+                                    </fmsdocs-button>
+                                </div>
 
                                 <dialog-modal v-if="modal[item.id]" :show="modal[item.id]" :id="item.id"
                                               @closeModalFromDialog="closeModalFromItems">
@@ -74,6 +110,10 @@
                                       hover:text-white hover:bg-indigo-600">
                             {{__('New ' + controllerName)}}
                         </inertia-link>
+
+                        <div class="text-right text-xs pr-5">
+                            {{itemCount}}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -113,44 +153,43 @@
             'pagination',
             'modal',
             'docList',
+            'formFields',
             'controllerName',
             'controllerNames',
         ],
 
-        provide()
-        {
+        provide() {
             return {
                 controllerName: this.controllerName,
                 controllerNames: this.controllerNames,
             };
         },
 
-        data()
-        {
+        data() {
             return {
                 centeredItemWidth: {
                     md: 'full',
                     xl: '3/4',
                 },
                 buttonCustomClass: 'inline-flex text-white bg-indigo-400 hover:text-white hover:bg-indigo-600',
+                needAdditionalButton: this.items.length > 7,
+                itemCount: [
+                    this.pagination.firstItem + '-' + this.pagination.lastItem,
+                    this.__('from'),
+                    this.pagination.total
+                ].join(' '),
             };
         },
 
         methods: {
-            getDefaultName(item)
-            {
-                return (this.controllerName === 'employee') ? item.full_name_ru : item.default_name;
-            },
-
-            deleteItem(item)
-            {
+            deleteItem(item) {
                 const
                     form = document.getElementById('delete-' + item.id),
                     confirm =
                         window.confirm(
                             this.__(
                                 'This action will permanently delete ":account" from database. Are you sure?',
-                                {account: this.getDefaultName(item)},
+                                {account: item.default_name},
                             ),
                         );
 
@@ -161,18 +200,15 @@
                 confirm && this.$inertia.post('/' + this.controllerName + '/delete', formData);
             },
 
-            openModalFromItems(doc)
-            {
+            openModalFromItems(doc) {
                 this.modal[doc] = true;
             },
 
-            closeModalFromItems(doc)
-            {
+            closeModalFromItems(doc) {
                 this.modal[doc] = false;
             },
 
-            addFieldToDocList(doc, id)
-            {
+            addFieldToDocList(doc, id) {
                 this.docList[doc][id] = true;
             },
         },

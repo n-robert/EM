@@ -1135,7 +1135,8 @@ class PdfFormFillingService
             $data['work_permit'] = $citizenship->no_visas ? __('WORK_PATENT') : __('WORK_PERMIT');
             $data['work_permit_serie'] = $employee->work_permit_serie;
             $data['work_permit_number'] = $employee->work_permit_number;
-            $data['work_permit_issuer'] = Employer::find($employee->work_permit_issuer_id)->name_ru;
+            $data['work_permit_issuer'] =
+                $employee->work_permit_issuer_id ? Employer::find($employee->work_permit_issuer_id)->name_ru : '';
         }
 
         $dates =

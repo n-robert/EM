@@ -25,14 +25,15 @@ class CountrySeeder extends Seeder
             'phone_code',
         ];
 
-        $oldData = DB::table('robert_fmsdocs_countries')->orderBy('id')->get();
+        $oldData = DB::connection('mysqlx')->table('fmsdocs_countries')->orderBy('id')->get();
+        Country::truncate();
 
         foreach ($oldData as $oldDatum) {
             $newData = [];
 
             foreach ($columns as $column) {
                 $newData[$column] = $oldDatum->$column;
-                $newData['user_ids'] = '2';
+                $newData['user_ids'] = '{2}';
                 $newData['created_at'] = Carbon::now();
             }
 

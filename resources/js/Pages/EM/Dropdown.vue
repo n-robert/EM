@@ -1,14 +1,13 @@
 <template>
-    <div class="relative">
+    <div class="relative m-2">
         <div @click="open = ! open" :class="{'relative z-50': open}">
-            <slot name="trigger">
-                <fmsdocs-button :type="'button'"
-                                :open="open"
-                                :originalText="__('Open filters')"
-                                :alternativeText="__('Close filters')"
-                                :custom-class="buttonCustomClass">
-                </fmsdocs-button>
-            </slot>
+            <slot name="trigger"></slot>
+            <e-m-button :type="'button'"
+                        :open="open"
+                        :originalText="buttonOpenText"
+                        :alternativeText="buttonCloseText"
+                        :custom-class="buttonCustomClass">
+            </e-m-button>
         </div>
 
         <!-- Full Screen Dropdown Overlay -->
@@ -35,11 +34,11 @@
 </template>
 
 <script>
-    import FmsdocsButton from './Button';
+    import EMButton from './Button';
 
     export default {
         components: {
-            FmsdocsButton,
+            EMButton,
         },
 
         props: {
@@ -53,6 +52,12 @@
                 default: () => ['py-2', 'px-6', 'bg-white'],
             },
             buttonCustomClass: {
+                default: '',
+            },
+            buttonOpenText: {
+                default: '',
+            },
+            buttonCloseText: {
                 default: '',
             },
         },

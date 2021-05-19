@@ -15,7 +15,7 @@
     </div>
 
     <div v-else class="space-y-3">
-        <div v-for="(subItem, subKey) in item[name]" class="border rounded-md bg-gray-100">
+        <div v-for="(subItem, subKey) in item[name]" class="border rounded-md bg-gray-200">
             <div v-for="(subField, subName) in field" v-if="!isNotFields.includes(subName)">
                 <fmsdocs-input
                         :name="name + '[' + subKey + '][' + subField.name + ']'"
@@ -31,14 +31,14 @@
 
             <fmsdocs-input
                     type="button"
-                    :value="__('Remove')"
+                    :value="__('Remove ' + name)"
                     hasLabel="false"
                     @click.native="removeItem(name, subKey)"></fmsdocs-input>
         </div>
 
         <fmsdocs-input
                 type="button"
-                :value="__('Add')"
+                :value="__('Add ' + name)"
                 hasLabel="false"
                 @click.native="addItem(name)"></fmsdocs-input>
     </div>
@@ -56,6 +56,7 @@
             'field',
             'name',
             'item',
+            'controllerName',
         ],
 
         data() {
@@ -65,12 +66,12 @@
         },
 
         methods: {
-            addItem(key) {
-                this.$emit('addItem', key);
+            addItem(fieldSetName) {
+                this.$emit('addItem', fieldSetName);
             },
 
-            removeItem(key, index) {
-                this.$emit('removeItem', key, index);
+            removeItem(fieldSetName, index) {
+                this.$emit('removeItem', fieldSetName, index);
             },
         },
     };

@@ -7,6 +7,8 @@ use App\Repositories\Eloquent\BaseRepository;
 use Carbon\Carbon;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Schema\Grammars\PostgresGrammar;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
@@ -30,19 +32,20 @@ class ExpatManagerServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $fileSystem = app('files');
-        $systemViews = $fileSystem->files(config('app.xml_form_path')['system']);
-        $models = [];
+//        $fileSystem = app('files');
+//        $systemViews = $fileSystem->files(config('app.xml_form_path')['system']['item']);
+//        $models = [];
+//
+//        foreach ($systemViews as $file) {
+//            $forbidden = ['Country', 'Staff'];
+//            $baseName = str_replace(['.', $file->getExtension()], '', $file->getFilename());
+//
+//            if (!in_array($baseName, $forbidden)) {
+//                $models[] = strtolower($baseName);
+//            }
+//        }
 
-        foreach ($systemViews as $file) {
-            $forbidden = ['Country', 'Staff'];
-            $baseName = str_replace(['.', $file->getExtension()], '', $file->getFilename());
-
-            if (!in_array($baseName, $forbidden)) {
-                $models[] = strtolower($baseName);
-            }
-        }
-
+        $models = ['employee', 'employer', 'permit', 'quota', 'occupation', 'address'];
         session(['views' => $models]);
 
         Route::group(['middleware' => config('jetstream.middleware', ['web'])], function () use ($models) {
@@ -78,7 +81,7 @@ class ExpatManagerServiceProvider extends ServiceProvider
                         ->where($model, '[0-9]+');
                 }
 
-                Route::post('/get-options/{dir}/{name}/{doc}/{id}',
+                Route::post('/get-options/{dir}/{name}/{id}',
                     'App\Http\Controllers\BaseController@getFormFields');
                 Route::post('/print/{doc}/{id}', 'App\Http\Controllers\BaseController@printDoc');
             });
@@ -91,11 +94,16 @@ class ExpatManagerServiceProvider extends ServiceProvider
         QueryBuilder::macro(
             'whereNotEmpty',
             function (string $column, bool $distinct = true) {
-                return
-                    $this
-                        ->distinct($distinct)
-                        ->whereNotNull($column)
-                        ->where($column, '!=', '""');
+                $this
+                    ->distinct($distinct)
+                    ->whereNotNull($column);
+                if (str_ends_with($column, '_id')) {
+                    $this->where($column, '!=', 0);
+                } else {
+                    $this->where($column, '!=', '""');
+                }
+
+                return $this;
             }
         );
 
@@ -108,5 +116,12 @@ class ExpatManagerServiceProvider extends ServiceProvider
                         ->whereNotEmpty($column, $distinct);
             }
         );
+
+        DB::connection()->setSchemaGrammar(new class extends PostgresGrammar {
+            protected function typeInt_array(\Illuminate\Support\Fluent $column)
+            {
+                return 'int[]';
+            }
+        });
     }
 }

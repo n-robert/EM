@@ -34,7 +34,7 @@
         data()
         {
             return {
-                defaultClass: 'items-center m-1 px-2 py-1 border rounded-md hover:bg-indigo-600 hover:text-white transition ease-in-out duration-150',
+                defaultClass: 'items-center px-2 py-1 border border-gray-300 rounded-md hover:bg-indigo-600 hover:text-white transition ease-in-out duration-150',
             }
         },
     };

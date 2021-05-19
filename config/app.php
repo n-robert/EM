@@ -39,7 +39,7 @@ return [
     |
     */
 
-    'debug' => (bool) env('APP_DEBUG', false),
+    'debug' => (bool)env('APP_DEBUG', false),
 
     /*
     |--------------------------------------------------------------------------
@@ -237,10 +237,13 @@ return [
     'pdf_template_path' => base_path() . '/resources/pdf/templates/',
 
     'xml_form_path' => [
-        'doc'    => [
-            'employee' => base_path() . '/resources/xml/forms/doc/employee/',
+        'doc' => [
+            'employee' => base_path() . '/resources/xml/doc/employee/',
         ],
-        'system' => base_path() . '/resources/xml/forms/system/',
+        'system' => [
+            'item' => base_path() . '/resources/xml/system/item/',
+            'list' => base_path() . '/resources/xml/system/list/',
+        ],
     ],
 
 ];
