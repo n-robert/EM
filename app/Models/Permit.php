@@ -17,7 +17,7 @@ class Permit extends BaseModel
      */
     static $ownSelectOptionsCondtitions = [
         'Valid' => [
-            ['whereRaw' => 'expired_date > NOW()'],
+            ['whereRaw' => 'DATE_PART(\'MONTH\', expired_date) >= DATE_PART(\'MONTH\', NOW())'],
         ],
     ];
 
@@ -51,12 +51,12 @@ class Permit extends BaseModel
     protected $filterFields = [
         'employer_id'                => [
             'model' => 'Employer',
-            ['leftJoin' => 'employers|employers.id|=|employer_id'],
-            ['leftJoin' => 'types|types.id|=|employers.type_id'],
+            ['leftJoin' => 'employers|employers.id|employer_id'],
+            ['leftJoin' => 'types|types.id|employers.type_id'],
             ['whereRaw' => 'types.code LIKE \'%LEGAL%\''],
         ],
-        'expired_date.valid_permits' => [
-            ['whereRaw' => 'expired_date > NOW()']
+        'valid_permits' => [
+            ['whereRaw' => 'permits.expired_date > NOW()']
         ],
     ];
 

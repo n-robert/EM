@@ -3220,12 +3220,9 @@ __webpack_require__.r(__webpack_exports__);
     JetResponsiveNavLink: _Jetstream_ResponsiveNavLink__WEBPACK_IMPORTED_MODULE_5__.default
   },
   provide: {
-    filterFieldDefaultClass: 'm-1 p-1 rounded cursor-pointer bg-indigo-100 hover:bg-indigo-600 hover:text-white text-sm',
-    filterFieldIsChecked: 'bg-indigo-500 text-white',
-    tabActive: 'py-4 px-8 rounded-t-lg border-t border-r border-l bg-gray-100 text-indigo-500',
-    tabInActive: 'py-4 px-8 border-b hover:text-indigo-500',
-    noTab: 'border-t rounded-t-lg',
-    paginationActive: 'bg-indigo-400 text-white',
+    filterFieldDefaultClass: 'm-1 p-1 rounded cursor-pointer bg-indigo-100 hover:bg-indigo-500 hover:text-white text-sm',
+    filterFieldIsChecked: 'bg-indigo-400 text-white',
+    paginationActive: 'bg-indigo-400 text-white rounded-md',
     paginationNull: 'bg-white text-gray-500',
     leftColumn: 'table-cell text-right p-1 w-60',
     rightColumn: 'table-cell text-left p-1',
@@ -4320,6 +4317,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: {
     type: {
@@ -4347,7 +4346,7 @@ __webpack_require__.r(__webpack_exports__);
   },
   data: function data() {
     return {
-      defaultClass: 'items-center px-2 py-1 border border-gray-300 rounded-md hover:bg-indigo-600 hover:text-white transition ease-in-out duration-150'
+      defaultClass: 'items-center px-2 py-1 border border-gray-300 rounded-md transition ease-in-out duration-150'
     };
   }
 });
@@ -4425,8 +4424,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -4468,9 +4465,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _Label__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Label */ "./resources/js/Pages/EM/Label.vue");
-/* harmony import */ var _Input__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Input */ "./resources/js/Pages/EM/Input.vue");
-/* harmony import */ var _Button__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Button */ "./resources/js/Pages/EM/Button.vue");
+/* harmony import */ var _Item__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Item */ "./resources/js/Pages/EM/Item.vue");
 //
 //
 //
@@ -4498,44 +4493,17 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
-    FmsdocsLabel: _Label__WEBPACK_IMPORTED_MODULE_0__.default,
-    FmsdocsInput: _Input__WEBPACK_IMPORTED_MODULE_1__.default,
-    FmsdocsButton: _Button__WEBPACK_IMPORTED_MODULE_2__.default
+    Item: _Item__WEBPACK_IMPORTED_MODULE_0__.default
   },
   inject: ['controllerName'],
   props: {
     name: {
       "default": null
     },
-    itemId: {
+    item: {
       "default": null
     },
     modal: {
@@ -4544,13 +4512,14 @@ __webpack_require__.r(__webpack_exports__);
   },
   data: function data() {
     return {
-      id: this.name + '-' + this.itemId,
-      getFieldsUri: '/get-options/doc.' + this.controllerName + '/' + this.name + '/' + this.itemId,
-      actionUri: '/print/' + this.name + '/' + this.itemId,
+      id: this.name + '-' + this.item.id,
+      getFieldsUri: '/get-options/doc.' + this.controllerName + '/' + this.name + '/' + this.item.id,
+      actionUri: '/print/' + this.name + '/' + this.item.id,
       formFields: {},
       requiredFields: [],
       isNotFields: ['type', 'show', 'repeatable'],
-      errors: {}
+      errors: {},
+      dataLoaded: false
     };
   },
   mounted: function mounted() {
@@ -4562,6 +4531,8 @@ __webpack_require__.r(__webpack_exports__);
       _this.formFields = response.data;
       _this.requiredFields = _this.formFields.requiredFields;
       delete _this.formFields.requiredFields;
+    }).then(function () {
+      _this.dataLoaded = true;
     });
   },
   computed: {
@@ -4586,7 +4557,7 @@ __webpack_require__.r(__webpack_exports__);
       }
 
       this.$emit('closeModalFromDocForm', this.name.toPascalCase());
-      this.$emit('addFieldStateFromDocForm', this.name.toPascalCase(), this.itemId);
+      this.$emit('addFieldStateFromDocForm', this.name.toPascalCase(), this.item.id);
       document.getElementById(this.id).submit();
     }
   } //        watch: {
@@ -4651,8 +4622,18 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 var components = {
-  FmsdocsButton: function FmsdocsButton() {
+  EMButton: function EMButton() {
     return Promise.resolve(/*! import() */).then(__webpack_require__.bind(__webpack_require__, /*! ./Button */ "./resources/js/Pages/EM/Button.vue"));
   },
   DialogModal: function DialogModal() {
@@ -4742,7 +4723,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     contentClasses: {
       "default": function _default() {
-        return ['py-2', 'px-6', 'bg-white'];
+        return ['py-2', 'px-6', 'mb-4', 'bg-white'];
       }
     },
     buttonCustomClass: {
@@ -4812,6 +4793,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var _Input__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Input */ "./resources/js/Pages/EM/Input.vue");
+/* harmony import */ var _Button__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Button */ "./resources/js/Pages/EM/Button.vue");
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -4859,10 +4848,13 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
-    FmsdocsInput: _Input__WEBPACK_IMPORTED_MODULE_0__.default
+    EMInput: _Input__WEBPACK_IMPORTED_MODULE_0__.default,
+    EMButton: _Button__WEBPACK_IMPORTED_MODULE_1__.default
   },
+  inject: ['leftColumn', 'rightColumn'],
   props: ['field', 'name', 'item', 'controllerName'],
   data: function data() {
     return {
@@ -5185,6 +5177,10 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
 
 
 
@@ -5194,10 +5190,31 @@ __webpack_require__.r(__webpack_exports__);
     FieldSet: _FieldSet__WEBPACK_IMPORTED_MODULE_1__.default,
     FmsdocsInput: _Input__WEBPACK_IMPORTED_MODULE_2__.default
   },
-  inject: ['tabActive', 'tabInActive', 'noTab'],
-  props: ['item', 'repeatable', 'formFields', 'requiredFields', 'controllerName'],
+  props: {
+    item: {
+      "default": {}
+    },
+    formFields: {
+      "default": {}
+    },
+    requiredFields: {
+      "default": {}
+    },
+    controllerName: {
+      "default": null
+    },
+    noBorder: {
+      "default": false
+    }
+  },
   data: function data() {
-    var selected = {};
+    var hasTab = this.formFields['has_tabs'];
+    var selected = {},
+        backLayer,
+        frontLayer,
+        tabLayer,
+        tabActive,
+        tabInActive;
 
     for (var key in this.formFields) {
       if (this.formFields.hasOwnProperty(key)) {
@@ -5205,10 +5222,30 @@ __webpack_require__.r(__webpack_exports__);
       }
     }
 
+    if (this.noBorder) {
+      backLayer = '';
+      frontLayer = hasTab ? 'table w-full p-2 rounded-b-lg bg-white' : '';
+      tabLayer = hasTab ? 'm-4 rounded-lg bg-gradient-to-b from-indigo-100 to-white' : '';
+      tabActive = 'py-2 px-8 rounded-t-lg bg-white text-indigo-500';
+      tabInActive = 'py-2 px-8 rounded-t-lg hover:text-indigo-500';
+    } else {
+      backLayer = hasTab ? 'shadow-xl m-4 sm:rounded-lg' : 'shadow-xl m-4 sm:rounded-lg';
+      frontLayer = hasTab ? 'table w-full p-4 rounded-b-lg bg-white' : 'table w-full p-4 pt-6 rounded-lg bg-white';
+      tabLayer = 'bg-gradient-to-b rounded-t-lg from-indigo-100 to-white';
+      tabActive = 'py-4 px-8 rounded-t-lg bg-white text-indigo-500';
+      tabInActive = 'py-4 px-8 rounded-lg hover:text-indigo-500';
+    }
+
     return {
+      hasTab: hasTab,
       selected: selected,
-      isNotFields: ['type', 'show', 'repeatable'],
-      fieldSetKey: 0
+      backLayer: backLayer,
+      frontLayer: frontLayer,
+      tabLayer: tabLayer,
+      isNotFields: ['type', 'show', 'repeatable', 'upper_case', 'justify', 'split_word', 'cells', 'has_tabs'],
+      fieldSetKey: 0,
+      tabActive: tabActive,
+      tabInActive: tabInActive
     };
   },
   methods: {
@@ -5291,6 +5328,13 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -5301,13 +5345,11 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
     AppLayout: _Layouts_AppLayout__WEBPACK_IMPORTED_MODULE_0__.default,
     CenteredItem: _CenteredItem__WEBPACK_IMPORTED_MODULE_1__.default,
     Item: _Item__WEBPACK_IMPORTED_MODULE_2__.default,
-    FmsdocsButton: _Button__WEBPACK_IMPORTED_MODULE_3__.default
+    EMButton: _Button__WEBPACK_IMPORTED_MODULE_3__.default
   },
   props: ['item', 'repeatable', 'action', 'formFields', 'requiredFields', 'controllerName', 'controllerNames', 'listUrl'],
   data: function data() {
-    var selected = {},
-        i = 0,
-        newItems = {};
+    var newItems = {};
 
     for (var key in this.repeatable) {
       if (this.repeatable.hasOwnProperty(key)) {
@@ -5316,12 +5358,13 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
     }
 
     return {
+      newItems: newItems,
+      itemHeader: this.item.default_name || this.__('New ' + this.controllerName),
       centeredItemWidth: {
         md: 'full',
         xl: '3/5'
       },
-      errors: {},
-      newItems: newItems
+      errors: {}
     };
   },
   methods: {
@@ -5584,6 +5627,9 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 
 
 
@@ -5595,7 +5641,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
     AppLayout: _Layouts_AppLayout__WEBPACK_IMPORTED_MODULE_0__.default,
-    FmsdocsButton: _Button__WEBPACK_IMPORTED_MODULE_1__.default,
+    EMButton: _Button__WEBPACK_IMPORTED_MODULE_1__.default,
     CenteredItem: _CenteredItem__WEBPACK_IMPORTED_MODULE_2__.default,
     DialogModal: _DialogModal__WEBPACK_IMPORTED_MODULE_3__.default,
     DocList: _DocList__WEBPACK_IMPORTED_MODULE_4__.default,
@@ -5603,7 +5649,7 @@ __webpack_require__.r(__webpack_exports__);
     FilterByField: _FilterByField__WEBPACK_IMPORTED_MODULE_6__.default,
     Dropdown: _Dropdown__WEBPACK_IMPORTED_MODULE_7__.default
   },
-  props: ['items', 'filters', 'pagination', 'modal', 'docList', 'formFields', 'controllerName', 'controllerNames'],
+  props: ['items', 'filters', 'hasFilters', 'pagination', 'modal', 'docList', 'formFields', 'controllerName', 'controllerNames'],
   provide: function provide() {
     return {
       controllerName: this.controllerName,
@@ -5616,10 +5662,18 @@ __webpack_require__.r(__webpack_exports__);
         md: 'full',
         xl: '3/4'
       },
-      buttonCustomClass: 'inline-flex text-white bg-indigo-400 hover:text-white hover:bg-indigo-600',
       needAdditionalButton: this.items.length > 7,
+      createNewItem: this.__('New ' + this.controllerName),
       itemCount: [this.pagination.firstItem + '-' + this.pagination.lastItem, this.__('from'), this.pagination.total].join(' ')
     };
+  },
+  computed: {
+    customClass: function customClass() {
+      return 'inline-flex text-white' + (this.hasFilters ? ' bg-green-500 hover:bg-green-600' : ' bg-indigo-400 hover:bg-indigo-500');
+    },
+    pageInfo: function pageInfo() {
+      return [this.pagination.firstItem + '-' + this.pagination.lastItem, this.__('from'), this.pagination.total].join(' ');
+    }
   },
   methods: {
     deleteItem: function deleteItem(item) {
@@ -38548,7 +38602,10 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c(
     "div",
-    { staticClass: "space-y-4 text-center mx-auto", class: _vm.widthClass },
+    {
+      staticClass: "space-y-4 pb-2 text-center mx-auto",
+      class: _vm.widthClass
+    },
     [_vm._t("default")],
     2
   )
@@ -38594,7 +38651,7 @@ var render = function() {
           _c(
             "fmsdocs-button",
             {
-              staticClass: "relative float-right cursor-pointer m-2",
+              staticClass: "relative float-right cursor-pointer m-1",
               nativeOn: {
                 click: function($event) {
                   return _vm.closeModal($event)
@@ -38608,9 +38665,9 @@ var render = function() {
             ? _c("div", { staticClass: "text-lg" }, [_vm._t("title")], 2)
             : _vm._e(),
           _vm._v(" "),
-          _c("div", { staticClass: "mt-4" }, [_vm._t("content")], 2)
+          _vm._t("content")
         ],
-        1
+        2
       ),
       _vm._v(" "),
       this.$slots.footer
@@ -38664,91 +38721,26 @@ var render = function() {
       }
     },
     [
-      _c("div", { staticClass: "font-bold text-center" }, [
+      _c("div", { staticClass: "font-bold text-center py-2" }, [
         _vm._v(_vm._s(_vm.__(_vm.name.toString().toPhrase())))
       ]),
       _vm._v(" "),
       _c(
         "div",
-        { staticClass: "table" },
         [
           _vm._t("upperFields"),
           _vm._v(" "),
-          _vm._l(_vm.formFields, function(attributes, key) {
-            return _c(
-              "div",
-              { staticClass: "table-row" },
-              [
-                attributes.type === "hidden"
-                  ? _c("fmsdocs-input", {
-                      attrs: {
-                        name: key,
-                        type: attributes.type,
-                        value: attributes.value
-                      }
-                    })
-                  : attributes.type === "fieldset"
-                  ? _c(
-                      "div",
-                      {
-                        directives: [
-                          {
-                            name: "show",
-                            rawName: "v-show",
-                            value: attributes.show,
-                            expression: "attributes.show"
-                          }
-                        ],
-                        attrs: { id: key }
-                      },
-                      _vm._l(attributes, function(fieldAttributes, fieldName) {
-                        return !_vm.isNotFields.includes(fieldName)
-                          ? _c(
-                              "div",
-                              [
-                                _c("fmsdocs-input", {
-                                  attrs: {
-                                    name: fieldName,
-                                    options: fieldAttributes.options,
-                                    type: fieldAttributes.type,
-                                    value: fieldAttributes.value,
-                                    id: fieldName.toString().toKebabCase(),
-                                    isRequired: fieldAttributes.required,
-                                    checked: fieldAttributes.checked,
-                                    onclick: fieldAttributes.onclick
-                                  }
-                                })
-                              ],
-                              1
-                            )
-                          : _vm._e()
-                      }),
-                      0
-                    )
-                  : _c(
-                      "div",
-                      [
-                        !_vm.isNotFields.includes(key)
-                          ? _c("fmsdocs-input", {
-                              attrs: {
-                                name: key,
-                                options: attributes.options,
-                                type: attributes.type,
-                                id: key.toString().toKebabCase(),
-                                value: attributes.value,
-                                isRequired: attributes.required,
-                                checked: attributes.checked,
-                                onclick: attributes.onclick
-                              }
-                            })
-                          : _vm._e()
-                      ],
-                      1
-                    )
-              ],
-              1
-            )
-          }),
+          _vm.dataLoaded
+            ? _c("item", {
+                attrs: {
+                  noBorder: "true",
+                  item: _vm.item,
+                  formFields: _vm.formFields,
+                  requiredFields: _vm.requiredFields,
+                  "controller-name": _vm.controllerName
+                }
+              })
+            : _vm._e(),
           _vm._v(" "),
           _vm._t("lowerFields"),
           _vm._v(" "),
@@ -38796,8 +38788,9 @@ var render = function() {
           { staticClass: "pl-10 py-1" },
           [
             _c(
-              "fmsdocs-button",
+              "e-m-button",
               {
+                staticClass: "hover:text-white hover:bg-indigo-500",
                 attrs: { type: "button" },
                 nativeOn: {
                   click: function($event) {
@@ -38835,7 +38828,7 @@ var render = function() {
                             _c("doc-form", {
                               attrs: {
                                 name: doc.toKebabCase(),
-                                "item-id": _vm.item.id,
+                                item: _vm.item,
                                 modal: _vm.modal,
                                 leftColumn: _vm.leftColumn,
                                 rightColumn: _vm.rightColumn
@@ -38866,9 +38859,10 @@ var render = function() {
                                                   { class: _vm.rightColumn },
                                                   [
                                                     _c(
-                                                      "fmsdocs-button",
+                                                      "e-m-button",
                                                       {
-                                                        staticClass: "mr-6",
+                                                        staticClass:
+                                                          "mr-6 hover:text-white hover:bg-indigo-500",
                                                         attrs: {
                                                           type: "button"
                                                         },
@@ -38892,17 +38886,21 @@ var render = function() {
                                                     ),
                                                     _vm._v(" "),
                                                     _c(
-                                                      "fmsdocs-button",
+                                                      "e-m-button",
                                                       {
+                                                        staticClass:
+                                                          "hover:text-white hover:bg-indigo-500",
                                                         attrs: {
                                                           type: "submit"
                                                         }
                                                       },
                                                       [
                                                         _vm._v(
-                                                          _vm._s(
-                                                            _vm.__("Print")
-                                                          )
+                                                          "\n                                            " +
+                                                            _vm._s(
+                                                              _vm.__("Print")
+                                                            ) +
+                                                            "\n                                        "
                                                         )
                                                       ]
                                                     )
@@ -38970,6 +38968,7 @@ var render = function() {
       _c(
         "div",
         {
+          staticClass: "w-48 text-left",
           class: { "relative z-50": _vm.open },
           on: {
             click: function($event) {
@@ -38986,7 +38985,7 @@ var render = function() {
               open: _vm.open,
               originalText: _vm.buttonOpenText,
               alternativeText: _vm.buttonCloseText,
-              "custom-class": _vm.buttonCustomClass
+              customClass: _vm.buttonCustomClass
             }
           })
         ],
@@ -39114,14 +39113,17 @@ var render = function() {
           _vm._l(_vm.item[_vm.name], function(subItem, subKey) {
             return _c(
               "div",
-              { staticClass: "border rounded-md bg-gray-200" },
+              {
+                staticClass:
+                  "p-2 mt-2 rounded-md bg-gradient-to-b from-indigo-100 to-white"
+              },
               [
                 _vm._l(_vm.field, function(subField, subName) {
                   return !_vm.isNotFields.includes(subName)
                     ? _c(
                         "div",
                         [
-                          _c("fmsdocs-input", {
+                          _c("e-m-input", {
                             attrs: {
                               name:
                                 _vm.name +
@@ -39146,35 +39148,53 @@ var render = function() {
                     : _vm._e()
                 }),
                 _vm._v(" "),
-                _c("fmsdocs-input", {
-                  attrs: {
-                    type: "button",
-                    value: _vm.__("Remove " + _vm.name),
-                    hasLabel: "false"
-                  },
-                  nativeOn: {
-                    click: function($event) {
-                      return _vm.removeItem(_vm.name, subKey)
-                    }
-                  }
-                })
+                _c("span", { class: _vm.leftColumn }),
+                _vm._v(" "),
+                _c(
+                  "span",
+                  { class: _vm.rightColumn },
+                  [
+                    _c("e-m-button", {
+                      attrs: {
+                        type: "button",
+                        originalText: _vm.__("Remove " + _vm.name),
+                        customClass: "hover:text-white hover:bg-indigo-500"
+                      },
+                      nativeOn: {
+                        click: function($event) {
+                          return _vm.removeItem(_vm.name, subKey)
+                        }
+                      }
+                    })
+                  ],
+                  1
+                )
               ],
               2
             )
           }),
           _vm._v(" "),
-          _c("fmsdocs-input", {
-            attrs: {
-              type: "button",
-              value: _vm.__("Add " + _vm.name),
-              hasLabel: "false"
-            },
-            nativeOn: {
-              click: function($event) {
-                return _vm.addItem(_vm.name)
-              }
-            }
-          })
+          _c("span", { class: _vm.leftColumn }),
+          _vm._v(" "),
+          _c(
+            "span",
+            { class: _vm.rightColumn },
+            [
+              _c("e-m-button", {
+                attrs: {
+                  type: "button",
+                  originalText: _vm.__("Add " + _vm.name),
+                  customClass: "hover:text-white hover:bg-indigo-500"
+                },
+                nativeOn: {
+                  click: function($event) {
+                    return _vm.addItem(_vm.name)
+                  }
+                }
+              })
+            ],
+            1
+          )
         ],
         2
       )
@@ -39291,7 +39311,7 @@ var render = function() {
                 ],
                 attrs: {
                   text:
-                    _vm.hasLabel && _vm.hasLabel !== "false"
+                    _vm.hasLabel && _vm.hasLabel !== "false" && _vm.labelText
                       ? _vm.__(_vm.labelText).toPhrase() + ": "
                       : "",
                   for: _vm.name
@@ -39685,172 +39705,173 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c(
-    "div",
-    { staticClass: "p-2 m-4 bg-white shadow-xl sm:rounded-lg" },
-    [
-      _c(
-        "ul",
-        { staticClass: "flex w-full" },
-        _vm._l(_vm.formFields, function(fieldGroup, name) {
-          return fieldGroup.type === "fieldgroup"
-            ? _c(
-                "li",
-                {
-                  staticClass: "cursor-pointer w-full",
-                  class: _vm.selected[name] ? _vm.tabActive : _vm.tabInActive,
-                  on: {
-                    click: function($event) {
-                      return _vm.selectTab(name)
-                    }
+  return _c("div", { class: _vm.backLayer }, [
+    _c(
+      "ul",
+      { staticClass: "flex w-full", class: _vm.tabLayer },
+      _vm._l(_vm.formFields, function(fieldGroup, name) {
+        return fieldGroup.type === "fieldgroup"
+          ? _c(
+              "li",
+              {
+                staticClass: "cursor-pointer w-full",
+                class: _vm.selected[name] ? _vm.tabActive : _vm.tabInActive,
+                on: {
+                  click: function($event) {
+                    return _vm.selectTab(name)
                   }
-                },
-                [
-                  _c("span", [
-                    _vm._v(
-                      "\n                " +
-                        _vm._s(
-                          _vm
-                            .__(name)
-                            .toString()
-                            .toPhrase()
-                        ) +
-                        "\n            "
-                    )
-                  ])
-                ]
-              )
-            : _vm._e()
-        }),
-        0
-      ),
-      _vm._v(" "),
-      _c(
-        "div",
-        {
-          staticClass:
-            "p-4 table w-full border-r border-b border-l rounded-b-lg bg-gray-100",
-          class: _vm.selected["id"] ? _vm.noTab : ""
-        },
-        [
-          _vm._l(_vm.formFields, function(element, key) {
-            return _c(
-              "div",
+                }
+              },
               [
-                element.type === "fieldgroup"
-                  ? _c(
-                      "tab",
-                      { key: key, attrs: { selected: _vm.selected[key] } },
-                      _vm._l(element, function(field, name) {
-                        return !_vm.isNotFields.includes(name)
-                          ? _c(
-                              "div",
-                              { staticClass: "table-row", class: name },
-                              [
-                                field.type === "fieldset"
-                                  ? _c("field-set", {
-                                      directives: [
-                                        {
-                                          name: "show",
-                                          rawName: "v-show",
-                                          value: field.show,
-                                          expression: "field.show"
-                                        }
-                                      ],
-                                      key: _vm.fieldSetKey,
-                                      attrs: {
-                                        field: field,
-                                        name: name,
-                                        item: _vm.item,
-                                        controllerName: _vm.controllerName
-                                      },
-                                      on: {
-                                        addItem: _vm.addItem,
-                                        removeItem: _vm.removeItem
+                _c("span", [
+                  _vm._v(
+                    "\n                " +
+                      _vm._s(
+                        _vm
+                          .__(name)
+                          .toString()
+                          .toPhrase()
+                      ) +
+                      "\n            "
+                  )
+                ])
+              ]
+            )
+          : _vm._e()
+      }),
+      0
+    ),
+    _vm._v(" "),
+    _c(
+      "div",
+      { class: _vm.frontLayer },
+      [
+        _vm._l(_vm.formFields, function(element, key) {
+          return _c(
+            "div",
+            [
+              element.type === "fieldgroup"
+                ? _c(
+                    "tab",
+                    { key: key, attrs: { selected: _vm.selected[key] } },
+                    _vm._l(element, function(field, name) {
+                      return !_vm.isNotFields.includes(name)
+                        ? _c(
+                            "div",
+                            { staticClass: "table-row", class: name },
+                            [
+                              field.type === "fieldset"
+                                ? _c("field-set", {
+                                    directives: [
+                                      {
+                                        name: "show",
+                                        rawName: "v-show",
+                                        value: field.show,
+                                        expression: "field.show"
                                       }
-                                    })
-                                  : _c("fmsdocs-input", {
-                                      attrs: {
-                                        name: field.name,
-                                        type: field.type,
-                                        value:
-                                          _vm.item[field.name] || field.value,
-                                        options: field.options,
-                                        onclick: field.onclick,
-                                        label: field.label,
-                                        hasLabel: field.hasLabel,
-                                        id: field.name.toString().toKebabCase(),
-                                        isRequired: field.required
-                                      }
-                                    })
-                              ],
-                              1
-                            )
-                          : _vm._e()
-                      }),
-                      0
-                    )
-                  : _c("div", { staticClass: "table-row-group" }, [
-                      _c(
-                        "div",
-                        { staticClass: "table-row" },
-                        [
-                          element.type === "fieldset"
-                            ? _c("field-set", {
-                                directives: [
-                                  {
-                                    name: "show",
-                                    rawName: "v-show",
-                                    value: element.show,
-                                    expression: "element.show"
-                                  }
-                                ],
-                                key: _vm.fieldSetKey,
-                                attrs: {
-                                  field: element,
-                                  name: key,
-                                  item: _vm.item,
-                                  controllerName: _vm.controllerName
-                                },
-                                on: {
-                                  addItem: _vm.addItem,
-                                  removeItem: _vm.removeItem
-                                }
-                              })
-                            : _c(
-                                "div",
-                                [
-                                  _c("fmsdocs-input", {
+                                    ],
+                                    key: _vm.fieldSetKey,
                                     attrs: {
-                                      name: element.name,
-                                      type: element.type,
-                                      value:
-                                        _vm.item[element.name] || element.value,
-                                      options: element.options,
-                                      label: element.label,
-                                      hasLabel: element.hasLabel,
-                                      id: element.name.toString().toKebabCase(),
-                                      isRequired: element.required
+                                      field: field,
+                                      name: name,
+                                      item: _vm.item,
+                                      controllerName: _vm.controllerName
+                                    },
+                                    on: {
+                                      addItem: _vm.addItem,
+                                      removeItem: _vm.removeItem
                                     }
                                   })
-                                ],
-                                1
-                              )
-                        ],
-                        1
-                      )
-                    ])
-              ],
-              1
-            )
-          }),
-          _vm._v(" "),
-          _vm._t("default")
-        ],
-        2
-      )
-    ]
-  )
+                                : _c("fmsdocs-input", {
+                                    attrs: {
+                                      name: field.name,
+                                      type: field.type,
+                                      value:
+                                        _vm.item[field.name] || field.value,
+                                      options: field.options,
+                                      onclick: field.onclick,
+                                      label: field.label,
+                                      hasLabel: field.hasLabel,
+                                      checked: field.checked,
+                                      id: field.name.toString().toKebabCase(),
+                                      isRequired: field.required
+                                    }
+                                  })
+                            ],
+                            1
+                          )
+                        : _vm._e()
+                    }),
+                    0
+                  )
+                : _c("div", { staticClass: "table-row-group" }, [
+                    !_vm.isNotFields.includes(key)
+                      ? _c(
+                          "div",
+                          { staticClass: "table-row" },
+                          [
+                            element.type === "fieldset"
+                              ? _c("field-set", {
+                                  directives: [
+                                    {
+                                      name: "show",
+                                      rawName: "v-show",
+                                      value: element.show,
+                                      expression: "element.show"
+                                    }
+                                  ],
+                                  key: _vm.fieldSetKey,
+                                  attrs: {
+                                    field: element,
+                                    name: key,
+                                    id: key,
+                                    item: _vm.item,
+                                    controllerName: _vm.controllerName
+                                  },
+                                  on: {
+                                    addItem: _vm.addItem,
+                                    removeItem: _vm.removeItem
+                                  }
+                                })
+                              : _c(
+                                  "div",
+                                  [
+                                    _c("fmsdocs-input", {
+                                      attrs: {
+                                        name: element.name,
+                                        type: element.type,
+                                        value:
+                                          _vm.item[element.name] ||
+                                          element.value,
+                                        options: element.options,
+                                        onclick: element.onclick,
+                                        label: element.label,
+                                        hasLabel: element.hasLabel,
+                                        checked: element.checked,
+                                        id:
+                                          element.name &&
+                                          element.name.toString().toKebabCase(),
+                                        isRequired: element.required
+                                      }
+                                    })
+                                  ],
+                                  1
+                                )
+                          ],
+                          1
+                        )
+                      : _vm._e()
+                  ])
+            ],
+            1
+          )
+        }),
+        _vm._v(" "),
+        _vm._t("default")
+      ],
+      2
+    )
+  ])
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -39887,10 +39908,7 @@ var render = function() {
                 _c("h1", { staticClass: "font-bold text-indigo-600 text-xl" }, [
                   _vm._v(
                     "\n                " +
-                      _vm._s(
-                        _vm.item.default_name ||
-                          _vm.__("New " + _vm.controllerName)
-                      ) +
+                      _vm._s(_vm.itemHeader) +
                       "\n            "
                   )
                 ])
@@ -39921,7 +39939,6 @@ var render = function() {
               {
                 attrs: {
                   item: _vm.item,
-                  repeatable: _vm.repeatable,
                   formFields: _vm.formFields,
                   requiredFields: _vm.requiredFields,
                   controllerName: _vm.controllerName
@@ -39930,63 +39947,72 @@ var render = function() {
               },
               [
                 _c(
-                  "fmsdocs-button",
-                  {
-                    attrs: { type: "button" },
-                    nativeOn: {
-                      click: function($event) {
-                        return _vm.visit(_vm.listUrl)
-                      }
-                    }
-                  },
+                  "div",
+                  { staticClass: "mt-4" },
                   [
-                    _vm._v(
-                      "\n                    " +
-                        _vm._s(_vm.__("Cancel")) +
-                        "\n                "
+                    _c(
+                      "e-m-button",
+                      {
+                        staticClass: "hover:text-white hover:bg-indigo-500",
+                        attrs: { type: "button" },
+                        nativeOn: {
+                          click: function($event) {
+                            return _vm.visit(_vm.listUrl)
+                          }
+                        }
+                      },
+                      [
+                        _vm._v(
+                          "\n                        " +
+                            _vm._s(_vm.__("Cancel")) +
+                            "\n                    "
+                        )
+                      ]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "e-m-button",
+                      {
+                        staticClass: "hover:text-white hover:bg-indigo-500",
+                        attrs: { type: "button" },
+                        nativeOn: {
+                          click: function($event) {
+                            return _vm.submit(_vm.action, "apply")
+                          }
+                        }
+                      },
+                      [
+                        _vm._v(
+                          "\n                        " +
+                            _vm._s(_vm.__("Apply")) +
+                            "\n                    "
+                        )
+                      ]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "e-m-button",
+                      {
+                        staticClass: "hover:text-white hover:bg-indigo-500",
+                        attrs: { type: "button" },
+                        nativeOn: {
+                          click: function($event) {
+                            return _vm.submit(_vm.action, "save")
+                          }
+                        }
+                      },
+                      [
+                        _vm._v(
+                          "\n                        " +
+                            _vm._s(_vm.__("Save")) +
+                            "\n                    "
+                        )
+                      ]
                     )
-                  ]
-                ),
-                _vm._v(" "),
-                _c(
-                  "fmsdocs-button",
-                  {
-                    attrs: { type: "button" },
-                    nativeOn: {
-                      click: function($event) {
-                        return _vm.submit(_vm.action, "apply")
-                      }
-                    }
-                  },
-                  [
-                    _vm._v(
-                      "\n                    " +
-                        _vm._s(_vm.__("Apply")) +
-                        "\n                "
-                    )
-                  ]
-                ),
-                _vm._v(" "),
-                _c(
-                  "fmsdocs-button",
-                  {
-                    attrs: { type: "button" },
-                    nativeOn: {
-                      click: function($event) {
-                        return _vm.submit(_vm.action, "save")
-                      }
-                    }
-                  },
-                  [
-                    _vm._v(
-                      "\n                    " +
-                        _vm._s(_vm.__("Save")) +
-                        "\n                "
-                    )
-                  ]
+                  ],
+                  1
                 )
-              ],
-              1
+              ]
             )
           ],
           1
@@ -40106,7 +40132,7 @@ var render = function() {
                   attrs: {
                     align: "left",
                     width: "9/12",
-                    buttonCustomClass: _vm.buttonCustomClass,
+                    buttonCustomClass: _vm.customClass,
                     buttonOpenText: _vm.__("Open filters"),
                     buttonCloseText: _vm.__("Close filters")
                   },
@@ -40132,7 +40158,11 @@ var render = function() {
                                 _c(
                                   "div",
                                   { staticClass: "font-bold text-indigo-600" },
-                                  [_vm._v(_vm._s(_vm.__(field).ucFirst()))]
+                                  [
+                                    _vm._v(
+                                      _vm._s(field && _vm.__(field).ucFirst())
+                                    )
+                                  ]
                                 ),
                                 _vm._v(" "),
                                 _vm._l(elements, function(element) {
@@ -40157,7 +40187,7 @@ var render = function() {
                     ],
                     null,
                     false,
-                    3443933358
+                    227348140
                   )
                 })
               : _vm._e(),
@@ -40182,7 +40212,7 @@ var render = function() {
                     _c("div", { staticClass: "text-right text-xs pr-5" }, [
                       _vm._v(
                         "\n                        " +
-                          _vm._s(_vm.itemCount) +
+                          _vm._s(_vm.pageInfo) +
                           "\n                    "
                       )
                     ]),
@@ -40192,13 +40222,13 @@ var render = function() {
                           "inertia-link",
                           {
                             staticClass:
-                              "px-4 py-2 border border-gray-300 rounded-md text-white bg-indigo-400\n                                  hover:text-white hover:bg-indigo-600",
+                              "px-4 py-2 border border-gray-300 rounded-md text-white bg-indigo-400\n                                  hover:bg-indigo-500",
                             attrs: { href: "/" + _vm.controllerName + "/new" }
                           },
                           [
                             _vm._v(
                               "\n                        " +
-                                _vm._s(_vm.__("New " + _vm.controllerName)) +
+                                _vm._s(_vm.createNewItem) +
                                 "\n                    "
                             )
                           ]
@@ -40216,7 +40246,7 @@ var render = function() {
                       "div",
                       {
                         staticClass:
-                          "even:bg-indigo-100 table-row-group font-bold"
+                          "even:bg-indigo-100 text-indigo-600 table-row-group font-bold"
                       },
                       [
                         _c(
@@ -40236,7 +40266,8 @@ var render = function() {
                                           _vm._v(
                                             "\n                                    " +
                                               _vm._s(
-                                                _vm.__(field.label).ucFirst()
+                                                field.label &&
+                                                  _vm.__(field.label).ucFirst()
                                               ) +
                                               "\n                                "
                                           )
@@ -40244,7 +40275,10 @@ var render = function() {
                                       )
                                     : _c("div", [
                                         _vm._v(
-                                          _vm._s(_vm.__(field.label).ucFirst())
+                                          _vm._s(
+                                            field.label &&
+                                              _vm.__(field.label).ucFirst()
+                                          )
                                         )
                                       ])
                                 ]
@@ -40319,7 +40353,8 @@ var render = function() {
                                           _vm._v(
                                             "\n                                    " +
                                               _vm._s(
-                                                field.name.endsWith("_date")
+                                                field.name &&
+                                                  field.name.endsWith("_date")
                                                   ? _vm.formatDate(
                                                       item[field.name]
                                                     )
@@ -40347,9 +40382,20 @@ var render = function() {
                                       }
                                     },
                                     [
-                                      _c("fmsdocs-button", [
-                                        _vm._v(_vm._s(_vm.__("Delete")))
-                                      ])
+                                      _c(
+                                        "e-m-button",
+                                        {
+                                          staticClass:
+                                            "hover:text-white hover:bg-indigo-500"
+                                        },
+                                        [
+                                          _vm._v(
+                                            "\n                                    " +
+                                              _vm._s(_vm.__("Delete")) +
+                                              "\n                                "
+                                          )
+                                        ]
+                                      )
                                     ],
                                     1
                                   )
@@ -40363,8 +40409,10 @@ var render = function() {
                                     },
                                     [
                                       _c(
-                                        "fmsdocs-button",
+                                        "e-m-button",
                                         {
+                                          staticClass:
+                                            "hover:text-white hover:bg-indigo-500",
                                           attrs: { type: "button" },
                                           nativeOn: {
                                             click: function($event) {
@@ -40448,13 +40496,13 @@ var render = function() {
                       "inertia-link",
                       {
                         staticClass:
-                          "px-4 py-2 border border-gray-300 rounded-md text-white bg-indigo-400\n                                  hover:text-white hover:bg-indigo-600",
+                          "px-4 py-2 border border-gray-300 rounded-md text-white bg-indigo-400\n                                  hover:bg-indigo-500",
                         attrs: { href: "/" + _vm.controllerName + "/new" }
                       },
                       [
                         _vm._v(
                           "\n                        " +
-                            _vm._s(_vm.__("New " + _vm.controllerName)) +
+                            _vm._s(_vm.createNewItem) +
                             "\n                    "
                         )
                       ]
@@ -40463,7 +40511,7 @@ var render = function() {
                     _c("div", { staticClass: "text-right text-xs pr-5" }, [
                       _vm._v(
                         "\n                        " +
-                          _vm._s(_vm.itemCount) +
+                          _vm._s(_vm.pageInfo) +
                           "\n                    "
                       )
                     ])
@@ -40733,7 +40781,7 @@ var render = function() {
                     "inertia-link",
                     {
                       staticClass:
-                        "relative inline-flex items-center px-4 py-2 text-sm font-medium border\n                              border-gray-300 leading-5 rounded-md focus:outline-none focus:shadow-outline-indigo\n                              focus:border-indigo-300 hover:bg-indigo-600 hover:text-white active:bg-indigo-600\n                              active:text-white transition ease-in-out duration-150",
+                        "relative inline-flex items-center px-4 py-2 text-sm font-medium border\n                              border-gray-300 leading-5 rounded-md focus:outline-none focus:shadow-outline-indigo\n                              focus:border-indigo-300 hover:bg-indigo-500 hover:text-white active:bg-indigo-500\n                              active:text-white transition ease-in-out duration-150",
                       attrs: { href: _vm.pagination.previous.url }
                     },
                     [
@@ -40774,7 +40822,7 @@ var render = function() {
                           "inertia-link",
                           {
                             staticClass:
-                              "relative inline-flex items-center px-4 py-2 text-sm font-medium border\n                                  border-gray-300 leading-5 rounded-md focus:outline-none focus:shadow-outline-indigo\n                                  focus:border-indigo-300 hover:bg-indigo-600 hover:text-white active:bg-indigo-600\n                                  active:text-white transition ease-in-out duration-150",
+                              "relative inline-flex items-center px-4 py-2 text-sm font-medium border\n                                  border-gray-300 leading-5 rounded-md focus:outline-none focus:shadow-outline-indigo\n                                  focus:border-indigo-300 hover:bg-indigo-500 hover:text-white active:bg-indigo-500\n                                  active:text-white transition ease-in-out duration-150",
                             attrs: { href: link.url }
                           },
                           [
@@ -40795,7 +40843,7 @@ var render = function() {
                     "inertia-link",
                     {
                       staticClass:
-                        "relative inline-flex items-center px-4 py-2 text-sm font-medium border\n                              border-gray-300 leading-5 rounded-md focus:outline-none focus:shadow-outline-indigo\n                              focus:border-indigo-300 hover:bg-indigo-600 hover:text-white active:bg-indigo-600\n                              active:text-white transition ease-in-out duration-150",
+                        "relative inline-flex items-center px-4 py-2 text-sm font-medium border\n                              border-gray-300 leading-5 rounded-md focus:outline-none focus:shadow-outline-indigo\n                              focus:border-indigo-300 hover:bg-indigo-500 hover:text-white active:bg-indigo-500\n                              active:text-white transition ease-in-out duration-150",
                       attrs: { href: _vm.pagination.next.url }
                     },
                     [

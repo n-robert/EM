@@ -15,9 +15,10 @@
     </div>
 
     <div v-else class="space-y-3">
-        <div v-for="(subItem, subKey) in item[name]" class="border rounded-md bg-gray-200">
+        <div v-for="(subItem, subKey) in item[name]"
+             class="p-2 mt-2 rounded-md bg-gradient-to-b from-indigo-100 to-white">
             <div v-for="(subField, subName) in field" v-if="!isNotFields.includes(subName)">
-                <fmsdocs-input
+                <e-m-input
                         :name="name + '[' + subKey + '][' + subField.name + ']'"
                         :type="subField.type"
                         :value="subItem[subField.name] || subField.value"
@@ -26,31 +27,44 @@
                         :label="subField.label"
                         :hasLabel="subField.hasLabel"
                         :id="subField.name.toString().toKebabCase()"
-                        :isRequired="subField.required"></fmsdocs-input>
+                        :isRequired="subField.required"></e-m-input>
             </div>
 
-            <fmsdocs-input
-                    type="button"
-                    :value="__('Remove ' + name)"
-                    hasLabel="false"
-                    @click.native="removeItem(name, subKey)"></fmsdocs-input>
+            <span :class="leftColumn"></span>
+            <span :class="rightColumn">
+                <e-m-button
+                        type="button"
+                        :originalText="__('Remove ' + name)"
+                        customClass="hover:text-white hover:bg-indigo-500"
+                        @click.native="removeItem(name, subKey)"></e-m-button>
+            </span>
         </div>
 
-        <fmsdocs-input
-                type="button"
-                :value="__('Add ' + name)"
-                hasLabel="false"
-                @click.native="addItem(name)"></fmsdocs-input>
+        <span :class="leftColumn"></span>
+        <span :class="rightColumn">
+            <e-m-button
+                    type="button"
+                    :originalText="__('Add ' + name)"
+                    customClass="hover:text-white hover:bg-indigo-500"
+                    @click.native="addItem(name)"></e-m-button>
+        </span>
     </div>
 </template>
 
 <script>
-    import FmsdocsInput from './Input';
+    import EMInput from './Input';
+    import EMButton from './Button';
 
     export default {
         components: {
-            FmsdocsInput,
+            EMInput,
+            EMButton,
         },
+
+        inject: [
+            'leftColumn',
+            'rightColumn',
+        ],
 
         props: [
             'field',

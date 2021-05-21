@@ -1,6 +1,6 @@
 <template>
-    <div class="p-2 m-4 bg-white shadow-xl sm:rounded-lg">
-        <ul class="flex w-full">
+    <div :class="backLayer">
+        <ul :class="tabLayer" class="flex w-full">
             <li v-for="(fieldGroup, name) in formFields"
                 v-if="fieldGroup.type === 'fieldgroup'"
                 :class="selected[name] ? tabActive : tabInActive"
@@ -12,7 +12,7 @@
             </li>
         </ul>
 
-        <div class="p-4 table w-full border-r border-b border-l rounded-b-lg bg-gray-100" :class="selected['id'] ? noTab : ''">
+        <div :class="frontLayer">
             <div v-for="(element, key) in formFields">
                 <tab v-if="element.type === 'fieldgroup'"
                      :key="key"
@@ -40,18 +40,20 @@
                                        :onclick="field.onclick"
                                        :label="field.label"
                                        :hasLabel="field.hasLabel"
+                                       :checked="field.checked"
                                        :id="field.name.toString().toKebabCase()"
                                        :isRequired="field.required"></fmsdocs-input>
                     </div>
                 </tab>
 
                 <div v-else class="table-row-group">
-                    <div class="table-row">
+                    <div v-if="!isNotFields.includes(key)" class="table-row">
                         <field-set
                                 v-if="element.type === 'fieldset'"
                                 v-show="element.show"
                                 :field="element"
                                 :name="key"
+                                :id="key"
                                 :item="item"
                                 :key="fieldSetKey"
                                 :controllerName="controllerName"
@@ -63,9 +65,11 @@
                                            :type="element.type"
                                            :value="item[element.name] || element.value"
                                            :options="element.options"
+                                           :onclick="element.onclick"
                                            :label="element.label"
                                            :hasLabel="element.hasLabel"
-                                           :id="element.name.toString().toKebabCase()"
+                                           :checked="element.checked"
+                                           :id="element.name && element.name.toString().toKebabCase()"
                                            :isRequired="element.required"></fmsdocs-input>
                         </div>
                     </div>
@@ -89,22 +93,27 @@
             FmsdocsInput,
         },
 
-        inject: [
-            'tabActive',
-            'tabInActive',
-            'noTab',
-        ],
-
-        props: [
-            'item',
-            'repeatable',
-            'formFields',
-            'requiredFields',
-            'controllerName',
-        ],
+        props: {
+            item: {
+                default: {},
+            },
+            formFields: {
+                default: {},
+            },
+            requiredFields: {
+                default: {},
+            },
+            controllerName: {
+                default: null,
+            },
+            noBorder: {
+                default: false,
+            },
+        },
 
         data() {
-            let selected = {};
+            const hasTab = this.formFields['has_tabs'];
+            let selected = {}, backLayer, frontLayer, tabLayer, tabActive, tabInActive;
 
             for (const key in this.formFields) {
                 if (this.formFields.hasOwnProperty(key)) {
@@ -112,10 +121,33 @@
                 }
             }
 
+            if (this.noBorder) {
+                backLayer = '';
+                frontLayer = hasTab ? 'table w-full p-2 rounded-b-lg bg-white' : '';
+                tabLayer = hasTab ? 'm-4 rounded-lg bg-gradient-to-b from-indigo-100 to-white' : '';
+                tabActive = 'py-2 px-8 rounded-t-lg bg-white text-indigo-500';
+                tabInActive = 'py-2 px-8 rounded-t-lg hover:text-indigo-500';
+            } else {
+                backLayer = hasTab ? 'shadow-xl m-4 sm:rounded-lg' : 'shadow-xl m-4 sm:rounded-lg';
+                frontLayer =
+                    hasTab ?
+                        'table w-full p-4 rounded-b-lg bg-white' :
+                        'table w-full p-4 pt-6 rounded-lg bg-white';
+                tabLayer = 'bg-gradient-to-b rounded-t-lg from-indigo-100 to-white';
+                    tabActive = 'py-4 px-8 rounded-t-lg bg-white text-indigo-500';
+                tabInActive = 'py-4 px-8 rounded-lg hover:text-indigo-500';
+            }
+
             return {
+                hasTab,
                 selected,
-                isNotFields: ['type', 'show', 'repeatable'],
+                backLayer,
+                frontLayer,
+                tabLayer,
+                isNotFields: ['type', 'show', 'repeatable', 'upper_case', 'justify', 'split_word', 'cells', 'has_tabs'],
                 fieldSetKey: 0,
+                tabActive,
+                tabInActive,
             };
         },
 

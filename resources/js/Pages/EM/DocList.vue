@@ -1,18 +1,25 @@
 <template>
     <div>
         <div v-for="(state, doc) in docList" class="pl-10 py-1">
-            <fmsdocs-button :type="'button'" @click.native="openModal(doc)">
+            <e-m-button :type="'button'"
+                        @click.native="openModal(doc)"
+                        class="hover:text-white hover:bg-indigo-500">
                 {{__(doc.toPhrase())}}
-            </fmsdocs-button>
+            </e-m-button>
         </div>
 
         <div v-for="(state, doc) in docList">
             <dialog-modal v-if="modal[doc] || state[item.id]" :show="modal[doc]" :id="doc"
                           @closeModalFromDialog="closeModal">
                 <template #content>
-                    <doc-form :name="doc.toKebabCase()" :item-id="item.id" :modal="modal"
-                              :leftColumn="leftColumn" :rightColumn="rightColumn" @openModalFromDocForm="openModal"
-                              @closeModalFromDocForm="closeModal" @addFieldStateFromDocForm="addFieldToDocList">
+                    <doc-form :name="doc.toKebabCase()"
+                              :item="item"
+                              :modal="modal"
+                              :leftColumn="leftColumn"
+                              :rightColumn="rightColumn"
+                              @openModalFromDocForm="openModal"
+                              @closeModalFromDocForm="closeModal"
+                              @addFieldStateFromDocForm="addFieldToDocList">
                         <template #submit>
                             <div class="table-row">
                                 <div>
@@ -20,10 +27,13 @@
                                         <span :class="leftColumn"></span>
 
                                         <span :class="rightColumn">
-                                            <fmsdocs-button :type="'button'" class="mr-6"
-                                                            @click.native="closeModal(doc)">{{__('Cancel')}}</fmsdocs-button>
+                                            <e-m-button :type="'button'"
+                                                        class="mr-6 hover:text-white hover:bg-indigo-500"
+                                                        @click.native="closeModal(doc)">{{__('Cancel')}}</e-m-button>
 
-                                            <fmsdocs-button :type="'submit'">{{__('Print')}}</fmsdocs-button>
+                                            <e-m-button :type="'submit'" class="hover:text-white hover:bg-indigo-500">
+                                                {{__('Print')}}
+                                            </e-m-button>
                                         </span>
                                     </div>
                                 </div>
@@ -39,7 +49,7 @@
 <script>
     const
         components = {
-            FmsdocsButton: () => import('./Button'),
+            EMButton: () => import('./Button'),
             DialogModal: () => import('./DialogModal'),
             DocForm: () => import('./DocForm'),
         };
@@ -59,18 +69,15 @@
         ],
 
         methods: {
-            openModal(doc)
-            {
+            openModal(doc) {
                 this.$emit('openModalFromDocList', doc);
             },
 
-            closeModal(doc)
-            {
+            closeModal(doc) {
                 this.$emit('closeModalFromDocList', doc);
             },
 
-            addFieldToDocList(doc, id)
-            {
+            addFieldToDocList(doc, id) {
                 this.$emit('addFieldStateFromDocList', doc, id);
             },
         },

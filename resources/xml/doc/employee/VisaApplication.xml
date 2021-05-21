@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<root upper_case="false" justify="false" split_word="false" cells="false">
+    <fieldgroup name="general" show="true">
+        <field
+                name="date"
+                required="true"
+                type="date"/>
+        <field
+                name="inviter_id"
+                type="select"
+                required="true"
+                model="Employer"/>
+        <field
+                name="action"
+                type="select"
+                required="true">
+            <option value="RENEW"/>
+            <option value="ISSUE"/>
+            <option value="EXTEND"/>
+        </field>
+        <field
+                name="reason"
+                type="select"
+                required="true">
+            <option value="NEW_WORK_PERMIT"/>
+            <option value="EXPIRED_VISA"/>
+            <option value="NEW_PASSPORT"/>
+        </field>
+        <field
+                name="work_permit"
+                value="12345"
+                type="hidden"/>
+        <field
+                name="visa"
+                value="34567"
+                type="hidden"/>
+        <field
+                name="passport"
+                value="45678"
+                type="hidden"/>
+    </fieldgroup>
+
+    <fieldgroup name="visa_details">
+        <field
+                name="visa_purpose"
+                type="select"
+                required="true">
+            <option value="WORK"/>
+            <option value="BUSINESS"/>
+        </field>
+        <field
+                name="visa_multiplicity"
+                type="select"
+                required="true">
+            <option value="MULTI"/>
+            <option value="SINGLE"/>
+        </field>
+        <field
+                name="visa_category"
+                type="select"
+                required="true">
+            <option value="COMMON"/>
+        </field>
+        <field
+                name="destination_id"
+                type="select"
+                required="true"
+                model="Address"/>
+    </fieldgroup>
+</root>

@@ -1,5 +1,5 @@
 <template>
-    <div class="space-y-4 text-center mx-auto" :class="widthClass">
+    <div class="space-y-4 pb-2 text-center mx-auto" :class="widthClass">
         <slot></slot>
     </div>
 </template>

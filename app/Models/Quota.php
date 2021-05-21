@@ -50,8 +50,8 @@ class Quota extends BaseModel
             ['leftJoin' => 'types|types.id|employers.type_id'],
             ['whereRaw' => 'types.code LIKE \'%LEGAL%\''],
         ],
-        'year.valid_quotas' => [
-            ['whereRaw' => 'CAST(year AS INT) >= DATE_PART(\'YEAR\', NOW())']
+        'valid_quotas' => [
+            ['whereRaw' => 'CAST(quotas.year AS INTEGER) >= DATE_PART(\'YEAR\', NOW())']
         ],
     ];
 

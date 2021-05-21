@@ -114,9 +114,11 @@ class XmlFormHandlingService
             }
 
             $fields = $root->xpath('descendant-or-self::field');
+            $hasTabs = false;
 
             foreach ($fields as $field) {
-                $hasAncestor = false;
+                $hasFieldGroup = false;
+                $hasFieldSet = false;
                 $fieldAttributes = $field->attributes();
                 $fieldName = preg_replace('~[^\w\s]~', '', (string)$fieldAttributes['name']);
                 $tmpField = [];
@@ -137,12 +139,16 @@ class XmlFormHandlingService
                 }
 
                 static::parseFieldByOptions($field, $fieldAttributes, $tmpField);
-                static::addFieldToCollection($field, $fieldName, $formFields, $tmpField, $hasAncestor);
+                static::addFieldToCollection($field, $fieldName, $formFields, $tmpField, $hasFieldGroup, $hasFieldSet);
 
-                if (!$hasAncestor) {
+                if (!$hasFieldGroup && !$hasFieldSet) {
                     $formFields[$fieldName] = $tmpField;
                 }
+
+                $hasTabs = $hasTabs ?: !!$hasFieldGroup;
             }
+
+            $formFields['has_tabs'] = $hasTabs;
         }
 //        dd($formFields);
         return $formFields;
@@ -202,12 +208,10 @@ class XmlFormHandlingService
      * @param bool $hasAncestor
      * @return void
      */
-    public static function addFieldToCollection($field, $fieldName, &$formFields, &$tmpField, &$hasAncestor)
+    public static function addFieldToCollection($field, $fieldName, &$formFields, &$tmpField, &$hasFieldGroup, &$hasFieldSet)
     {
         $hasFieldGroup = $field->xpath('ancestor::fieldgroup[@name]/@name');
         $hasFieldSet = $field->xpath('ancestor::fieldset[@name]/@name');
-
-        $hasAncestor = $hasFieldGroup || $hasFieldSet;
 
         $fieldGroupName = null;
         $fieldGroupShow = null;

@@ -4,7 +4,7 @@
 
         <div v-else>
             <span :class="leftColumn">
-                <fmsdocs-label :text="(hasLabel && hasLabel !== 'false') ? (__(labelText).toPhrase() + ': ') : ''"
+                <fmsdocs-label :text="(hasLabel && hasLabel !== 'false' && labelText) ? (__(labelText).toPhrase() + ': ') : ''"
                                :for="name"
                                :class="[isRequired && (!modelValue || $page.props.errors[name]) ? warningClass : '', labelDefaultClass]"></fmsdocs-label>
             </span>

@@ -1,15 +1,13 @@
 <template>
     <modal :show="show" :max-width="maxWidth" :closeable="closeable" @close="closeModal">
         <div class="px-6 py-4">
-            <fmsdocs-button class="relative float-right cursor-pointer m-2" @click.native="closeModal">X</fmsdocs-button>
+            <fmsdocs-button class="relative float-right cursor-pointer m-1" @click.native="closeModal">X</fmsdocs-button>
 
             <div v-if="this.$slots.title" class="text-lg">
                 <slot name="title"></slot>
             </div>
 
-            <div class="mt-4">
-                <slot name="content"></slot>
-            </div>
+            <slot name="content"></slot>
         </div>
 
         <div v-if="this.$slots.footer" class="px-6 py-4 bg-gray-100 text-right">

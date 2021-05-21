@@ -3,7 +3,7 @@
         <template #header>
             <centered-item :width="centeredItemWidth">
                 <h1 class="font-bold text-indigo-600 text-xl">
-                    {{item.default_name || __('New ' + controllerName)}}
+                    {{itemHeader}}
                 </h1>
             </centered-item>
         </template>
@@ -11,23 +11,30 @@
         <centered-item :width="centeredItemWidth">
             <form ref="itemForm" @submit.prevent="submit">
                 <item :item="item"
-                      :repeatable="repeatable"
                       :formFields="formFields"
                       :requiredFields="requiredFields"
                       :controllerName="controllerName"
                       @addItem="addItem"
                       @removeItem="removeItem">
-                    <fmsdocs-button type="button" @click.native="visit(listUrl)">
-                        {{__('Cancel')}}
-                    </fmsdocs-button>
+                    <div class="mt-4">
+                        <e-m-button type="button"
+                                    @click.native="visit(listUrl)"
+                                    class="hover:text-white hover:bg-indigo-500">
+                            {{__('Cancel')}}
+                        </e-m-button>
 
-                    <fmsdocs-button type="button" @click.native="submit(action, 'apply')">
-                        {{__('Apply')}}
-                    </fmsdocs-button>
+                        <e-m-button type="button"
+                                    @click.native="submit(action, 'apply')"
+                                    class="hover:text-white hover:bg-indigo-500">
+                            {{__('Apply')}}
+                        </e-m-button>
 
-                    <fmsdocs-button type="button" @click.native="submit(action, 'save')">
-                        {{__('Save')}}
-                    </fmsdocs-button>
+                        <e-m-button type="button"
+                                    @click.native="submit(action, 'save')"
+                                    class="hover:text-white hover:bg-indigo-500">
+                            {{__('Save')}}
+                        </e-m-button>
+                    </div>
                 </item>
             </form>
         </centered-item>
@@ -38,7 +45,7 @@
     import AppLayout from '../../Layouts/AppLayout';
     import CenteredItem from './CenteredItem';
     import Item from './Item';
-    import FmsdocsButton from './Button';
+    import EMButton from './Button';
     import qs from 'qs';
 
     export default {
@@ -46,7 +53,7 @@
             AppLayout,
             CenteredItem,
             Item,
-            FmsdocsButton,
+            EMButton,
         },
 
         props: [
@@ -61,7 +68,7 @@
         ],
 
         data() {
-            let selected = {}, i = 0, newItems = {};
+            let newItems = {};
 
             for (const key in this.repeatable) {
                 if (this.repeatable.hasOwnProperty(key)) {
@@ -70,12 +77,13 @@
             }
 
             return {
+                newItems,
+                itemHeader: this.item.default_name || this.__('New ' + this.controllerName),
                 centeredItemWidth: {
                     md: 'full',
                     xl: '3/5',
                 },
                 errors: {},
-                newItems,
             };
         },
 

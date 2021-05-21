@@ -61,7 +61,6 @@ class BaseModel extends Model implements ModelInterface
      * @var array|bool
      */
     protected $guarded = [
-        'id',
         'user_ids',
         'password',
     ];
@@ -202,17 +201,39 @@ class BaseModel extends Model implements ModelInterface
      */
     public function scopeApplyFilters($builder)
     {
-//        Session::remove($this->names);
-        $filters = session($this->names);
-//        dd($filters);
+//        Session::remove($this->names . '.filters');
+        $filters = session($this->names . '.filters');
+//        dd(array_filter($filters));
 
         if ($filters && $filters = array_filter($filters)) {
-            array_walk($filters, function ($value, $key) use ($builder) {
-                $builder->whereIn($key, $value);
-            });
+            $this->applyFiltersRecursive($filters, $builder);
         }
 
         return $builder;
+    }
+
+    /**
+     * Traverse filters array recursively to apply them
+     *
+     * @param $filters
+     * @param $builder
+     * @param null $defaultKey
+     */
+    protected function applyFiltersRecursive($filters, $builder, $defaultKey = null)
+    {
+        array_walk($filters, function ($value, $key) use ($builder, $defaultKey) {
+            if (count($value) != count($value, COUNT_RECURSIVE)) {
+                $this->applyFiltersRecursive($value, $builder, $key);
+            }
+            // If there is a simplified filter, then we just apply its original options to query
+            // Otherwise we will apply the "where... IN" clause to query
+            if ($options = session($this->names . '.queries.' . $key)) {
+                static::applyQueryOptions($options, $builder);
+            } else {
+                $key = $defaultKey ?: $key;
+                $builder->whereIn($key, $value);
+            }
+        });
     }
 
     /**
@@ -287,6 +308,7 @@ class BaseModel extends Model implements ModelInterface
      * Get filters parameters.
      *
      * @return array
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function getFilters()
     {
@@ -297,46 +319,37 @@ class BaseModel extends Model implements ModelInterface
         }
 
         foreach ($this->filterFields as $field => $options) {
-            // If field has alias after '.', then we will extract them apart
-            // and we will assume that the field value will be an array
-            if ($hasAlias = strpos($field, '.') !== false) {
-                $tmpField = explode('.', $field);
-                $field = $tmpField[0];
-                $alias = $tmpField[1] ?? $field;
-                $aliasValue = [];
+            $tmpKey = $this->names . '.filters.' . $field;
+            // If field has no model, then we will assume that filter is simplified
+            // and just store query clause in session
+            if (!isset($options['model'])) {
+                session([$this->names . '.queries.' . $field => $options]);
+
+                $key = $tmpKey;
+                $filters[$field][$field]['name'] = $field;
+                $filters[$field][$field]['value'] = $field;
+                $filters[$field][$field]['field'] = $field;
+                $filters[$field][$field]['checked'] = session($key) ? 'checked' : '';
+                $filters[$field][$field]['action'] = session($key) ? 'remove' : 'put';
+
+                continue;
             }
 
-            $tmpKey = $this->names . '.' . $field;
             $items = $this->getFilterFieldItems($field, $options);
 
             if (!$items) {
                 continue;
             }
 
-
             foreach ($items as $item) {
                 $item = $item instanceof Model ? $item->getAttributes() : (array)$item;
                 $value = $item['value'];
                 $key = $tmpKey . '.' . $value;
 
-                if ($hasAlias) {
-                    $aliasValue[] = $value;
-                } else {
-                    $filters[$field][$value] = $item;
-                    $filters[$field][$value]['field'] = $field;
-                    $filters[$field][$value]['checked'] = session($key) ? 'checked' : '';
-                    $filters[$field][$value]['action'] = session($key) ? 'remove' : 'put';
-                }
-            }
-
-            // We assign attributes to alias only by the end of loop
-            if ($hasAlias) {
-                $key = $tmpKey . '.' . $alias;
-                $filters[$field][$alias]['name'] = $alias;
-                $filters[$field][$alias]['value'] = json_encode($aliasValue);
-                $filters[$field][$alias]['field'] = $field;
-                $filters[$field][$alias]['checked'] = session($key) ? 'checked' : '';
-                $filters[$field][$alias]['action'] = session($key) ? 'remove' : 'put';
+                $filters[$field][$value] = $item;
+                $filters[$field][$value]['field'] = $field;
+                $filters[$field][$value]['checked'] = session($key) ? 'checked' : '';
+                $filters[$field][$value]['action'] = session($key) ? 'remove' : 'put';
             }
         }
 //        dd($filters);
@@ -388,7 +401,7 @@ class BaseModel extends Model implements ModelInterface
         }
 
         if (!empty($options)) {
-            array_walk_recursive($options, function ($args, $method) use(&$query) {
+            array_walk_recursive($options, function ($args, $method) use (&$query) {
                 $args = preg_split('~\s*\|\s*~', $args);
                 $query = $query->$method(...$args);
             });
@@ -450,11 +463,17 @@ class BaseModel extends Model implements ModelInterface
     /**
      * Save the model to the database.
      *
-     * @param  array  $options
+     * @param  array $options
      * @return bool
      */
     public function save(array $options = [])
     {
+        $key = $this->getKeyName();
+
+        if (is_null($this->attributes[$key])) {
+            unset($this->attributes[$key]);
+        }
+
         if ($result = parent::save($options) && $this->getConnectionName() == 'pgsql') {
             $attributes = $this->getAttributes();
             $attributes['user_ids'] = str_replace(['{', '}'], '', $attributes['user_ids']);

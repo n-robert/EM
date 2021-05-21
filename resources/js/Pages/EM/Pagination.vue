@@ -12,7 +12,7 @@
                     <inertia-link v-else :href="pagination.previous.url"
                                   class="relative inline-flex items-center px-4 py-2 text-sm font-medium border
                                   border-gray-300 leading-5 rounded-md focus:outline-none focus:shadow-outline-indigo
-                                  focus:border-indigo-300 hover:bg-indigo-600 hover:text-white active:bg-indigo-600
+                                  focus:border-indigo-300 hover:bg-indigo-500 hover:text-white active:bg-indigo-500
                                   active:text-white transition ease-in-out duration-150">
                         {{pagination.previous.label}}
                     </inertia-link>
@@ -28,7 +28,7 @@
                         <inertia-link v-else :href="link.url"
                                       class="relative inline-flex items-center px-4 py-2 text-sm font-medium border
                                       border-gray-300 leading-5 rounded-md focus:outline-none focus:shadow-outline-indigo
-                                      focus:border-indigo-300 hover:bg-indigo-600 hover:text-white active:bg-indigo-600
+                                      focus:border-indigo-300 hover:bg-indigo-500 hover:text-white active:bg-indigo-500
                                       active:text-white transition ease-in-out duration-150">
                             {{link.label}}
                         </inertia-link>
@@ -37,7 +37,7 @@
                     <inertia-link v-if="pagination.hasPages" :href="pagination.next.url"
                                   class="relative inline-flex items-center px-4 py-2 text-sm font-medium border
                                   border-gray-300 leading-5 rounded-md focus:outline-none focus:shadow-outline-indigo
-                                  focus:border-indigo-300 hover:bg-indigo-600 hover:text-white active:bg-indigo-600
+                                  focus:border-indigo-300 hover:bg-indigo-500 hover:text-white active:bg-indigo-500
                                   active:text-white transition ease-in-out duration-150">
                         {{pagination.next.label}}
                     </inertia-link>

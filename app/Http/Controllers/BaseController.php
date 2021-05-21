@@ -121,11 +121,6 @@ class BaseController extends Controller implements ControllerInterface
             return true;
         }
 
-        // We will transform coming JSON string to an array
-        if (preg_match('~^\[.+\]$~', $value)) {
-            $value = json_decode($value);
-        }
-
         try {
             if (!($value && $action)) {
                 throw new \Exception(__('Not enough parameters.'));
@@ -135,7 +130,7 @@ class BaseController extends Controller implements ControllerInterface
                 throw new \Exception(__('Illegal action.'));
             }
 
-            $key = $this->names . '.';
+            $key = $this->names . '.filters.';
             $key .= is_array($value) ? $field . '.' . $name : $field . '.' . $value;
 
             $args =
@@ -193,6 +188,11 @@ class BaseController extends Controller implements ControllerInterface
     public function printDoc($doc, $id)
     {
         $docData = $this->request->input();
+
+        array_walk($docData, function (&$data) {
+            $data = trim($data);
+        });
+
         call_user_func_array(
             [$this->formFillingService, 'printDoc'],
             [$doc, $id, $docData]
@@ -263,6 +263,7 @@ class BaseController extends Controller implements ControllerInterface
 
         $page = 'EM/Items';
         $filters = $this->model->getFilters();
+        $hasFilters = session($this->names . '.filters') && !!array_filter(session($this->names . '.filters'));
         $pagination = $this->model->getPagination($items);
         $modal = [];
         $docList = [];
@@ -286,6 +287,7 @@ class BaseController extends Controller implements ControllerInterface
         return Jetstream::inertia()->render($this->request, $page, [
             'items'           => $items->all(),
             'filters'         => $filters,
+            'hasFilters'      => $hasFilters,
             'pagination'      => $pagination,
             'modal'           => $modal,
             'docList'         => $docList,

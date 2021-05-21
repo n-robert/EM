@@ -11,14 +11,14 @@
                 <dropdown
                         v-if="filters.length !== 0"
                         align="left" width="9/12"
-                        :buttonCustomClass="buttonCustomClass"
+                        :buttonCustomClass="customClass"
                         :buttonOpenText="__('Open filters')"
                         :buttonCloseText="__('Close filters')">
                     <template #trigger></template>
 
                     <template #content>
                         <div v-for="(elements, field) in filters" class="p-2 my-4 border rounded-lg w-full">
-                            <div class="font-bold text-indigo-600">{{__(field).ucFirst()}}</div>
+                            <div class="font-bold text-indigo-600">{{field && __(field).ucFirst()}}</div>
 
                             <div v-for="element in elements" class="inline-flex">
                                 <filter-by-field :element="element"></filter-by-field>
@@ -34,25 +34,25 @@
                 <div class="p-2 m-1 bg-white shadow-xl sm:rounded-lg">
                     <div class="p-2">
                         <div class="text-right text-xs pr-5">
-                            {{itemCount}}
+                            {{pageInfo}}
                         </div>
 
                         <inertia-link v-if="needAdditionalButton" :href="'/' + controllerName + '/new'"
                                       class="px-4 py-2 border border-gray-300 rounded-md text-white bg-indigo-400
-                                      hover:text-white hover:bg-indigo-600">
-                            {{__('New ' + controllerName)}}
+                                      hover:bg-indigo-500">
+                            {{createNewItem}}
                         </inertia-link>
                     </div>
 
                     <div class="p-4 table w-full">
-                        <div class="even:bg-indigo-100 table-row-group font-bold">
+                        <div class="even:bg-indigo-100 text-indigo-600 table-row-group font-bold">
                             <div class="table-row">
                                 <div v-for="field in formFields" class="p-2 align-middle table-cell">
                                     <div v-if="field.name === 'default_name'" class="pl-6 text-left">
-                                        {{__(field.label).ucFirst()}}
+                                        {{field.label && __(field.label).ucFirst()}}
                                     </div>
 
-                                    <div v-else>{{__(field.label).ucFirst()}}</div>
+                                    <div v-else>{{field.label && __(field.label).ucFirst()}}</div>
                                 </div>
 
                                 <div class="p-2 align-middle table-cell"></div>
@@ -71,7 +71,7 @@
                                     </h2>
 
                                     <div v-else>
-                                        {{field.name.endsWith('_date') ? formatDate(item[field.name]) :
+                                        {{field.name && field.name.endsWith('_date') ? formatDate(item[field.name]) :
                                         __(item[field.name])}}
                                     </div>
                                 </div>
@@ -80,15 +80,18 @@
                                       :id="'delete-' + item.id"
                                       @submit.prevent="deleteItem(item)"
                                       class="p-2 align-middle table-cell">
-                                    <fmsdocs-button>{{__('Delete')}}</fmsdocs-button>
+                                    <e-m-button class="hover:text-white hover:bg-indigo-500">
+                                        {{__('Delete')}}
+                                    </e-m-button>
                                 </form>
 
                                 <div v-if="Object.keys(docList).length"
                                      class="p-2 align-middle table-cell">
-                                    <fmsdocs-button :type="'button'"
-                                                    @click.native="openModalFromItems(item.id)">
+                                    <e-m-button :type="'button'"
+                                                class="hover:text-white hover:bg-indigo-500"
+                                                @click.native="openModalFromItems(item.id)">
                                         {{__('Print documents')}}
-                                    </fmsdocs-button>
+                                    </e-m-button>
                                 </div>
 
                                 <dialog-modal v-if="modal[item.id]" :show="modal[item.id]" :id="item.id"
@@ -107,12 +110,12 @@
                     <div class="p-2">
                         <inertia-link :href="'/' + controllerName + '/new'"
                                       class="px-4 py-2 border border-gray-300 rounded-md text-white bg-indigo-400
-                                      hover:text-white hover:bg-indigo-600">
-                            {{__('New ' + controllerName)}}
+                                      hover:bg-indigo-500">
+                            {{createNewItem}}
                         </inertia-link>
 
                         <div class="text-right text-xs pr-5">
-                            {{itemCount}}
+                            {{pageInfo}}
                         </div>
                     </div>
                 </div>
@@ -127,7 +130,7 @@
 
 <script>
     import AppLayout from '../../Layouts/AppLayout';
-    import FmsdocsButton from './Button';
+    import EMButton from './Button';
     import CenteredItem from './CenteredItem';
     import DialogModal from './DialogModal';
     import DocList from './DocList';
@@ -138,7 +141,7 @@
     export default {
         components: {
             AppLayout,
-            FmsdocsButton,
+            EMButton,
             CenteredItem,
             DialogModal,
             DocList,
@@ -150,6 +153,7 @@
         props: [
             'items',
             'filters',
+            'hasFilters',
             'pagination',
             'modal',
             'docList',
@@ -171,14 +175,26 @@
                     md: 'full',
                     xl: '3/4',
                 },
-                buttonCustomClass: 'inline-flex text-white bg-indigo-400 hover:text-white hover:bg-indigo-600',
                 needAdditionalButton: this.items.length > 7,
+                createNewItem: this.__('New ' + this.controllerName),
                 itemCount: [
                     this.pagination.firstItem + '-' + this.pagination.lastItem,
                     this.__('from'),
                     this.pagination.total
                 ].join(' '),
             };
+        },
+
+        computed: {
+            customClass: function () {
+                return 'inline-flex text-white' + (
+                    this.hasFilters ? ' bg-green-500 hover:bg-green-600' : ' bg-indigo-400 hover:bg-indigo-500'
+                );
+            },
+
+            pageInfo: function () {
+                return [this.pagination.firstItem + '-' + this.pagination.lastItem, this.__('from'), this.pagination.total].join(' ');
+            },
         },
 
         methods: {

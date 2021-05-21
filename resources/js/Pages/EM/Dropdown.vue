@@ -1,12 +1,12 @@
 <template>
     <div class="relative m-2">
-        <div @click="open = ! open" :class="{'relative z-50': open}">
+        <div @click="open = ! open" :class="{'relative z-50': open}" class="w-48 text-left">
             <slot name="trigger"></slot>
             <e-m-button :type="'button'"
                         :open="open"
                         :originalText="buttonOpenText"
                         :alternativeText="buttonCloseText"
-                        :custom-class="buttonCustomClass">
+                        :customClass="buttonCustomClass">
             </e-m-button>
         </div>
 
@@ -49,7 +49,7 @@
                 default: '48',
             },
             contentClasses: {
-                default: () => ['py-2', 'px-6', 'bg-white'],
+                default: () => ['py-2', 'px-6', 'mb-4', 'bg-white'],
             },
             buttonCustomClass: {
                 default: '',

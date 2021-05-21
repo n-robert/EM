@@ -1,43 +1,20 @@
 <template>
-    <form :id="id" :action="actionUri" method="post" target="_blank" @submit.prevent="submit">
-        <div class="font-bold text-center">{{__(name.toString().toPhrase())}}</div>
+    <form :id="id"
+          :action="actionUri"
+          method="post"
+          target="_blank"
+          @submit.prevent="submit">
+        <div class="font-bold text-center py-2">{{__(name.toString().toPhrase())}}</div>
 
-        <div class="table">
+        <div>
             <slot name="upperFields"></slot>
 
-            <div v-for="(attributes, key) in formFields" class="table-row">
-                <fmsdocs-input v-if="attributes.type === 'hidden'"
-                               :name="key"
-                               :type="attributes.type"
-                               :value="attributes.value"></fmsdocs-input>
-
-                <div v-else-if="attributes.type === 'fieldset'" :id="key" v-show="attributes.show">
-                    <div v-for="(fieldAttributes, fieldName) in attributes" v-if="!isNotFields.includes(fieldName)">
-                        <fmsdocs-input
-                                :name="fieldName"
-                                :options="fieldAttributes.options"
-                                :type="fieldAttributes.type"
-                                :value="fieldAttributes.value"
-                                :id="fieldName.toString().toKebabCase()"
-                                :isRequired="fieldAttributes.required"
-                                :checked="fieldAttributes.checked"
-                                :onclick="fieldAttributes.onclick"></fmsdocs-input>
-                    </div>
-                </div>
-
-                <div v-else>
-                    <fmsdocs-input
-                            v-if="!isNotFields.includes(key)"
-                            :name="key"
-                            :options="attributes.options"
-                            :type="attributes.type"
-                            :id="key.toString().toKebabCase()"
-                            :value="attributes.value"
-                            :isRequired="attributes.required"
-                            :checked="attributes.checked"
-                            :onclick="attributes.onclick"></fmsdocs-input>
-                </div>
-            </div>
+            <item v-if="dataLoaded"
+                  noBorder="true"
+                  :item="item"
+                  :formFields="formFields"
+                  :requiredFields="requiredFields"
+                  :controller-name="controllerName"></item>
 
             <slot name="lowerFields"></slot>
 
@@ -49,15 +26,11 @@
 </template>
 
 <script>
-    import FmsdocsLabel from './Label';
-    import FmsdocsInput from './Input';
-    import FmsdocsButton from './Button';
+    import Item from './Item';
 
     export default {
         components: {
-            FmsdocsLabel,
-            FmsdocsInput,
-            FmsdocsButton,
+            Item,
         },
 
         inject: [
@@ -68,7 +41,7 @@
             name: {
                 default: null,
             },
-            itemId: {
+            item: {
                 default: null,
             },
             modal: {
@@ -79,13 +52,14 @@
         data()
         {
             return {
-                id: this.name + '-' + this.itemId,
-                getFieldsUri: '/get-options/doc.' + this.controllerName + '/' + this.name + '/' + this.itemId,
-                actionUri: '/print/' + this.name + '/' + this.itemId,
+                id: this.name + '-' + this.item.id,
+                getFieldsUri: '/get-options/doc.' + this.controllerName + '/' + this.name + '/' + this.item.id,
+                actionUri: '/print/' + this.name + '/' + this.item.id,
                 formFields: {},
                 requiredFields: [],
                 isNotFields: ['type', 'show', 'repeatable'],
                 errors: {},
+                dataLoaded: false,
             };
         },
 
@@ -98,6 +72,8 @@
 
                 this.requiredFields = this.formFields.requiredFields;
                 delete this.formFields.requiredFields;
+            }).then(() => {
+                this.dataLoaded = true;
             });
         },
 
@@ -113,7 +89,7 @@
                 }
 
                 this.$emit('closeModalFromDocForm', this.name.toPascalCase());
-                this.$emit('addFieldStateFromDocForm', this.name.toPascalCase(), this.itemId);
+                this.$emit('addFieldStateFromDocForm', this.name.toPascalCase(), this.item.id);
                 document.getElementById(this.id).submit();
             },
         },

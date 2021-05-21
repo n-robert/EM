@@ -1,5 +1,7 @@
 <template>
-    <button :type="type" :class="[defaultClass, customClass]" :onclick="onclick">
+    <button :type="type"
+            :class="[defaultClass, customClass]"
+            :onclick="onclick">
         <slot>{{open ? alternativeText || originalText : originalText}}</slot>
     </button>
 </template>
@@ -34,7 +36,7 @@
         data()
         {
             return {
-                defaultClass: 'items-center px-2 py-1 border border-gray-300 rounded-md hover:bg-indigo-600 hover:text-white transition ease-in-out duration-150',
+                defaultClass: 'items-center px-2 py-1 border border-gray-300 rounded-md transition ease-in-out duration-150',
             }
         },
     };

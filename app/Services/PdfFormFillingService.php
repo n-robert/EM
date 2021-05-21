@@ -1047,7 +1047,7 @@ class PdfFormFillingService
         $employerPhone = self::handlePhones($employer->phone, '8');
 
         $citizenship = Country::find($employee->citizenship_id);
-        $birthPlace = trim($citizenship->name_ru . ', ' . $employee->birth_place, ', ');
+        $birthPlace = implode(', ', [$citizenship->name_ru, $employee->birth_place]);
 
         $director = Employee::find($employer->director_id);
         $director_name = [
@@ -1318,172 +1318,139 @@ class PdfFormFillingService
         self::output($template, $fields);
     }
 
-    public static function printVisa($app, $input, $model, $view, $id, $template = 'visa')
+    public static function printVisaApplication($docData, $doc, $id)
     {
-        $action = $input->post->get('action', '', 'string');
-        $trip_purpose = $input->post->get('trip_purpose', '', 'string');
-        $reason = $input->post->get('reason', '', 'string');
-        $inviter_id = $input->post->get('inviter_id', '', 'string');
-        $destination_address = $input->post->get('destination_address', 0, 'int');
+        $action = $docData['action'];
+        $visaPurpose = $docData['visa_purpose'];
+        $reason = __($docData['reason']);
+        $inviterId = $docData['inviter_id'];
+        $destinationId = $docData['destination_id'];
 
-        self::checkRequiredValues(
-            $app,
-            $view,
-            $id,
-            $template,
-            $action,
-            $trip_purpose,
-            $reason,
-            $inviter_id,
-            $destination_address
-        );
+        $visaMultiplicity = $docData['visa_multiplicity'];
+        $visaCategory = $docData['visa_category'];
+        $date = $docData['date'];
 
-        $item = $model->getItem($id, true);
-        $file_name = self::getFileName($item, $template);
-        $multiplicity = $input->post->get('multiplicity', 'MULTI', 'string');
-        $category = $input->post->get('category', 'COMMON', 'string');
-        $date = !$input->post->get('date') ? date('d.m.Y', time()) : $input->post->get('date');
-        $date = date('d/m/Y', strtotime($date));
-
-        $home_address
-            = !empty($item->citizenship_name) ?
-            $item->citizenship_name . ', ' . $item->birth_place :
-            $item->birth_place;
-
-        $birth_place = $item->birth_place;
-
-        $dates =
-            [
-                'birth_date',
-                'passport_issued',
-                'passport_expired',
-                'visa_started',
-                'visa_expired'
-            ];
-
-        foreach ($dates as $var) {
-            $$var = !$item->$var ? '' : date('d/m/Y', strtotime($item->$var));
-        }
+        $employee = Employee::find($id);
+        $citizenship = Country::find($employee->citizenship_id)->name_ru;
+        $birthPlace = $employee->birth_place;
+        $homeAddress = implode(', ', [$citizenship, $birthPlace]);
+        $occupation = Occupation::find($employee->occupation_id)->name_ru;
 
         switch ($reason) {
             case 'EXPIRED_VISA':
-                $visa_info = trim($input->post->get('visa', '', 'string'));
-
-                if (
-                    strpos(strtolower($visa_info), strtolower(__('SERIE'))) !== false ||
-                    strpos(strtolower($visa_info), strtolower(__('SHORT_NUMBER'))) !== false
-                ) {
-                    $reason = __($reason) . ' ' . $visa_info;
-                    break;
-                }
-
-                $visa_info = explode(' ', $visa_info);
-                $reason
-                    =
-                    __($reason) . Text::sprintf('SERIE_NUMBER_SPRINTF', $visa_info[0], $visa_info[1]);
+                $suffix = $docData['visa'];
+                $format = __('SERIE_NUMBER_SPRINTF');
                 break;
             case 'NEW_PASSPORT':
-                $passport_info = trim($input->post->get('passport', '', 'string'));
-
-                if (
-                    strpos(strtolower($passport_info), strtolower(__('SERIE'))) !== false ||
-                    strpos(strtolower($passport_info), strtolower(__('SHORT_NUMBER'))) !== false
-                ) {
-                    $reason = __($reason) . ' ' . $passport_info;
-                    break;
-                }
-
-                $reason = __($reason) . Text::sprintf('NUMBER_SPRINTF', $passport_info);
+                $suffix = $docData['passport'];
+                $format = __('NUMBER_SPRINTF');
                 break;
             case 'NEW_WORK_PERMIT':
             default:
-                $work_permit_info = trim($input->post->get('work_permit', '', 'string'));
-
-                if (
-                    strpos(strtolower($work_permit_info), strtolower(__('SERIE'))) !== false ||
-                    strpos(strtolower($work_permit_info), strtolower(__('SHORT_NUMBER'))) !== false
-                ) {
-                    $reason = __($reason) . ' ' . $work_permit_info;
-                    break;
-                }
-
-                $reason = __($reason) . Text::sprintf('NUMBER_SPRINTF', $work_permit_info);
+                $suffix = $docData['work_permit'];
+                $format = __('NUMBER_SPRINTF');
+                break;
         }
 
+        if (
+            strpos(strtolower($suffix), strtolower(__('SERIE'))) !== false ||
+            strpos(strtolower($suffix), strtolower(__('SHORT_NUMBER'))) !== false
+        ) {
+            $reason .= ' ' . $suffix;
+        } else {
+            $reason .= sprintf($format, ...explode(' ', $suffix));
+        }
 
-        $employer_model = BaseDatabaseModel::getInstance('Employer', 'FMSDocsModel');
+        $inviter = Employer::find($inviterId);
+        $inviterPhone = self::handlePhones($inviter->phone, '8');
+        $inviterAddress = Address::find($inviter->address_id)->name_ru;
+        $inviterTaxpayerId = __('TAXPAYER_ID') . ' ' . $inviter->taxpayer_id;
+        $inviterInfo = array_filter([
+            $inviter->full_name_ru,
+            $inviterTaxpayerId,
+            $inviterAddress,
+            $inviterPhone
+        ]);
+        $inviterInfo = implode(', ', $inviterInfo);
 
-        $inviter = $employer_model->getItem($inviter_id, true);
-        $inviter_phone = self::handlePhones($inviter->phone, '8');
-        $inviter_taxpayer_id = __('TAXPAYER_ID') . ' ' . $inviter->taxpayer_id;
-        $inviter_info = [$inviter->full_name_ru, $inviter_taxpayer_id, $inviter->address_name, $inviter_phone];
-        $inviter_info = array_filter($inviter_info);
-        $inviter_info = !empty($inviter_info) ? implode(', ', $inviter_info) : '';
+        $employer = Employer::find($employee->employer_id);
+        $employerPhone = self::handlePhones($employer->phone, '8');
+        $employerTaxpayerId = __('TAXPAYER_ID') . ' ' . $employer->taxpayer_id;
+        $employerAddress = Address::find($employer->address_id)->name_ru;
 
-        $employer_phone = self::handlePhones($item->employer_phone, '8');
-        $employer_taxpayer_id = __('TAXPAYER_ID') . ' ' . $item->employer_taxpayer_id;
+        $hostInfo = array_filter([
+            $employer->name_ru,
+            $employerTaxpayerId,
+            $employerAddress,
+            $employerPhone
+        ]);
+        $hostInfo = implode(', ', $hostInfo) ?: $inviterInfo;
 
-        $host_info
-            = [$item->employer_name, $employer_taxpayer_id, $item->employer_address, $employer_phone];
-        $host_info = array_filter($host_info);
-        $host_info = !empty($host_info) ? implode(', ', $host_info) : $inviter_info;
+        $workInfo = array_filter([
+            $employer->name_ru,
+            $occupation,
+            $employerAddress,
+            $employerPhone
+        ]);
+        $workInfo = implode(', ', $workInfo);
 
-        $work_info
-            = [$item->employer_name, $item->occupation_name, $item->employer_address, $employer_phone];
-        $work_info = array_filter($work_info);
-        $work_info = !empty($work_info) ? implode(', ', $work_info) : '';
-
-        $address_model = BaseDatabaseModel::getInstance('Address', 'FMSDocsModel');
-        $address = $address_model->getItem($destination_address);
-        $destination_address = $address->name_ru;
+        $destination = Address::find($destinationId)->name_ru;
         $relatives = __('NO');
 
-        $inviter_address = self::parseAddress($inviter->address_name);
-        $trip_stops = [];
-        $trip_stops[] = __('RUSSIA');
-        $tmp = array_filter([$inviter_address['region'], $inviter_address['city'], $inviter_address['locality']]);
-        $trip_stops = array_merge($trip_stops, $tmp);
-        $trip_stops = implode(', ', $trip_stops);
+        $inviterAddress = self::parseAddress($inviterAddress);
+        $tripStops = array_filter([
+            $inviterAddress['region'],
+            $inviterAddress['city'],
+            $inviterAddress['locality']
+        ]);
+        array_unshift($tripStops, __('RUSSIA'));
+        $tripStops = implode(', ', $tripStops);
 
-        $fields =
+        $data =
             [
-                'file_name'                     => $file_name,
-                'date'                          => $date,
-                self::$actions[$action]         => '',
-                self::$visaTypes[$multiplicity] => 'Х',
-                self::$visaTypes[$category]     => 'Х',
-                self::$visaTypes[$trip_purpose] => 'Х',
-                'last_name_ru'                  => $item->last_name_ru,
-                'last_name_en'                  => $item->last_name_en,
-                'first_name_ru'                 => $item->first_name_ru,
-                'first_name_en'                 => $item->first_name_en,
-                'middle_name_ru'                => $item->middle_name_ru,
-                'birth_date'                    => $birth_date,
-                self::$genders[$item->gender]   => 'Х',
-                'citizenship_name'              => $item->citizenship_name,
-                'birth_place'                   => $birth_place,
-                'passport'                      => __('PASSPORT'),
-                'passport_serie'                => $item->passport_serie,
-                'passport_number'               => $item->passport_number,
-                'passport_issued'               => $passport_issued,
-                'passport_expired'              => $passport_expired,
-                'existing_visa_serie'           => $item->visa_serie,
-                'existing_visa_number'          => $item->visa_number,
-                'existing_visa_started'         => $visa_started,
-                'existing_visa_expired'         => $visa_expired,
-                'existing_invitation_number'    => $item->invitation_number
+                'date'                              => $date,
+                self::$actions[$action]             => '',
+                self::$visaTypes[$visaMultiplicity] => 'Х',
+                self::$visaTypes[$visaCategory]     => 'Х',
+                self::$visaTypes[$visaPurpose]      => 'Х',
+                'last_name_ru'                      => $employee->last_name_ru,
+                'last_name_en'                      => $employee->last_name_en,
+                'first_name_ru'                     => $employee->first_name_ru,
+                'first_name_en'                     => $employee->first_name_en,
+                'middle_name_ru'                    => $employee->middle_name_ru,
+                self::$genders[$employee->gender]   => 'Х',
+                'citizenship_name'                  => $citizenship,
+                'birth_place'                       => $birthPlace,
+                'passport'                          => __('PASSPORT'),
+                'passport_serie'                    => $employee->passport_serie,
+                'passport_number'                   => $employee->passport_number,
+                'existing_visa_serie'               => $employee->visa_serie,
+                'existing_visa_number'              => $employee->visa_number,
+                'existing_invitation_number'        => $employee->invitation_number,
+                'reason' => $reason,
+                'inviter' => $inviterInfo,
+                'host' => $hostInfo,
+                'relatives' => $relatives,
+                'destination_address' => $destination,
+                'trip_stops' => $tripStops,
+                'home_address' => $homeAddress,
+                'work_info' => $workInfo,
             ];
 
-        self::splitText($reason, 'reason', $fields, false, false, false, 2, 60, 75);
-        self::splitText($inviter_info, 'inviter', $fields, true, false, false, 3, 44, 70);
-        self::splitText($host_info, 'host', $fields, true, false, false, 3, 44, 70);
-        self::splitText($destination_address, 'destination_address', $fields, true, false, false, 3, 42, 70);
-        self::splitText($trip_stops, 'trip_stops', $fields, true, false, false, 2, 42, 70);
-        self::splitText($home_address, 'home_address', $fields, true, false, false, 2, 42, 70);
-        self::splitText($work_info, 'work_info', $fields, true, false, false, 2, 44, 70);
-        self::splitText($relatives, 'relatives', $fields, true, false, false, 3, 24, 70);
+        $dates =
+            [
+                'birth_date'            => $employee->birth_date,
+                'passport_issued_date'  => $employee->passport_issued_date,
+                'passport_expired_date' => $employee->passport_expired_date,
+                'visa_started_date'     => $employee->visa_started_date,
+                'visa_expired_date'     => $employee->visa_expired_date,
+            ];
 
-        self::output($template, $fields);
+        array_walk($dates, function ($value, $key) use (&$data) {
+            $data[$key] = Carbon::parse($value)->isoFormat('DD/MM/YYYY');
+        });
+
+        return static::populateSplitFields($doc, $docData, $data);
     }
 
     public static function printVisaMotion($app, $input, $model, $view, $id, $template = 'visamotion')
@@ -1844,26 +1811,26 @@ class PdfFormFillingService
     {
         $recipient = Employer::find($docData['authority_id']);
         $permit = Permit::find($docData['employ_permit_id']);
-        $permit_issued = Carbon::parse($permit->issued_date)->isoFormat('DD.MM.YYYY');
+        $permitIssued = Carbon::parse($permit->issued_date)->isoFormat('DD.MM.YYYY');
 
-        $permit_info =
+        $permitInfo =
             __('SHORT_PERMIT_NUMBER') .
             $permit->number .
             __('SINCE') .
-            $permit_issued;
+            $permitIssued;
 
         $employee = Employee::find($id);
         $citizenship = Country::find($employee->citizenship_id)->name_ru;
-        $birth_place = !empty($citizenship) ? ($citizenship . ', ' . $employee->birth_place) : $employee->birth_place;
-        $address = $employee->address ?: $birth_place;
-        $reg_address = Address::find($employee->reg_address_id)->name_ru;
+        $birthPlace = !empty($citizenship) ? ($citizenship . ', ' . $employee->birth_place) : $employee->birth_place;
+        $address = $employee->address ?: $birthPlace;
+        $regAddress = Address::find($employee->reg_address_id)->name_ru;
         $occupation = Occupation::find($employee->occupation_id)->name_ru;
         $passport = __('PASSPORT');
 
         $employer = Employer::find($employee->employer_id);
-        $employer_phone = self::handlePhones($employer->phone, '8', 0);
-        $employer_address = Address::find($employer->address_id)->name_ru;
-        $employer_info = $employer->uni_reg_number . ', ' . $permit_info;
+        $employerPhone = self::handlePhones($employer->phone, '8', 0);
+        $employerAddress = Address::find($employer->address_id)->name_ru;
+        $employerInfo = $employer->uni_reg_number . ', ' . $permitInfo;
 
         $data =
             [
@@ -1873,20 +1840,20 @@ class PdfFormFillingService
                 'passport_number'                 => $employee->passport_number,
                 'taxpayer_id'                     => $employee->taxpayer_id,
                 'employer_taxpayer_id'            => $employee->employer_taxpayer_id,
-                'employer_info'                   => $employer_info,
-                'permit_info'                     => $permit_info,
-                'employer_phone'                  => $employer_phone,
+                'employer_info'                   => $employerInfo,
+                'permit_info'                     => $permitInfo,
+                'employer_phone'                  => $employerPhone,
                 'last_name'                       => $employee->last_name_ru,
                 'first_name'                      => $employee->first_name_ru,
                 'middle_name'                     => $employee->middle_name_ru,
                 'citizenship'                     => $citizenship,
-                'birth_place'                     => $birth_place,
+                'birth_place'                     => $birthPlace,
                 'address'                         => $address,
                 'issuer'                          => $employee->passport_issuer,
-                'reg_address'                     => $reg_address,
+                'reg_address'                     => $regAddress,
                 'occupation'                      => $occupation,
                 'employer_name'                   => $employer->full_name_ru,
-                'employer_address'                => $employer_address,
+                'employer_address'                => $employerAddress,
                 'active_business_type'            => preg_replace(
                     '~(\d+)(.\d+)*(\D)*~',
                     '$1$2',
