@@ -237,6 +237,34 @@ class BaseModel extends Model implements ModelInterface
     }
 
     /**
+     * Apply additional options to query
+     *
+     * @param array $options
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string $field
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     */
+    public static function applyQueryOptions($options, &$query, &$field = '')
+    {
+        if (isset($options['model'])) {
+            $model = app()->make(__NAMESPACE__ . '\\' . $options['model']);
+            $table = $model->getTable();
+            $field = $table . '.' . $model::$defaultName;
+            unset($options['model']);
+        }
+
+        if (!empty($options)) {
+            array_walk_recursive($options, function ($args, $method) use (&$query) {
+                $args =
+                    $query->getConnection()->getName() == 'mysql' ?
+                        str_replace(['INTEGER', 'INT'], 'UNSIGNED', $args) : $args;
+                $args = preg_split('~\s*\|\s*~', $args);
+                $query = $query->$method(...$args);
+            });
+        }
+    }
+
+    /**
      * Scope a query to default order by.
      *
      * @param  \Illuminate\Database\Eloquent\Builder $builder
@@ -359,8 +387,8 @@ class BaseModel extends Model implements ModelInterface
     /**
      * Get items for filter field
      *
-     * @param $field
-     * @param $options
+     * @param string $field
+     * @param array $options
      * @return mixed
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
@@ -381,31 +409,6 @@ class BaseModel extends Model implements ModelInterface
                 ->get();
 
         return $items;
-    }
-
-    /**
-     * Apply additional options to query
-     *
-     * @param $options
-     * @param $query
-     * @param string $field
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
-     */
-    public static function applyQueryOptions($options, &$query, &$field = '')
-    {
-        if (isset($options['model'])) {
-            $model = app()->make(__NAMESPACE__ . '\\' . $options['model']);
-            $table = $model->getTable();
-            $field = $table . '.' . $model::$defaultName;
-            unset($options['model']);
-        }
-
-        if (!empty($options)) {
-            array_walk_recursive($options, function ($args, $method) use (&$query) {
-                $args = preg_split('~\s*\|\s*~', $args);
-                $query = $query->$method(...$args);
-            });
-        }
     }
 
     /**

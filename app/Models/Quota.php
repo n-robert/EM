@@ -46,12 +46,12 @@ class Quota extends BaseModel
     protected $filterFields = [
         'employer_id'       => [
             'model' => 'Employer',
-            ['leftJoin' => 'employers|employers.id|employer_id'],
+            ['leftJoin' => 'employers|employers.id|quotas.employer_id'],
             ['leftJoin' => 'types|types.id|employers.type_id'],
             ['whereRaw' => 'types.code LIKE \'%LEGAL%\''],
         ],
         'valid_quotas' => [
-            ['whereRaw' => 'CAST(quotas.year AS INTEGER) >= DATE_PART(\'YEAR\', NOW())']
+            ['whereRaw' => 'CAST(quotas.year AS INTEGER) >= EXTRACT(YEAR FROM NOW())']
         ],
     ];
 

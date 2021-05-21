@@ -117,11 +117,14 @@ class ExpatManagerServiceProvider extends ServiceProvider
             }
         );
 
-        DB::connection()->setSchemaGrammar(new class extends PostgresGrammar {
-            protected function typeInt_array(\Illuminate\Support\Fluent $column)
+        if (DB::connection()->getName() == 'pgsql') {
+            DB::connection()->setSchemaGrammar(new class extends PostgresGrammar
             {
-                return 'int[]';
-            }
-        });
+                protected function typeInt_array(\Illuminate\Support\Fluent $column)
+                {
+                    return 'int[]';
+                }
+            });
+        }
     }
 }

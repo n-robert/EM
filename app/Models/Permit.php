@@ -51,7 +51,7 @@ class Permit extends BaseModel
     protected $filterFields = [
         'employer_id'                => [
             'model' => 'Employer',
-            ['leftJoin' => 'employers|employers.id|employer_id'],
+            ['leftJoin' => 'employers|employers.id|permits.employer_id'],
             ['leftJoin' => 'types|types.id|employers.type_id'],
             ['whereRaw' => 'types.code LIKE \'%LEGAL%\''],
         ],
