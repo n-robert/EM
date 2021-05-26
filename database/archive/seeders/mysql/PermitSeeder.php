@@ -21,7 +21,6 @@ class PermitSeeder extends Seeder
             'issued_date',
             'expired_date',
             'employer_id',
-            'quota_id',
             'details',
             'user_ids',
             'published',
