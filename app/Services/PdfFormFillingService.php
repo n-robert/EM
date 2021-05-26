@@ -1013,7 +1013,12 @@ class PdfFormFillingService
         $pdf->fillForm($data)->needAppearances();
 
         if (!$pdf->send()) {
-            abort($pdf->getError());
+            abort(
+                implode(
+                    "\r\n",
+                    array_filter([$pdf->getError(), $pdf->getCommand()->getStdErr()])
+                )
+            );
         }
     }
 

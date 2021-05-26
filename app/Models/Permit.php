@@ -17,7 +17,7 @@ class Permit extends BaseModel
      */
     static $ownSelectOptionsCondtitions = [
         'Valid' => [
-            ['whereRaw' => 'DATE_PART(\'MONTH\', expired_date) >= DATE_PART(\'MONTH\', NOW())'],
+            ['whereRaw' => 'EXTRACT(MONTH FROM expired_date) >= EXTRACT(MONTH FROM NOW())'],
         ],
     ];
 
