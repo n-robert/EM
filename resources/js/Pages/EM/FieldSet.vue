@@ -1,7 +1,7 @@
 <template>
     <div v-if="!field.repeatable">
         <div v-for="(subField, subName) in field" v-if="!isNotFields.includes(subName)">
-            <fmsdocs-input
+            <e-m-input
                     :name="subField.name"
                     :type="subField.type"
                     :value="item[subField.name] || subField.value"
@@ -10,7 +10,7 @@
                     :label="subField.label"
                     :hasLabel="subField.hasLabel"
                     :id="subField.name.toString().toKebabCase()"
-                    :isRequired="subField.required"></fmsdocs-input>
+                    :isRequired="subField.required"></e-m-input>
         </div>
     </div>
 
