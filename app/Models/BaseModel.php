@@ -456,7 +456,9 @@ class BaseModel extends Model implements ModelInterface
      */
     public function delete()
     {
-        if ($result = parent::delete() && $this->getConnectionName() == 'pgsql') {
+        $result = parent::delete();
+
+        if ($result && env('DB_SYNC', false) && $this->getConnectionName() == 'pgsql') {
             $result = $this->on('mysql')->toBase()->delete($this->getKey());
         }
 
@@ -477,7 +479,9 @@ class BaseModel extends Model implements ModelInterface
             unset($this->attributes[$key]);
         }
 
-        if ($result = parent::save($options) && $this->getConnectionName() == 'pgsql') {
+        $result = parent::save($options);
+
+        if ($result && env('DB_SYNC', false) && $this->getConnectionName() == 'pgsql') {
             $attributes = $this->getAttributes();
             $attributes['user_ids'] = str_replace(['{', '}'], '', $attributes['user_ids']);
             $result = $this->on('mysql')->upsert($attributes, [$this->getKeyName()]);
