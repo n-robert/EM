@@ -30,7 +30,7 @@
             name="toggle_proxy"
             type="checkbox"
             value="1"
-            onclick="toggleVisibility(this, 'firing-proxy')"
+            onclick="toggleVisibility('firing-proxy', this.checked)"
             checked="false"/>
 
     <fieldset name="firing-proxy" show="false">

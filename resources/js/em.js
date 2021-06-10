@@ -137,7 +137,15 @@ String.prototype.toPascalCase = function() {
     return this.toLowerCaseArray().map(word => word.ucFirst()).join('');
 };
 
-toggleVisibility = function(el, id) {
-    document.getElementById(id).style.display = el.checked ? 'block' : 'none';
+toggleVisibility = function(id, checked = true, parent = null) {
+    if (parent) {
+        document.getElementById(parent).childNodes.forEach(el => {
+            if (el.style) {
+                el.style.display = 'none';
+            }
+        });
+    }
+
+    document.getElementById(id).style.display = checked ? 'block' : 'none';
 };
 

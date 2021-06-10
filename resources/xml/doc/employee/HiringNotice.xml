@@ -19,7 +19,7 @@
             name="toggle_proxy"
             type="checkbox"
             value="1"
-            onclick="toggleVisibility(this, 'hiring-proxy')"
+            onclick="toggleVisibility('hiring-proxy', this.checked)"
             checked="false"/>
 
     <fieldset name="hiring-proxy" show="false">

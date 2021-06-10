@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-show="show" :id="parenId">
         <input v-if="type === 'hidden'" :name="name" :id="id" :value="value" :type="type"/>
 
         <div v-else>
@@ -14,6 +14,7 @@
                         :name="name"
                         v-model="modelValue"
                         :id="id"
+                        :onchange="onchange"
                         :disabled="! $page.props.canEdit"
                         class="form-select"
                         :class="isRequired && (!modelValue || $page.props.errors[name]) ? fieldWarningClass : inputDefaultClass">
@@ -122,6 +123,9 @@
             onclick: {
                 default: null,
             },
+            onchange: {
+                default: null,
+            },
             open: {
                 default: false,
             },
@@ -136,6 +140,12 @@
             },
             customClass: {
                 default: null,
+            },
+            parenId: {
+                default: null,
+            },
+            show: {
+                default: true,
             },
         },
 

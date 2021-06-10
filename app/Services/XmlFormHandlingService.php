@@ -168,7 +168,7 @@ class XmlFormHandlingService
             if ($fieldAttributes['type'] == 'select') {
                 $tmp['options'] = BaseModel::getSingleSelectOptions($fieldAttributes['model']);
             } else {
-                $tmp['value'] = BaseModel::getSinglePropertyValue($fieldAttributes['model'], $id);
+                $tmp['value'] = BaseModel::getSingleValue($fieldAttributes['model'], $id);
             }
         }
     }

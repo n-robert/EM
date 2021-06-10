@@ -1,34 +1,40 @@
 <template>
-    <div v-if="!field.repeatable">
-        <div v-for="(subField, subName) in field" v-if="!isNotFields.includes(subName)">
+    <div v-if="!field.repeatable" :id="name">
+        <e-m-input
+                v-for="(subField, subName) in field"
+                v-if="!isNotFields.includes(subName)"
+                :key="subName"
+                :name="subField.name"
+                :type="subField.type"
+                :value="item[subField.name] || subField.value"
+                :options="subField.options"
+                :onclick="subField.onclick"
+                :label="subField.label"
+                :hasLabel="subField.hasLabel"
+                :id="subField.name.toString().toKebabCase()"
+                :isRequired="subField.required"
+                :parenId="subField.parent_id"
+                :show="subField.show"></e-m-input>
+    </div>
+
+    <div v-else class="space-y-3" :id="name">
+        <div v-for="(subItem, subKey) in item[name]"
+             class="p-2 mt-2 rounded-md bg-gradient-to-b from-indigo-100 to-white">
             <e-m-input
-                    :name="subField.name"
+                    v-for="(subField, subName) in field"
+                    v-if="!isNotFields.includes(subName)"
+                    :key="subName"
+                    :name="name + '[' + subKey + '][' + subField.name + ']'"
                     :type="subField.type"
-                    :value="item[subField.name] || subField.value"
+                    :value="subItem[subField.name] || subField.value"
                     :options="subField.options"
                     :onclick="subField.onclick"
                     :label="subField.label"
                     :hasLabel="subField.hasLabel"
                     :id="subField.name.toString().toKebabCase()"
-                    :isRequired="subField.required"></e-m-input>
-        </div>
-    </div>
-
-    <div v-else class="space-y-3">
-        <div v-for="(subItem, subKey) in item[name]"
-             class="p-2 mt-2 rounded-md bg-gradient-to-b from-indigo-100 to-white">
-            <div v-for="(subField, subName) in field" v-if="!isNotFields.includes(subName)">
-                <e-m-input
-                        :name="name + '[' + subKey + '][' + subField.name + ']'"
-                        :type="subField.type"
-                        :value="subItem[subField.name] || subField.value"
-                        :options="subField.options"
-                        :onclick="subField.onclick"
-                        :label="subField.label"
-                        :hasLabel="subField.hasLabel"
-                        :id="subField.name.toString().toKebabCase()"
-                        :isRequired="subField.required"></e-m-input>
-            </div>
+                    :isRequired="subField.required"
+                    :parenId="subField.parent_id"
+                    :show="subField.show"></e-m-input>
 
             <span :class="leftColumn"></span>
             <span :class="rightColumn">

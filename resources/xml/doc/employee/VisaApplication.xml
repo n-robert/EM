@@ -21,23 +21,30 @@
         <field
                 name="reason"
                 type="select"
-                required="true">
+                required="true"
+                onchange="toggleVisibility(this.value, true, 'reasons')">
             <option value="NEW_WORK_PERMIT"/>
             <option value="EXPIRED_VISA"/>
             <option value="NEW_PASSPORT"/>
         </field>
-        <field
-                name="work_permit"
-                value="12345"
-                type="hidden"/>
-        <field
-                name="visa"
-                value="34567"
-                type="hidden"/>
-        <field
-                name="passport"
-                value="45678"
-                type="hidden"/>
+
+        <fieldset name="reasons" show="true">
+            <field
+                    name="work_permit"
+                    parent_id="NEW_WORK_PERMIT"
+                    show="false"
+                    model="Employee:work_permit_serie:work_permit_number"/>
+            <field
+                    name="visa"
+                    parent_id="EXPIRED_VISA"
+                    show="false"
+                    model="Employee:visa_serie:visa_number"/>
+            <field
+                    name="passport"
+                    parent_id="NEW_PASSPORT"
+                    show="false"
+                    model="Employee:passport_serie:passport_number"/>
+        </fieldset>
     </fieldgroup>
 
     <fieldgroup name="visa_details">

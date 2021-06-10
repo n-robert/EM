@@ -4847,6 +4847,12 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -5007,6 +5013,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 
 
 
@@ -5040,6 +5047,9 @@ __webpack_require__.r(__webpack_exports__);
     onclick: {
       "default": null
     },
+    onchange: {
+      "default": null
+    },
     open: {
       "default": false
     },
@@ -5054,6 +5064,12 @@ __webpack_require__.r(__webpack_exports__);
     },
     customClass: {
       "default": null
+    },
+    parenId: {
+      "default": null
+    },
+    show: {
+      "default": true
     }
   },
   data: function data() {
@@ -5098,6 +5114,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Tab__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Tab */ "./resources/js/Pages/EM/Tab.vue");
 /* harmony import */ var _FieldSet__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./FieldSet */ "./resources/js/Pages/EM/FieldSet.vue");
 /* harmony import */ var _Input__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Input */ "./resources/js/Pages/EM/Input.vue");
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -7295,8 +7317,19 @@ String.prototype.toPascalCase = function () {
   }).join('');
 };
 
-toggleVisibility = function toggleVisibility(el, id) {
-  document.getElementById(id).style.display = el.checked ? 'block' : 'none';
+toggleVisibility = function toggleVisibility(id) {
+  var checked = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+  var parent = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+
+  if (parent) {
+    document.getElementById(parent).childNodes.forEach(function (el) {
+      if (el.style) {
+        el.style.display = 'none';
+      }
+    });
+  }
+
+  document.getElementById(id).style.display = checked ? 'block' : 'none';
 };
 
 /***/ }),
@@ -39081,34 +39114,32 @@ var render = function() {
   return !_vm.field.repeatable
     ? _c(
         "div",
+        { attrs: { id: _vm.name } },
         _vm._l(_vm.field, function(subField, subName) {
           return !_vm.isNotFields.includes(subName)
-            ? _c(
-                "div",
-                [
-                  _c("e-m-input", {
-                    attrs: {
-                      name: subField.name,
-                      type: subField.type,
-                      value: _vm.item[subField.name] || subField.value,
-                      options: subField.options,
-                      onclick: subField.onclick,
-                      label: subField.label,
-                      hasLabel: subField.hasLabel,
-                      id: subField.name.toString().toKebabCase(),
-                      isRequired: subField.required
-                    }
-                  })
-                ],
-                1
-              )
+            ? _c("e-m-input", {
+                key: subName,
+                attrs: {
+                  name: subField.name,
+                  type: subField.type,
+                  value: _vm.item[subField.name] || subField.value,
+                  options: subField.options,
+                  onclick: subField.onclick,
+                  label: subField.label,
+                  hasLabel: subField.hasLabel,
+                  id: subField.name.toString().toKebabCase(),
+                  isRequired: subField.required,
+                  parenId: subField.parent_id,
+                  show: subField.show
+                }
+              })
             : _vm._e()
         }),
-        0
+        1
       )
     : _c(
         "div",
-        { staticClass: "space-y-3" },
+        { staticClass: "space-y-3", attrs: { id: _vm.name } },
         [
           _vm._l(_vm.item[_vm.name], function(subItem, subKey) {
             return _c(
@@ -39120,31 +39151,28 @@ var render = function() {
               [
                 _vm._l(_vm.field, function(subField, subName) {
                   return !_vm.isNotFields.includes(subName)
-                    ? _c(
-                        "div",
-                        [
-                          _c("e-m-input", {
-                            attrs: {
-                              name:
-                                _vm.name +
-                                "[" +
-                                subKey +
-                                "][" +
-                                subField.name +
-                                "]",
-                              type: subField.type,
-                              value: subItem[subField.name] || subField.value,
-                              options: subField.options,
-                              onclick: subField.onclick,
-                              label: subField.label,
-                              hasLabel: subField.hasLabel,
-                              id: subField.name.toString().toKebabCase(),
-                              isRequired: subField.required
-                            }
-                          })
-                        ],
-                        1
-                      )
+                    ? _c("e-m-input", {
+                        key: subName,
+                        attrs: {
+                          name:
+                            _vm.name +
+                            "[" +
+                            subKey +
+                            "][" +
+                            subField.name +
+                            "]",
+                          type: subField.type,
+                          value: subItem[subField.name] || subField.value,
+                          options: subField.options,
+                          onclick: subField.onclick,
+                          label: subField.label,
+                          hasLabel: subField.hasLabel,
+                          id: subField.name.toString().toKebabCase(),
+                          isRequired: subField.required,
+                          parenId: subField.parent_id,
+                          show: subField.show
+                        }
+                      })
                     : _vm._e()
                 }),
                 _vm._v(" "),
@@ -39290,45 +39318,125 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", [
-    _vm.type === "hidden"
-      ? _c("input", {
-          attrs: { name: _vm.name, id: _vm.id, type: _vm.type },
-          domProps: { value: _vm.value }
-        })
-      : _c("div", [
-          _c(
-            "span",
-            { class: _vm.leftColumn },
-            [
-              _c("fmsdocs-label", {
-                class: [
-                  _vm.isRequired &&
-                  (!_vm.modelValue || _vm.$page.props.errors[_vm.name])
-                    ? _vm.warningClass
-                    : "",
-                  _vm.labelDefaultClass
-                ],
-                attrs: {
-                  text:
-                    _vm.hasLabel && _vm.hasLabel !== "false" && _vm.labelText
-                      ? _vm.__(_vm.labelText).toPhrase() + ": "
+  return _c(
+    "div",
+    {
+      directives: [
+        { name: "show", rawName: "v-show", value: _vm.show, expression: "show" }
+      ],
+      attrs: { id: _vm.parenId }
+    },
+    [
+      _vm.type === "hidden"
+        ? _c("input", {
+            attrs: { name: _vm.name, id: _vm.id, type: _vm.type },
+            domProps: { value: _vm.value }
+          })
+        : _c("div", [
+            _c(
+              "span",
+              { class: _vm.leftColumn },
+              [
+                _c("fmsdocs-label", {
+                  class: [
+                    _vm.isRequired &&
+                    (!_vm.modelValue || _vm.$page.props.errors[_vm.name])
+                      ? _vm.warningClass
                       : "",
-                  for: _vm.name
-                }
-              })
-            ],
-            1
-          ),
-          _vm._v(" "),
-          _c(
-            "span",
-            { class: _vm.rightColumn },
-            [
-              _vm.options
-                ? _c(
-                    "select",
-                    {
+                    _vm.labelDefaultClass
+                  ],
+                  attrs: {
+                    text:
+                      _vm.hasLabel && _vm.hasLabel !== "false" && _vm.labelText
+                        ? _vm.__(_vm.labelText).toPhrase() + ": "
+                        : "",
+                    for: _vm.name
+                  }
+                })
+              ],
+              1
+            ),
+            _vm._v(" "),
+            _c(
+              "span",
+              { class: _vm.rightColumn },
+              [
+                _vm.options
+                  ? _c(
+                      "select",
+                      {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.modelValue,
+                            expression: "modelValue"
+                          }
+                        ],
+                        staticClass: "form-select",
+                        class:
+                          _vm.isRequired &&
+                          (!_vm.modelValue || _vm.$page.props.errors[_vm.name])
+                            ? _vm.fieldWarningClass
+                            : _vm.inputDefaultClass,
+                        attrs: {
+                          name: _vm.name,
+                          id: _vm.id,
+                          onchange: _vm.onchange,
+                          disabled: !_vm.$page.props.canEdit
+                        },
+                        on: {
+                          change: function($event) {
+                            var $$selectedVal = Array.prototype.filter
+                              .call($event.target.options, function(o) {
+                                return o.selected
+                              })
+                              .map(function(o) {
+                                var val = "_value" in o ? o._value : o.value
+                                return val
+                              })
+                            _vm.modelValue = $event.target.multiple
+                              ? $$selectedVal
+                              : $$selectedVal[0]
+                          }
+                        }
+                      },
+                      _vm._l(_vm.options, function(option) {
+                        return _c(
+                          "option",
+                          { domProps: { value: option.value } },
+                          [_vm._v(_vm._s(_vm.__(option.text)))]
+                        )
+                      }),
+                      0
+                    )
+                  : _vm.type === "date"
+                  ? _c("datepicker", {
+                      attrs: {
+                        placeholder: _vm.__("Select Date"),
+                        name: _vm.name,
+                        id: _vm.id,
+                        language: _vm.ru,
+                        format: _vm.$page.props.defaultDateFormat,
+                        "clear-button": _vm.clearButton,
+                        "input-class": "form-input",
+                        highlighted: _vm.highlighted,
+                        "input-class":
+                          _vm.isRequired &&
+                          (!_vm.modelValue || _vm.$page.props.errors[_vm.name])
+                            ? _vm.fieldWarningClass
+                            : _vm.inputDefaultClass
+                      },
+                      model: {
+                        value: _vm.modelValue,
+                        callback: function($$v) {
+                          _vm.modelValue = $$v
+                        },
+                        expression: "modelValue"
+                      }
+                    })
+                  : _vm.type === "textarea"
+                  ? _c("textarea", {
                       directives: [
                         {
                           name: "model",
@@ -39337,107 +39445,148 @@ var render = function() {
                           expression: "modelValue"
                         }
                       ],
-                      staticClass: "form-select",
+                      staticClass: "form-textarea h-28 resize",
                       class:
                         _vm.isRequired &&
                         (!_vm.modelValue || _vm.$page.props.errors[_vm.name])
                           ? _vm.fieldWarningClass
                           : _vm.inputDefaultClass,
-                      attrs: {
-                        name: _vm.name,
-                        id: _vm.id,
-                        disabled: !_vm.$page.props.canEdit
-                      },
+                      attrs: { name: _vm.name, id: _vm.id },
+                      domProps: { value: _vm.modelValue },
                       on: {
-                        change: function($event) {
-                          var $$selectedVal = Array.prototype.filter
-                            .call($event.target.options, function(o) {
-                              return o.selected
-                            })
-                            .map(function(o) {
-                              var val = "_value" in o ? o._value : o.value
-                              return val
-                            })
-                          _vm.modelValue = $event.target.multiple
-                            ? $$selectedVal
-                            : $$selectedVal[0]
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.modelValue = $event.target.value
                         }
                       }
-                    },
-                    _vm._l(_vm.options, function(option) {
-                      return _c(
-                        "option",
-                        { domProps: { value: option.value } },
-                        [_vm._v(_vm._s(_vm.__(option.text)))]
-                      )
-                    }),
-                    0
-                  )
-                : _vm.type === "date"
-                ? _c("datepicker", {
-                    attrs: {
-                      placeholder: _vm.__("Select Date"),
-                      name: _vm.name,
-                      id: _vm.id,
-                      language: _vm.ru,
-                      format: _vm.$page.props.defaultDateFormat,
-                      "clear-button": _vm.clearButton,
-                      "input-class": "form-input",
-                      highlighted: _vm.highlighted,
-                      "input-class":
-                        _vm.isRequired &&
-                        (!_vm.modelValue || _vm.$page.props.errors[_vm.name])
-                          ? _vm.fieldWarningClass
-                          : _vm.inputDefaultClass
-                    },
-                    model: {
-                      value: _vm.modelValue,
-                      callback: function($$v) {
-                        _vm.modelValue = $$v
-                      },
-                      expression: "modelValue"
-                    }
-                  })
-                : _vm.type === "textarea"
-                ? _c("textarea", {
-                    directives: [
-                      {
-                        name: "model",
-                        rawName: "v-model",
-                        value: _vm.modelValue,
-                        expression: "modelValue"
+                    })
+                  : _vm.type === "button" || _vm.type === "submit"
+                  ? _c("fmsdocs-button", {
+                      attrs: {
+                        type: _vm.type,
+                        onclick: _vm.onclick,
+                        open: _vm.open,
+                        originalText: _vm.__(_vm.value),
+                        disabled: !_vm.$page.props.canEdit,
+                        customClass: _vm.customClass
                       }
-                    ],
-                    staticClass: "form-textarea h-28 resize",
-                    class:
-                      _vm.isRequired &&
-                      (!_vm.modelValue || _vm.$page.props.errors[_vm.name])
-                        ? _vm.fieldWarningClass
-                        : _vm.inputDefaultClass,
-                    attrs: { name: _vm.name, id: _vm.id },
-                    domProps: { value: _vm.modelValue },
-                    on: {
-                      input: function($event) {
-                        if ($event.target.composing) {
-                          return
+                    })
+                  : _vm.type === "checkbox"
+                  ? _vm.type === "checkbox"
+                    ? _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.modelValue,
+                            expression: "modelValue"
+                          }
+                        ],
+                        staticClass: "form-checkbox",
+                        class:
+                          _vm.isRequired &&
+                          (!_vm.modelValue || _vm.$page.props.errors[_vm.name])
+                            ? _vm.fieldWarningClass
+                            : _vm.inputDefaultClass,
+                        attrs: {
+                          name: _vm.name,
+                          id: _vm.id,
+                          disabled: !_vm.$page.props.canEdit,
+                          onclick: _vm.onclick,
+                          type: "checkbox"
+                        },
+                        domProps: {
+                          checked: Array.isArray(_vm.modelValue)
+                            ? _vm._i(_vm.modelValue, null) > -1
+                            : _vm.modelValue
+                        },
+                        on: {
+                          change: function($event) {
+                            var $$a = _vm.modelValue,
+                              $$el = $event.target,
+                              $$c = $$el.checked ? true : false
+                            if (Array.isArray($$a)) {
+                              var $$v = null,
+                                $$i = _vm._i($$a, $$v)
+                              if ($$el.checked) {
+                                $$i < 0 && (_vm.modelValue = $$a.concat([$$v]))
+                              } else {
+                                $$i > -1 &&
+                                  (_vm.modelValue = $$a
+                                    .slice(0, $$i)
+                                    .concat($$a.slice($$i + 1)))
+                              }
+                            } else {
+                              _vm.modelValue = $$c
+                            }
+                          }
                         }
-                        _vm.modelValue = $event.target.value
-                      }
-                    }
-                  })
-                : _vm.type === "button" || _vm.type === "submit"
-                ? _c("fmsdocs-button", {
-                    attrs: {
-                      type: _vm.type,
-                      onclick: _vm.onclick,
-                      open: _vm.open,
-                      originalText: _vm.__(_vm.value),
-                      disabled: !_vm.$page.props.canEdit,
-                      customClass: _vm.customClass
-                    }
-                  })
-                : _vm.type === "checkbox"
-                ? _vm.type === "checkbox"
+                      })
+                    : _vm.type === "radio"
+                    ? _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.modelValue,
+                            expression: "modelValue"
+                          }
+                        ],
+                        staticClass: "form-checkbox",
+                        class:
+                          _vm.isRequired &&
+                          (!_vm.modelValue || _vm.$page.props.errors[_vm.name])
+                            ? _vm.fieldWarningClass
+                            : _vm.inputDefaultClass,
+                        attrs: {
+                          name: _vm.name,
+                          id: _vm.id,
+                          disabled: !_vm.$page.props.canEdit,
+                          onclick: _vm.onclick,
+                          type: "radio"
+                        },
+                        domProps: { checked: _vm._q(_vm.modelValue, null) },
+                        on: {
+                          change: function($event) {
+                            _vm.modelValue = null
+                          }
+                        }
+                      })
+                    : _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.modelValue,
+                            expression: "modelValue"
+                          }
+                        ],
+                        staticClass: "form-checkbox",
+                        class:
+                          _vm.isRequired &&
+                          (!_vm.modelValue || _vm.$page.props.errors[_vm.name])
+                            ? _vm.fieldWarningClass
+                            : _vm.inputDefaultClass,
+                        attrs: {
+                          name: _vm.name,
+                          id: _vm.id,
+                          disabled: !_vm.$page.props.canEdit,
+                          onclick: _vm.onclick,
+                          type: _vm.type
+                        },
+                        domProps: { value: _vm.modelValue },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.modelValue = $event.target.value
+                          }
+                        }
+                      })
+                  : _vm.type === "checkbox"
                   ? _c("input", {
                       directives: [
                         {
@@ -39447,7 +39596,7 @@ var render = function() {
                           expression: "modelValue"
                         }
                       ],
-                      staticClass: "form-checkbox",
+                      staticClass: "form-input",
                       class:
                         _vm.isRequired &&
                         (!_vm.modelValue || _vm.$page.props.errors[_vm.name])
@@ -39497,7 +39646,7 @@ var render = function() {
                           expression: "modelValue"
                         }
                       ],
-                      staticClass: "form-checkbox",
+                      staticClass: "form-input",
                       class:
                         _vm.isRequired &&
                         (!_vm.modelValue || _vm.$page.props.errors[_vm.name])
@@ -39526,7 +39675,7 @@ var render = function() {
                           expression: "modelValue"
                         }
                       ],
-                      staticClass: "form-checkbox",
+                      staticClass: "form-input",
                       class:
                         _vm.isRequired &&
                         (!_vm.modelValue || _vm.$page.props.errors[_vm.name])
@@ -39548,139 +39697,28 @@ var render = function() {
                           _vm.modelValue = $event.target.value
                         }
                       }
-                    })
-                : _vm.type === "checkbox"
-                ? _c("input", {
-                    directives: [
-                      {
-                        name: "model",
-                        rawName: "v-model",
-                        value: _vm.modelValue,
-                        expression: "modelValue"
-                      }
-                    ],
-                    staticClass: "form-input",
-                    class:
-                      _vm.isRequired &&
-                      (!_vm.modelValue || _vm.$page.props.errors[_vm.name])
-                        ? _vm.fieldWarningClass
-                        : _vm.inputDefaultClass,
-                    attrs: {
-                      name: _vm.name,
-                      id: _vm.id,
-                      disabled: !_vm.$page.props.canEdit,
-                      onclick: _vm.onclick,
-                      type: "checkbox"
-                    },
-                    domProps: {
-                      checked: Array.isArray(_vm.modelValue)
-                        ? _vm._i(_vm.modelValue, null) > -1
-                        : _vm.modelValue
-                    },
-                    on: {
-                      change: function($event) {
-                        var $$a = _vm.modelValue,
-                          $$el = $event.target,
-                          $$c = $$el.checked ? true : false
-                        if (Array.isArray($$a)) {
-                          var $$v = null,
-                            $$i = _vm._i($$a, $$v)
-                          if ($$el.checked) {
-                            $$i < 0 && (_vm.modelValue = $$a.concat([$$v]))
-                          } else {
-                            $$i > -1 &&
-                              (_vm.modelValue = $$a
-                                .slice(0, $$i)
-                                .concat($$a.slice($$i + 1)))
-                          }
-                        } else {
-                          _vm.modelValue = $$c
-                        }
-                      }
-                    }
-                  })
-                : _vm.type === "radio"
-                ? _c("input", {
-                    directives: [
-                      {
-                        name: "model",
-                        rawName: "v-model",
-                        value: _vm.modelValue,
-                        expression: "modelValue"
-                      }
-                    ],
-                    staticClass: "form-input",
-                    class:
-                      _vm.isRequired &&
-                      (!_vm.modelValue || _vm.$page.props.errors[_vm.name])
-                        ? _vm.fieldWarningClass
-                        : _vm.inputDefaultClass,
-                    attrs: {
-                      name: _vm.name,
-                      id: _vm.id,
-                      disabled: !_vm.$page.props.canEdit,
-                      onclick: _vm.onclick,
-                      type: "radio"
-                    },
-                    domProps: { checked: _vm._q(_vm.modelValue, null) },
-                    on: {
-                      change: function($event) {
-                        _vm.modelValue = null
-                      }
-                    }
-                  })
-                : _c("input", {
-                    directives: [
-                      {
-                        name: "model",
-                        rawName: "v-model",
-                        value: _vm.modelValue,
-                        expression: "modelValue"
-                      }
-                    ],
-                    staticClass: "form-input",
-                    class:
-                      _vm.isRequired &&
-                      (!_vm.modelValue || _vm.$page.props.errors[_vm.name])
-                        ? _vm.fieldWarningClass
-                        : _vm.inputDefaultClass,
-                    attrs: {
-                      name: _vm.name,
-                      id: _vm.id,
-                      disabled: !_vm.$page.props.canEdit,
-                      onclick: _vm.onclick,
-                      type: _vm.type
-                    },
-                    domProps: { value: _vm.modelValue },
-                    on: {
-                      input: function($event) {
-                        if ($event.target.composing) {
-                          return
-                        }
-                        _vm.modelValue = $event.target.value
-                      }
-                    }
-                  }),
-              _vm._v(" "),
-              _vm.isRequired &&
-              (!_vm.modelValue || _vm.$page.props.errors[_vm.name])
-                ? _c("p", { class: [_vm.warningClass, _vm.pDefaultClass] }, [
-                    _vm._v(
-                      "\n                " +
-                        _vm._s(
-                          _vm.$page.props.errors[_vm.name]
-                            ? _vm.$page.props.errors[_vm.name]
-                            : _vm.errorMessage
-                        ) +
-                        "\n            "
-                    )
-                  ])
-                : _vm._e()
-            ],
-            1
-          )
-        ])
-  ])
+                    }),
+                _vm._v(" "),
+                _vm.isRequired &&
+                (!_vm.modelValue || _vm.$page.props.errors[_vm.name])
+                  ? _c("p", { class: [_vm.warningClass, _vm.pDefaultClass] }, [
+                      _vm._v(
+                        "\n                " +
+                          _vm._s(
+                            _vm.$page.props.errors[_vm.name]
+                              ? _vm.$page.props.errors[_vm.name]
+                              : _vm.errorMessage
+                          ) +
+                          "\n            "
+                      )
+                    ])
+                  : _vm._e()
+              ],
+              1
+            )
+          ])
+    ]
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -39790,11 +39828,14 @@ var render = function() {
                                         _vm.item[field.name] || field.value,
                                       options: field.options,
                                       onclick: field.onclick,
+                                      onchange: field.onchange,
                                       label: field.label,
                                       hasLabel: field.hasLabel,
                                       checked: field.checked,
                                       id: field.name.toString().toKebabCase(),
-                                      isRequired: field.required
+                                      isRequired: field.required,
+                                      parenId: field.parent_id,
+                                      show: field.show
                                     }
                                   })
                             ],
@@ -39845,13 +39886,16 @@ var render = function() {
                                           element.value,
                                         options: element.options,
                                         onclick: element.onclick,
+                                        onchange: element.onchange,
                                         label: element.label,
                                         hasLabel: element.hasLabel,
                                         checked: element.checked,
                                         id:
                                           element.name &&
                                           element.name.toString().toKebabCase(),
-                                        isRequired: element.required
+                                        isRequired: element.required,
+                                        parenId: element.parent_id,
+                                        show: element.show
                                       }
                                     })
                                   ],

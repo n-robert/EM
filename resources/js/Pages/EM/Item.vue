@@ -38,11 +38,14 @@
                                        :value="item[field.name] || field.value"
                                        :options="field.options"
                                        :onclick="field.onclick"
+                                       :onchange="field.onchange"
                                        :label="field.label"
                                        :hasLabel="field.hasLabel"
                                        :checked="field.checked"
                                        :id="field.name.toString().toKebabCase()"
-                                       :isRequired="field.required"></fmsdocs-input>
+                                       :isRequired="field.required"
+                                       :parenId="field.parent_id"
+                                       :show="field.show"></fmsdocs-input>
                     </div>
                 </tab>
 
@@ -66,11 +69,14 @@
                                            :value="item[element.name] || element.value"
                                            :options="element.options"
                                            :onclick="element.onclick"
+                                           :onchange="element.onchange"
                                            :label="element.label"
                                            :hasLabel="element.hasLabel"
                                            :checked="element.checked"
                                            :id="element.name && element.name.toString().toKebabCase()"
-                                           :isRequired="element.required"></fmsdocs-input>
+                                           :isRequired="element.required"
+                                           :parenId="element.parent_id"
+                                           :show="element.show"></fmsdocs-input>
                         </div>
                     </div>
                 </div>
@@ -134,7 +140,7 @@
                         'table w-full p-4 rounded-b-lg bg-white' :
                         'table w-full p-4 pt-6 rounded-lg bg-white';
                 tabLayer = 'bg-gradient-to-b rounded-t-lg from-indigo-100 to-white';
-                    tabActive = 'py-4 px-8 rounded-t-lg bg-white text-indigo-500';
+                tabActive = 'py-4 px-8 rounded-t-lg bg-white text-indigo-500';
                 tabInActive = 'py-4 px-8 rounded-lg hover:text-indigo-500';
             }
 

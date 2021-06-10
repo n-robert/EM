@@ -1327,7 +1327,7 @@ class PdfFormFillingService
     {
         $action = $docData['action'];
         $visaPurpose = $docData['visa_purpose'];
-        $reason = __($docData['reason']);
+        $reason = $docData['reason'];
         $inviterId = $docData['inviter_id'];
         $destinationId = $docData['destination_id'];
 
@@ -1344,27 +1344,24 @@ class PdfFormFillingService
         switch ($reason) {
             case 'EXPIRED_VISA':
                 $suffix = $docData['visa'];
-                $format = __('SERIE_NUMBER_SPRINTF');
                 break;
             case 'NEW_PASSPORT':
                 $suffix = $docData['passport'];
-                $format = __('NUMBER_SPRINTF');
                 break;
             case 'NEW_WORK_PERMIT':
             default:
                 $suffix = $docData['work_permit'];
-                $format = __('NUMBER_SPRINTF');
                 break;
         }
 
-        if (
-            strpos(strtolower($suffix), strtolower(__('SERIE'))) !== false ||
-            strpos(strtolower($suffix), strtolower(__('SHORT_NUMBER'))) !== false
-        ) {
-            $reason .= ' ' . $suffix;
-        } else {
-            $reason .= sprintf($format, ...explode(' ', $suffix));
-        }
+        $suffix = explode(' ', $suffix);
+        $format =
+            count($suffix) > 1 ?
+                __('SERIE_NUMBER_SPRINTF') : __('NUMBER_SPRINTF');
+
+        $reason =
+            __($reason) .
+            sprintf($format, ...$suffix);
 
         $inviter = Employer::find($inviterId);
         $inviterPhone = self::handlePhones($inviter->phone, '8');
@@ -1432,14 +1429,14 @@ class PdfFormFillingService
                 'existing_visa_serie'               => $employee->visa_serie,
                 'existing_visa_number'              => $employee->visa_number,
                 'existing_invitation_number'        => $employee->invitation_number,
-                'reason' => $reason,
-                'inviter' => $inviterInfo,
-                'host' => $hostInfo,
-                'relatives' => $relatives,
-                'destination_address' => $destination,
-                'trip_stops' => $tripStops,
-                'home_address' => $homeAddress,
-                'work_info' => $workInfo,
+                'reason'                            => $reason,
+                'inviter'                           => $inviterInfo,
+                'host'                              => $hostInfo,
+                'relatives'                         => $relatives,
+                'destination_address'               => $destination,
+                'trip_stops'                        => $tripStops,
+                'home_address'                      => $homeAddress,
+                'work_info'                         => $workInfo,
             ];
 
         $dates =

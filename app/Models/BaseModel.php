@@ -156,16 +156,22 @@ class BaseModel extends Model implements ModelInterface
      * @param int $id
      * @return string
      */
-    public static function getSinglePropertyValue($model, $id)
+    public static function getSingleValue($model, $id)
     {
         if (!is_array($model)) {
-            $model = explode(':', $model);
+            $model = explode(':', $model, 2);
         }
 
-        list($class, $property) = array_pad($model, 2, null);
+        list($class, $properties) = $model;
         $item = call_user_func([__NAMESPACE__ . '\\' . $class, 'find'], $id);
 
-        return $item->{$property};
+        return array_reduce(
+            explode(':', $properties),
+            function ($result, $property) use ($item) {
+                $result .= ' ' . $item->{$property};
+                return $result;
+            }
+        );
     }
 
     /**
