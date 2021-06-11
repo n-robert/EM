@@ -443,5 +443,6 @@
   "visa_multiplicity": "кратность визы",
   "visa_category": "категория визы",
   "visa_purpose": "вид визы",
-  "destination_id": "адрес места прибывания"
+  "destination_id": "адрес места прибывания",
+  "reg_address_id": "адрес регистрации"
 }
