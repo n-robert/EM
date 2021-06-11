@@ -77,7 +77,7 @@ class Employee extends BaseModel
         'employ_permit_id' => [
             'model' => 'Permit',
             ['leftJoin' => 'permits|permits.id|employ_permit_id'],
-            ['whereRaw' => 'EXTRACT(MONTH FROM expired_date) >= EXTRACT(MONTH FROM NOW())'],
+            ['whereRaw' => 'permits.expired_date >= NOW()'],
         ],
 
         'occupation_id' => [
