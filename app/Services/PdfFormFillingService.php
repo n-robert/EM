@@ -1455,111 +1455,103 @@ class PdfFormFillingService
         return static::populateSplitFields($doc, $docData, $data);
     }
 
-    public static function printVisaMotion($app, $input, $model, $view, $id, $template = 'visamotion')
+    public static function printVisaMotion($docData, $doc, $id)
     {
-        $recipient_id = $input->post->get('recipient_id', '', 'string');
+        $recipient = Employer::find($docData['authority_id']);
+        $recipientDirectorId = $docData['officer_id'] ?: $recipient->director_id;
+        $recipientDirector = Employee::find($recipientDirectorId);
+        $recipientDirector =
+            [
+                self::declension($recipientDirector->last_name_ru, 3, $recipientDirector->gender, 'name'),
+                mb_substr($recipientDirector->first_name_ru, 0, 1) . '.',
+                mb_substr($recipientDirector->middle_name_ru, 0, 1) . '.'
+            ];
+        $recipientDirector = implode(' ', $recipientDirector);
 
-        self::checkRequiredValues($app, $view, $id, $template, $recipient_id);
+        $employee = Employee::find($id);
+        $employer = Employer::find($employee->employer_id);
 
-        $item = $model->getItem($id, true);
-        $file_name = self::getFileName($item, $template);
-
-        $recipient = $item->recipient[$recipient_id];
-        $recipient_person_id = $input->post->get('recipient_person_id', $recipient->director, 'int');
-        $recipient_director = $model->getItem($recipient_person_id);
-        $recipient_director = [
-            self::declension($recipient_director->last_name_ru, 3, $recipient_director->gender, 'name'),
-            mb_substr($recipient_director->first_name_ru, 0, 1) . '.',
-            mb_substr($recipient_director->middle_name_ru, 0, 1) . '.'
+        $hostInfo = [
+            $employer->name_ru,
+            __('TAXPAYER_ID') . ' ' . $employer->taxpayer_id,
+            Address::find($employer->address_id)->name_ru,
+            $employer->phone
         ];
-        $recipient_director = implode(' ', $recipient_director);
+        $hostInfo = implode(', ', $hostInfo);
 
-        $host_info = [
-            $item->employer_name,
-            __('TAXPAYER_ID') . ' ' . $item->employer_taxpayer_id,
-            $item->employer_address,
-            $item->employer_phone
-        ];
-        $host_info = implode(', ', $host_info);
-
-        $action = $input->post->get('action', '0', 'string');
+        $action = $docData['action'];
         $actions = ['extend', 'renew'];
         $gender = ['MALE' => 'male', 'FEMALE' => 'female'];
         $birth_date = '';
 
-        if (trim($item->birth_date) != '0000-00-00') {
-            $birth_date = date('d/m/Y', strtotime($item->birth_date));
+        if (trim($employee->birth_date) != '0000-00-00') {
+            $birth_date = date('d/m/Y', strtotime($employee->birth_date));
         }
 
-        $documents = [
-            'WORKCONTRACT_EXTEND' => 'work_contract',
-            'NEW_WORK_PERMIT'     => 'work_permit',
-            'EXPIRED_VISA'        => 'visa'
-        ];
-        $reasons = [];
-        $reason = $input->post->get('reason', '', 'string');
-        $reasons[] = __($reason);
-        $reasons[] = __('SHORT_NUMBER');
-        $reasons[] = $input->post->get($documents[$reason]);
-        $reasons[] = __('VALID_FROM_LC');
+        $documents = ['work_contract', 'work_permit', 'visa'];
+        $reason = [];
+        $reason[] = __($docData['reason']);
+        $reason[] = __('SHORT_NUMBER');
+        $reason[] = $input->post->get($documents[$reason]);
+        $reason[] = __('VALID_FROM_LC');
         $from = $input->post->get($documents[$reason] . '_from');
-        $reasons[] = date('d/m/Y', strtotime($from));
-        $reasons[] = __('VALID_UNTIL_LC');
+        $reason[] = date('d/m/Y', strtotime($from));
+        $reason[] = __('VALID_UNTIL_LC');
         $until = $input->post->get($documents[$reason] . '_until');
-        $reasons[] = date('d/m/Y', strtotime($until));
-        $reasons = implode(' ', $reasons);
+        $reason[] = date('d/m/Y', strtotime($until));
+        $reason = implode(' ', $reason);
 
         $date = $input->post->get('date', '', 'string');
         $date = $date ? date('d/m/Y', strtotime($date)) : '';
 
         $director = __('GENERAL_DIRECTOR');
-        $director_name = [
-            $item->director_last_name_ru,
-            mb_substr($item->director_first_name_ru, 0, 1) . '.',
-            $item->director_middle_name_ru ? mb_substr($item->director_middle_name_ru, 0, 1) . '.' : ''
+        $directorName = [
+            $employee->director_last_name_ru,
+            mb_substr($employee->director_first_name_ru, 0, 1) . '.',
+            $employee->director_middle_name_ru ? mb_substr($employee->director_middle_name_ru, 0, 1) . '.' : ''
         ];
 
-        $fields =
+        $data =
             [
-                'file_name'            => $file_name,
-                'recipient_director'   => $recipient_director,
-                $actions[$action]      => '',
-                'last_name_ru'         => $item->last_name_ru,
-                'first_name_ru'        => $item->first_name_ru,
-                'middle_name_ru'       => $item->middle_name_ru,
-                'last_name_en'         => $item->last_name_en,
-                'first_name_en'        => $item->first_name_en,
-                'middle_name_en'       => $item->middle_name_en,
-                'birth_date'           => $birth_date,
-                'citizenship_name'     => $item->citizenship_name,
-                $gender[$item->gender] => 'X',
-                'passport_serie'       => $item->passport_serie,
-                'passport_number'      => $item->passport_number,
-                'passport_issued'      => date('d/m/Y', strtotime($item->passport_issued)),
-                'passport_expired'     => date('d/m/Y', strtotime($item->passport_expired)),
-                'visa_serie'           => $item->visa_serie,
-                'visa_number'          => $item->visa_number,
-                'visa_started'         => date('d/m/Y', strtotime($item->visa_started)),
-                'visa_expired'         => date('d/m/Y', strtotime($item->visa_expired)),
-                'date'                 => $date,
-                'director'             => $director,
-                'director_name'        => implode(' ', $director_name)
+                'recipient'                         => $recipient->name_ru,
+                'recipient_director'                => $recipientDirector,
+                strtolower($docData['action'])      => '',
+                'last_name_ru'                      => $employee->last_name_ru,
+                'first_name_ru'                     => $employee->first_name_ru,
+                'middle_name_ru'                    => $employee->middle_name_ru,
+                'last_name_en'                      => $employee->last_name_en,
+                'first_name_en'                     => $employee->first_name_en,
+                'middle_name_en'                    => $employee->middle_name_en,
+                'birth_date'                        => $birth_date,
+                'citizenship_name'                  => $employee->citizenship_name,
+                static::$genders[$employee->gender] => 'X',
+                'passport_serie'                    => $employee->passport_serie,
+                'passport_number'                   => $employee->passport_number,
+                'passport_issued'                   => date('d/m/Y', strtotime($employee->passport_issued)),
+                'passport_expired'                  => date('d/m/Y', strtotime($employee->passport_expired)),
+                'visa_serie'                        => $employee->visa_serie,
+                'visa_number'                       => $employee->visa_number,
+                'visa_started'                      => date('d/m/Y', strtotime($employee->visa_started)),
+                'visa_expired'                      => date('d/m/Y', strtotime($employee->visa_expired)),
+                'date'                              => $date,
+                'director'                          => $director,
+                'director_name'                     => implode(' ', $directorName)
             ];
 
         self::splitText(
             self::declension($recipient->name_ru, 2, '', '', 1),
             'recipient',
-            $fields,
+            $data,
             true,
             false,
             false,
             2,
             45
         );
-        self::splitText($host_info, 'host_info', $fields, true, false, false, 4, 35, 45);
-        self::splitText($reasons, 'reason', $fields, true, false, false, 2, 85, 95);
+        self::splitText($hostInfo, 'host_info', $data, true, false, false, 4, 35, 45);
+        self::splitText($reason, 'reason', $data, true, false, false, 2, 85, 95);
 
-        self::output($template, $fields, false, false);
+        return static::populateSplitFields($doc, $docData, $data);
     }
 
     public static function printWarranty($app, $input, $model, $view, $id, $template = 'warranty')
