@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION_PGSQL', 'pgsql'),
+    'default' => env('DB_CONNECTION_PG', 'pgsql'),
 
     /*
     |--------------------------------------------------------------------------
@@ -84,13 +84,13 @@ return [
         ],
 
         'pgsql' => [
-            'driver' => env('DB_CONNECTION_PGSQL'),
+            'driver' => env('DB_CONNECTION_PG'),
             'url' => env('DATABASE_URL'),
             'host' => env('DB_HOST', '127.0.0.1'),
-            'port' => env('DB_PORT_PGSQL', '5432'),
-            'database' => env('DB_DATABASE_PGSQL', 'forge'),
-            'username' => env('DB_USERNAME_PGSQL', 'forge'),
-            'password' => env('DB_PASSWORD_PGSQL', ''),
+            'port' => env('DB_PORT_PG', '5432'),
+            'database' => env('DB_DATABASE_PG', 'forge'),
+            'username' => env('DB_USERNAME_PG', 'forge'),
+            'password' => env('DB_PASSWORD_PG', ''),
             'charset' => 'utf8',
             'prefix' => '',
             'prefix_indexes' => true,
