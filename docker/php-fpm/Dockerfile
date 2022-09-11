@@ -12,7 +12,8 @@ RUN apt-get update \
 
 ADD ./php.ini /usr/local/etc/php/php.ini
 
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+RUN wget https://getcomposer.org/installer -O - -q \
+    | php -- --install-dir=/bin --filename=composer --quiet
 
 ARG user
 ARG uid
