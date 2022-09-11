@@ -1,12 +1,21 @@
 version: '3.7'
 
 services:
-  composer:
-    image: composer:2.0
-    working_dir: /var/www/em.nginx
-    command: composer install
-    depends_on:
-      - php-fpm
+  db:
+    container_name: pgsql
+    build: ./docker/pgsql
+    image: pgsql
+    ports:
+      - "5434:5432"
+    volumes:
+      - ./docker/pgsql/init:/docker-entrypoint-initdb.d
+      - ./docker/pgsql/pgdata:/var/lib/postgresql
+    environment:
+      - POSTGRES_DB=${DB_DATABASE_PG}
+      - POSTGRES_USER=${DB_USERNAME_PG}
+      - POSTGRES_PASSWORD=${DB_PASSWORD_PG}
+    networks:
+      - internal
   php-fpm:
     container_name: php-fpm
     build:
@@ -35,22 +44,14 @@ services:
       - php-fpm
     networks:
       - internal
-  db:
-    container_name: pgsql
-    build: ./docker/pgsql
-    image: pgsql
-    ports:
-      - "5434:5432"
-    volumes:
-      - ./docker/pgsql/init:/docker-entrypoint-initdb.d
-      - ./docker/pgsql/pgdata:/var/lib/postgresql
-    environment:
-      - POSTGRES_DB=${DB_DATABASE_PG}
-      - POSTGRES_USER=${DB_USERNAME_PG}
-      - POSTGRES_PASSWORD=${DB_PASSWORD_PG}
+  composer:
+    image: composer:2.0
+    working_dir: /var/www/em.nginx
+    command: composer install
+    depends_on:
+      - php-fpm
     networks:
       - internal
-
   #db:
     #container_name: mysql
     #build: ./docker/mysql
