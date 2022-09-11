@@ -16,6 +16,7 @@ services:
       - POSTGRES_PASSWORD=${DB_PASSWORD_PG}
     networks:
       - internal
+
   php-fpm:
     container_name: php-fpm
     build:
@@ -30,6 +31,7 @@ services:
       - db
     networks:
       - internal
+
   nginx:
     container_name: nginx
     build:
@@ -44,6 +46,7 @@ services:
       - php-fpm
     networks:
       - internal
+
   composer:
     image: composer:2.0
     working_dir: /var/www/em.nginx
@@ -52,6 +55,7 @@ services:
       - php-fpm
     networks:
       - internal
+
   #db:
     #container_name: mysql
     #build: ./docker/mysql
@@ -68,6 +72,7 @@ services:
       #- MYSQL_ALLOW_EMPTY_PASSWORD=true
     #networks:
       #- internal
+
 networks:
   internal:
     driver: bridge
