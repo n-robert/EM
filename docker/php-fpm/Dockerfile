@@ -15,19 +15,9 @@ ADD ./php.ini /usr/local/etc/php/php.ini
 RUN wget https://getcomposer.org/installer -O - -q \
     | php -- --install-dir=/bin --filename=composer --quiet
 
-ARG user
-ARG uid
-
-RUN useradd -G www-data,root -u $uid -d /home/$user $user
-
-RUN mkdir -p /home/$user/.composer && \
-    chown -R $user:$user /home/$user
-
-USER $user
-
-WORKDIR /var/www
-
 #pdftk
 RUN mkdir -p /usr/share/man/man1/ \
  && apt-get update \
  && apt-get install -y pdftk
+
+WORKDIR /var/www
