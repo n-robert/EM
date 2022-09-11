@@ -22,4 +22,4 @@ RUN mkdir -p /usr/share/man/man1/ \
 
 USER 1000
 
-WORKDIR /var/www
+WORKDIR /
