@@ -47,15 +47,6 @@ services:
     networks:
       - internal
 
-  composer:
-    image: composer:2.0
-    working_dir: /var/www/em.nginx
-    command: composer install
-    depends_on:
-      - php-fpm
-    networks:
-      - internal
-
   #db:
     #container_name: mysql
     #build: ./docker/mysql
