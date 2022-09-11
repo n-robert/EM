@@ -2,90 +2,93 @@
 <root>
     <fieldgroup name="general" show="true">
         <field
-                name="id"
-                type="hidden"/>
+            name="id"
+            type="hidden"/>
         <field
-                name="name_ru"
-                type="text"
-                required="true"/>
+            name="name_ru"
+            type="text"
+            required="true"/>
         <field
-                name="full_name_ru"
-                type="text"
-                required="true"/>
+            name="full_name_ru"
+            type="text"
+            required="true"/>
         <field
-                name="type_id"
-                type="select"
-                required="true"
-                model="Type"/>
+            name="type_id"
+            type="select"
+            required="true"
+            model="Type"/>
         <field
-                name="address_id"
-                type="select"
-                model="Address"/>
+            name="address_id"
+            type="select"
+            model="Address"/>
         <field
-                name="phone"
-                type="text"/>
+            name="phone"
+            type="text"/>
         <field
-                name="director_id"
-                type="select"
-                required="true"
-                model="Employee:Director"/>
+            name="email"
+            type="text"/>
         <field
-                name="booker_id"
-                type="select"
-                model="Employee:Booker"/>
+            name="director_id"
+            type="select"
+            required="true"
+            model="Employee:Director"/>
+        <field
+            name="booker_id"
+            type="select"
+            model="Employee:Booker"/>
     </fieldgroup>
 
     <fieldgroup name="details">
         <field
-                name="prime_reg_number"
-                type="text"/>
+            name="prime_reg_number"
+            type="text"/>
         <field
-                name="prime_reg_date"
-                type="date"
-                format="dd-MM-YYYY"/>
+            name="prime_reg_date"
+            type="date"
+            format="dd-MM-YYYY"/>
         <field
-                name="uni_reg_number"
-                type="text"/>
+            name="uni_reg_number"
+            type="text"/>
         <field
-                name="uni_reg_date"
-                type="date"
-                format="dd-MM-YYYY"/>
+            name="uni_reg_date"
+            type="date"
+            format="dd-MM-YYYY"/>
         <field
-                name="acc_reg_number"
-                type="text"/>
+            name="acc_reg_number"
+            type="text"/>
         <field
-                name="acc_reg_date"
-                type="date"
-                format="dd-MM-YYYY"/>
+            name="acc_reg_date"
+            type="date"
+            format="dd-MM-YYYY"/>
         <field
-                name="taxpayer_id"
-                type="text"/>
+            name="taxpayer_id"
+            type="text"/>
         <field
-                name="taxpayer_code"
-                type="text"/>
+            name="taxpayer_code"
+            type="text"/>
         <field
-                name="active_business_type"
-                type="text"/>
+            name="active_business_type"
+            type="text"/>
         <field
-                name="acc_book_number"
-                type="text"/>
+            name="acc_book_number"
+            type="text"/>
         <field
-                name="account_number"
-                type="text"/>
+            name="account_number"
+            type="text"/>
         <field
-                name="bank"
-                type="text"/>
+            name="bank"
+            type="text"/>
         <field
-                name="ca"
-                type="text"/>
+            name="ca"
+            type="text"/>
         <field
-                name="bic"
-                type="text"/>
+            name="bic"
+            type="text"/>
         <field
-                name="bcc"
-                type="text"/>
+            name="bcc"
+            type="text"/>
         <field
-                name="rcoad"
-                type="text"/>
+            name="rcoad"
+            type="text"/>
     </fieldgroup>
 </root>

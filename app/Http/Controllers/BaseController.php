@@ -310,10 +310,10 @@ class BaseController extends Controller implements ControllerInterface
     /**
      * Bind request data and save model
      *
-     * @param null|Model $model
+     * @param Model|null $model
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function save($model = null)
+    public function save(Model $model = null): \Illuminate\Http\RedirectResponse
     {
         $attributes = $this->requestValidation->except('type');
 
@@ -336,10 +336,10 @@ class BaseController extends Controller implements ControllerInterface
     /**
      * Update existing record.
      *
-     * @param  Model $model
-     * @return mixed
+     * @param Model $model
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function update($model)
+    public function update(Model $model): \Illuminate\Http\RedirectResponse
     {
         return $this->save($model);
     }
