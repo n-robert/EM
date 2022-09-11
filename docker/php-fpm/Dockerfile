@@ -12,9 +12,21 @@ RUN apt-get update \
 
 ADD ./php.ini /usr/local/etc/php/php.ini
 
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+ARG user
+ARG uid
+
+RUN useradd -G www-data,root -u $uid -d /home/$user $user
+
+RUN mkdir -p /home/$user/.composer && \
+    chown -R $user:$user /home/$user
+
+USER $user
+
+WORKDIR /var/www
+
 #pdftk
 RUN mkdir -p /usr/share/man/man1/ \
  && apt-get update \
  && apt-get install -y pdftk
-
-USER 1000
