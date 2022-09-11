@@ -12,14 +12,9 @@ RUN apt-get update \
 
 ADD ./php.ini /usr/local/etc/php/php.ini
 
-RUN wget https://getcomposer.org/installer -O - -q \
-    | php -- --install-dir=/bin --filename=composer --quiet
-
 #pdftk
 RUN mkdir -p /usr/share/man/man1/ \
  && apt-get update \
  && apt-get install -y pdftk
 
 USER 1000
-
-WORKDIR /
