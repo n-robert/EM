@@ -21,9 +21,4 @@ ADD ./php.ini /usr/local/etc/php/php.ini
 RUN wget https://getcomposer.org/installer -O - -q \
     | php -- --install-dir=/bin --filename=composer --quiet
 
-# Permissions
-RUN chown -R www-data:www-data /var/www/ \
-    && chgrp -R www-data /var/www/storage /var/www/bootstrap/cache \
-    && chmod -R ug+rwx /var/www/storage /var/www/bootstrap/cache
-
 WORKDIR /var/www
