@@ -10,14 +10,20 @@ RUN apt-get update \
     && docker-php-ext-install pgsql \
     && docker-php-ext-enable pgsql
 
-ADD ./php.ini /usr/local/etc/php/php.ini
-
-RUN wget https://getcomposer.org/installer -O - -q \
-    | php -- --install-dir=/bin --filename=composer --quiet
-
 #pdftk
 RUN mkdir -p /usr/share/man/man1/ \
  && apt-get update \
  && apt-get install -y pdftk
+
+ADD ./php.ini /usr/local/etc/php/php.ini
+
+# composer
+RUN wget https://getcomposer.org/installer -O - -q \
+    | php -- --install-dir=/bin --filename=composer --quiet
+
+# Permissions
+RUN chown -R www-data:www-data ./ \
+    && chgrp -R www-data storage bootstrap/cache \
+    && chmod -R ug+rwx storage bootstrap/cache
 
 WORKDIR /var/www
