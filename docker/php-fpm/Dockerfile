@@ -19,17 +19,10 @@ ADD ./php.ini /usr/local/etc/php/php.ini
 
 # composer
 RUN wget https://getcomposer.org/installer -O - -q \
-    | php -- --install-dir=/bin --filename=composer --quiet
-
-RUN composer install \
-    && chown -R www-data:www-data ./ \
-    && chgrp -R www-data storage bootstrap/cache \
-    && chmod -R ug+rwx storage bootstrap/cache
+    && php -- --install-dir=/bin --filename=composer --quiet \
 
 # npm
 RUN apt-get update \
     && apt-get install npm \
-    && npm install \
-    && npm audit fix
 
 WORKDIR /var/www
