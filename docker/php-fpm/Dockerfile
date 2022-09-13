@@ -21,8 +21,4 @@ ADD ./php.ini /usr/local/etc/php/php.ini
 RUN wget https://getcomposer.org/installer -O - -q \
     && php -- --install-dir=/bin --filename=composer --quiet \
 
-# npm
-RUN apt-get update \
-    && apt-get install npm \
-
 WORKDIR /var/www
