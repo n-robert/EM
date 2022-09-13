@@ -19,7 +19,7 @@ ADD ./php.ini /usr/local/etc/php/php.ini
 
 # composer
 RUN wget https://getcomposer.org/installer -O - -q \
-    && php -- --install-dir=/bin --filename=composer --quiet \
+    | php -- --install-dir=/bin --filename=composer --quiet
 
 # npm
 RUN curl -sL https://deb.nodesource.com/setup_18.x | bash -
