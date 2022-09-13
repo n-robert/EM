@@ -12,13 +12,24 @@ RUN apt-get update \
 
 #pdftk
 RUN mkdir -p /usr/share/man/man1/ \
- && apt-get update \
- && apt-get install -y pdftk
+    && apt-get update \
+    && apt-get install -y pdftk
 
 ADD ./php.ini /usr/local/etc/php/php.ini
 
 # composer
 RUN wget https://getcomposer.org/installer -O - -q \
     | php -- --install-dir=/bin --filename=composer --quiet
+
+RUN composer install \
+    && chown -R www-data:www-data ./ \
+    && chgrp -R www-data storage bootstrap/cache \
+    && chmod -R ug+rwx storage bootstrap/cache
+
+# npm
+RUN apt-get update \
+    && apt-get install npm \
+    && npm install \
+    && npm audit fix
 
 WORKDIR /var/www
