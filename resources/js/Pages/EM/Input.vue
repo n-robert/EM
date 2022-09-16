@@ -4,9 +4,9 @@
 
         <div v-else>
             <span :class="leftColumn">
-                <fmsdocs-label :text="(hasLabel && hasLabel !== 'false' && labelText) ? (__(labelText).toPhrase() + ': ') : ''"
+                <e-m-label :text="(hasLabel && hasLabel !== 'false' && labelText) ? (__(labelText).toPhrase() + ': ') : ''"
                                :for="name"
-                               :class="[isRequired && (!modelValue || $page.props.errors[name]) ? warningClass : '', labelDefaultClass]"></fmsdocs-label>
+                               :class="[isRequired && (!modelValue || $page.props.errors[name]) ? warningClass : '', labelDefaultClass]"></e-m-label>
             </span>
 
             <span :class="rightColumn">
@@ -40,14 +40,14 @@
                           class="form-textarea h-28 resize"
                           :class="isRequired && (!modelValue || $page.props.errors[name]) ? fieldWarningClass : inputDefaultClass"></textarea>
 
-                <fmsdocs-button v-else-if="type === 'button' || type === 'submit'"
+                <e-m-button v-else-if="type === 'button' || type === 'submit'"
                                 :type="type"
                                 :onclick="onclick"
                                 :open="open"
                                 :originalText="__(value)"
                                 :disabled="! $page.props.canEdit"
                                 :customClass="customClass">
-                </fmsdocs-button>
+                </e-m-button>
 
                 <input v-else-if="type === 'checkbox'"
                        :name="name"
@@ -79,15 +79,15 @@
 </template>
 
 <script>
-    import FmsdocsLabel from './Label';
-    import FmsdocsButton from './Button';
+    import EMLabel from './Label';
+    import EMButton from './Button';
     import Datepicker from 'vuejs-datepicker';
     import {ru} from 'vuejs-datepicker/dist/locale';
 
     export default {
         components: {
-            FmsdocsLabel,
-            FmsdocsButton,
+            EMLabel,
+            EMButton,
             Datepicker,
         },
 

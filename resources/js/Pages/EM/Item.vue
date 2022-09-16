@@ -32,7 +32,7 @@
                                 @addItem="addItem"
                                 @removeItem="removeItem"></field-set>
 
-                        <fmsdocs-input v-else
+                        <e-m-input v-else
                                        :name="field.name"
                                        :type="field.type"
                                        :value="item[field.name] || field.value"
@@ -45,7 +45,7 @@
                                        :id="field.name.toString().toKebabCase()"
                                        :isRequired="field.required"
                                        :parenId="field.parent_id"
-                                       :show="field.show"></fmsdocs-input>
+                                       :show="field.show"></e-m-input>
                     </div>
                 </tab>
 
@@ -64,7 +64,7 @@
                                 @removeItem="removeItem"></field-set>
 
                         <div v-else>
-                            <fmsdocs-input :name="element.name"
+                            <e-m-input :name="element.name"
                                            :type="element.type"
                                            :value="item[element.name] || element.value"
                                            :options="element.options"
@@ -76,7 +76,7 @@
                                            :id="element.name && element.name.toString().toKebabCase()"
                                            :isRequired="element.required"
                                            :parenId="element.parent_id"
-                                           :show="element.show"></fmsdocs-input>
+                                           :show="element.show"></e-m-input>
                         </div>
                     </div>
                 </div>
@@ -90,13 +90,13 @@
 <script>
     import Tab from './Tab';
     import FieldSet from './FieldSet';
-    import FmsdocsInput from './Input';
+    import EMInput from './Input';
 
     export default {
         components: {
             Tab,
             FieldSet,
-            FmsdocsInput,
+            EMInput,
         },
 
         props: {

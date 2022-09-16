@@ -1,7 +1,7 @@
 <template>
     <modal :show="show" :max-width="maxWidth" :closeable="closeable" @close="closeModal">
         <div class="px-6 py-4">
-            <fmsdocs-button class="relative float-right cursor-pointer m-1" @click.native="closeModal">X</fmsdocs-button>
+            <e-m-button class="relative float-right cursor-pointer m-1" @click.native="closeModal">X</e-m-button>
 
             <div v-if="this.$slots.title" class="text-lg">
                 <slot name="title"></slot>
@@ -17,12 +17,12 @@
 </template>
 
 <script>
-    import FmsdocsButton from './Button';
+    import EMButton from './Button';
     import Modal from './Modal';
 
     export default {
         components: {
-            FmsdocsButton,
+            EMButton,
             Modal,
         },
 
