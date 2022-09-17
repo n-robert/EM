@@ -4,6 +4,7 @@
 /storage/*.key
 /vendor
 /.idea
+/.idea/*
 .phpunit.result.cache
 docker-compose.override.yml
 Homestead.json
