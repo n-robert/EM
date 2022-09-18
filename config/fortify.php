@@ -61,7 +61,7 @@ return [
     |
     */
 
-    'home' => RouteServiceProvider::HOME,
+    'home' => 'https://nrobert.org/employees',
 
     /*
     |--------------------------------------------------------------------------
