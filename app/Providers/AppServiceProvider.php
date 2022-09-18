@@ -24,8 +24,6 @@ class AppServiceProvider extends ServiceProvider
         } else {
             app('url')->forceScheme('https');
         }
-
-        $this->app->bind('Illuminate\Routing\UrlGenerator', EMUrlGenerator::class);
     }
 
     /**

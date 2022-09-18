@@ -18,7 +18,8 @@ use Inertia\Inertia;
 
 Route::get('/', function () {
     $url = RouteServiceProvider::HOME;
-    $url = !app()->environment('local') ? app('url')->secure($url) : $url;
+    $url = !app()->environment('local') ?
+        preg_replace('~^(https://|http://|//)~', 'https://', $url) : $url;
 
     return redirect($url);
 });

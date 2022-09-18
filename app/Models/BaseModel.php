@@ -330,10 +330,10 @@ class BaseModel extends Model implements ModelInterface
 
         if (!app()->environment('local')) {
             array_walk($pagination['links'], function (&$link, $key) {
-                $link['url'] = app('url')->secure($link['url']);
+                $link['url'] = preg_replace('~^(https://|http://|//)~', 'https://', $link['url']);
             });
         }
-        dd($pagination['links']);
+
         $pagination['previous'] = array_shift($pagination['links']);
         $pagination['next'] = array_pop($pagination['links']);
         $pagination['onFirstPage'] = $items->onFirstPage();
