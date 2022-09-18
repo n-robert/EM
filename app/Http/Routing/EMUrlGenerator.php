@@ -18,7 +18,7 @@ class EMUrlGenerator extends UrlGenerator
     {
         // First we will get rid of non-secure schema if we need HTTPS
         if ($secure) {
-            $path = preg_replace('~^(http://|//)~', '', $path);
+            $path = preg_replace('~^(https://|http://|//)~', '', $path);
         }
 
         return parent::to($path, $extra, $secure);
