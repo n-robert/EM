@@ -16,7 +16,7 @@ class RedirectToHttps
      */
     public function handle(Request $request, Closure $next)
     {
-        if (!app()->environment('local')) {
+        if (!$request->secure()) {
             return redirect()->secure($request->getRequestUri());
         }
 
