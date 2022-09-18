@@ -17,7 +17,7 @@ use Inertia\Inertia;
 */
 
 Route::get('/', function () {
-    return redirect(\route(RouteServiceProvider::HOME));
+    return redirect(RouteServiceProvider::HOME);
 });
 
 Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
