@@ -62,10 +62,6 @@ class BaseController extends Controller implements ControllerInterface
             str_replace('Controller', '', class_basename(static::class))
         );
         $this->names = Str::plural($this->name);
-
-        if (!app()->environment('local')) {
-            app('url')->forceScheme('https');
-        }
     }
 
     /**

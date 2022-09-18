@@ -16,10 +16,6 @@ use Inertia\Inertia;
 |
 */
 
-if (!app()->environment('local')) {
-    app('url')->forceScheme('https');
-}
-
 Route::get('/', function () {
     return redirect(RouteServiceProvider::HOME);
 });
