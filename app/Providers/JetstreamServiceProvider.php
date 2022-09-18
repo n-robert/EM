@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Actions\Jetstream\DeleteUser;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Jetstream\Jetstream;
 
@@ -15,7 +16,9 @@ class JetstreamServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        if (!$this->app->environment('local')) {
+            URL::forceScheme('https');
+        }
     }
 
     /**
