@@ -328,11 +328,9 @@ class BaseModel extends Model implements ModelInterface
         $pagination = [];
         $pagination['links'] = $items->toArray()['links'];
 
-        if (!app()->environment('local')) {
-            array_walk($pagination['links'], function (&$link, $key) {
+        array_walk($pagination['links'], function (&$link, $key) {
                 $link['url'] = secure_url($link['url']);
             });
-        }
 
         $pagination['previous'] = array_shift($pagination['links']);
         $pagination['next'] = array_pop($pagination['links']);
