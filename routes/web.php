@@ -17,11 +17,7 @@ use Inertia\Inertia;
 */
 
 Route::get('/', function () {
-    $url = RouteServiceProvider::HOME;
-    $url = !app()->environment('local') ?
-        preg_replace('~^(https://|http://|//)~', 'https://', $url) : $url;
-
-    return redirect($url);
+    return redirect(RouteServiceProvider::HOME);
 });
 
 Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {

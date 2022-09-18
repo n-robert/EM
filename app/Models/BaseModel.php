@@ -330,7 +330,7 @@ class BaseModel extends Model implements ModelInterface
 
         if (!app()->environment('local')) {
             array_walk($pagination['links'], function (&$link, $key) {
-                $link['url'] = preg_replace('~^(https://|http://|//)~', 'https://', $link['url']);
+                $link['url'] = secure_url($link['url']);
             });
         }
 
