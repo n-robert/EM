@@ -1,5 +1,6 @@
 <?php
 
+use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -15,9 +16,9 @@ use Inertia\Inertia;
 |
 */
 
-//Route::get('/', function () {
-//    return redirect(\route('gets.employees'));
-//});
+Route::get('/', function () {
+    return redirect(\route(RouteServiceProvider::HOME));
+});
 
 Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
     return Inertia::render('Dashboard');
