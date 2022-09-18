@@ -17,7 +17,10 @@ use Inertia\Inertia;
 */
 
 Route::get('/', function () {
-    return redirect(RouteServiceProvider::HOME);
+    $url = RouteServiceProvider::HOME;
+    $url = !app()->environment('local') ? app('url')->secure($url) : $url;
+
+    return redirect($url);
 });
 
 Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
