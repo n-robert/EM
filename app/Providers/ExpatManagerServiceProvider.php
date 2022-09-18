@@ -3,13 +3,11 @@
 namespace App\Providers;
 
 use App\Contracts\RepositoryInterface;
-use App\Http\Routing\EMUrlGenerator;
 use App\Repositories\Eloquent\BaseRepository;
 use Carbon\Carbon;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Schema\Grammars\PostgresGrammar;
-use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -25,7 +23,6 @@ class ExpatManagerServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->bind(RepositoryInterface::class, BaseRepository::class);
-        $this->app->bind(UrlGenerator::class, EMUrlGenerator::class);
     }
 
     /**

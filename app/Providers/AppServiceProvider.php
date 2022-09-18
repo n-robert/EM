@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Http\Routing\EMUrlGenerator;
+use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
@@ -23,6 +25,8 @@ class AppServiceProvider extends ServiceProvider
         } else {
             app('url')->forceScheme('https');
         }
+
+        $this->app->bind(UrlGenerator::class, EMUrlGenerator::class);
     }
 
     /**
