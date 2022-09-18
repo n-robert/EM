@@ -15,9 +15,9 @@ use Inertia\Inertia;
 |
 */
 
-Route::get('/', function () {
-    return redirect(\route('gets.employees'));
-});
+//Route::get('/', function () {
+//    return redirect(\route('gets.employees'));
+//});
 
 Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
     return Inertia::render('Dashboard');
