@@ -21,6 +21,19 @@ class EMUrlGenerator extends UrlGenerator
             $path = preg_replace('~^(https://|http://|//)~', '', $path);
         }
 
-        return parent::to($path, $extra, $secure);
+        $tail = implode('/', array_map(
+                'rawurlencode', (array) $this->formatParameters($extra))
+        );
+
+        // Once we have the scheme we will compile the "tail" by collapsing the values
+        // into a single string delimited by slashes. This just makes it convenient
+        // for passing the array of parameters to this URL as a list of segments.
+        $root = $this->formatRoot($this->formatScheme($secure));
+
+        [$path, $query] = $this->extractQueryString($path);
+
+        return $this->format(
+                $root, '/'.trim($path.'/'.$tail, '/')
+            ).$query;
     }
 }
