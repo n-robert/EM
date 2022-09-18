@@ -149,8 +149,8 @@ if (!function_exists('validate_boolean')) {
     }
 }
 
-if (!function_exists('secure_url')) {
-    function secure_url($url)
+if (!function_exists('to_https')) {
+    function to_https($url)
     {
         return preg_replace('~^(https://|http://|//)(.+)$~', 'https://$2', $url);
     }
