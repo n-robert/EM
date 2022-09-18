@@ -65,7 +65,7 @@ services:
       #- internal
 
   pgbackup:
-    container_name: backup-footbot
+    container_name: backup-em
     image: prodrigestivill/postgres-backup-local
     restart: always
     volumes:
