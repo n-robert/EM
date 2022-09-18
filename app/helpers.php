@@ -148,3 +148,10 @@ if (!function_exists('validate_boolean')) {
         }
     }
 }
+
+if (!function_exists('secure_url')) {
+    function secure_url($url)
+    {
+        return preg_replace('~^(https://|http://|//)(.+)$~', 'https://$2', $url);
+    }
+}
