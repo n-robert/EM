@@ -333,7 +333,7 @@ class BaseModel extends Model implements ModelInterface
                 $link['url'] = app('url')->secure($link['url']);
             });
         }
-
+        dd($pagination['links']);
         $pagination['previous'] = array_shift($pagination['links']);
         $pagination['next'] = array_pop($pagination['links']);
         $pagination['onFirstPage'] = $items->onFirstPage();
