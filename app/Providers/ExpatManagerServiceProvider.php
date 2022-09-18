@@ -22,6 +22,10 @@ class ExpatManagerServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        if (!$this->app->environment('local')) {
+            app('url')->forceScheme('https');
+        }
+
         $this->app->bind(RepositoryInterface::class, BaseRepository::class);
     }
 
