@@ -140,6 +140,15 @@ return [
         Features::twoFactorAuthentication([
             'confirmPassword' => true,
         ]),
+    ],/*
+    |--------------------------------------------------------------------------
+    | Redirect urls
+    |--------------------------------------------------------------------------
+    |
+    */
+
+    'redirects' => [
+        'login' => '/user/profile',
     ],
 
 ];
