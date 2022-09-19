@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Http\Routing\EMRedirector;
+use App\Http\Routing\EMUrlGenerator;
+use Illuminate\Routing\Redirector;
+use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
@@ -18,8 +22,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind('\Illuminate\Routing\UrlGenerator', 'App\Http\Routing\EMUrlGenerator');
-        $this->app->bind('Illuminate\Routing\Redirector', 'App\Http\Routing\EMRedirector');
+        $this->app->bind(UrlGenerator::class, EMUrlGenerator::class);
+        $this->app->bind(Redirector::class, EMRedirector::class);
 
         if ($this->app->environment('local')) {
             $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
