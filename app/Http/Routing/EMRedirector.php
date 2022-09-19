@@ -3,9 +3,21 @@
 namespace App\Http\Routing;
 
 use Illuminate\Routing\Redirector;
+use Illuminate\Routing\UrlGenerator;
 
 class EMRedirector extends Redirector
 {
+    /**
+     * Create a new Redirector instance.
+     *
+     * @param  \Illuminate\Routing\UrlGenerator  $generator
+     * @return void
+     */
+    public function __construct(UrlGenerator $generator)
+    {
+        parent::__construct($generator);
+    }
+
     /**
      * Create a new redirect response to the given path.
      *
