@@ -17,7 +17,7 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @var string
      */
-    public const HOME = '/employees';
+    public const HOME = '/employers';
 
     /**
      * The controller namespace for the application.
@@ -35,10 +35,6 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        if (!$this->app->environment('local')) {
-            app('url')->forceScheme('https');
-        }
-
         $this->configureRateLimiting();
 
         $this->routes(function () {

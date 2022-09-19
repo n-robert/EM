@@ -23,10 +23,6 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        if (!$this->app->environment('local')) {
-            app('url')->forceScheme('https');
-        }
-
         $this->registerPolicies();
 
         Gate::define('can-edit', function ($user) {
