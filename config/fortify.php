@@ -151,6 +151,7 @@ return [
 
     'redirects' => [
         'login' => '/user/profile',
+        'logout' => '/login',
     ],
 
 ];
