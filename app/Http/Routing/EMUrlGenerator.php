@@ -12,7 +12,7 @@ class EMUrlGenerator extends UrlGenerator
 
         // We'll explicitly assign secure scheme
         if (!app()->environment('local') || $secure) {
-            return preg_replace('~^(https://|http://|//)(.+)~', 'https://$2', $path);
+            return to_https($path);
         }
 
         return $path;

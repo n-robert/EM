@@ -18,7 +18,7 @@ class EMRedirector extends Redirector
      */
     public function to($path, $status = 302, $headers = [], $secure = null)
     {
-        $path = preg_replace('~^(https://|http://|//)(.+)$~', 'https://$2', $path);
+        $path = to_https($path);
 
         return $this->createRedirect($this->generator->to($path, [], $secure), $status, $headers);
     }
