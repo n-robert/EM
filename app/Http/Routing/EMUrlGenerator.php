@@ -18,9 +18,13 @@ class EMUrlGenerator extends UrlGenerator
      */
     public function to($path, $extra = [], $secure = null)
     {
-        // First we will get rid of scheme
-        $path = preg_replace('~^(https://|http://|//)(.+)~', '$2', $path);
+        $path = parent::to($path, $extra, $secure);
 
-        return parent::to($path, $extra, $secure);
+        // We'll explicitly assign secure scheme
+        if (!app()->environment('local') || $secure) {
+            return preg_replace('~^(https://|http://|//)(.+)~', 'https://$2', $path);
+        }
+
+        return $path;
     }
 }
