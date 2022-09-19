@@ -2,6 +2,7 @@
 
 namespace App\Http\Routing;
 
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Redirector;
 use Illuminate\Routing\UrlGenerator;
 
@@ -10,7 +11,7 @@ class EMRedirector extends Redirector
     /**
      * Create a new Redirector instance.
      *
-     * @param  \Illuminate\Routing\UrlGenerator  $generator
+     * @param UrlGenerator $generator
      * @return void
      */
     public function __construct(UrlGenerator $generator)
@@ -25,7 +26,7 @@ class EMRedirector extends Redirector
      * @param  int  $status
      * @param  array  $headers
      * @param  bool|null  $secure
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function to($path, $status = 302, $headers = [], $secure = null)
     {

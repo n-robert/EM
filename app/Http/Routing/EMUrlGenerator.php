@@ -9,6 +9,19 @@ use Illuminate\Routing\UrlGenerator;
 class EMUrlGenerator extends UrlGenerator
 {
     /**
+     * Create a new URL Generator instance.
+     *
+     * @param RouteCollectionInterface $routes
+     * @param Request $request
+     * @param  string|null  $assetRoot
+     * @return void
+     */
+    public function __construct(RouteCollectionInterface $routes, Request $request, $assetRoot = null)
+    {
+        parent::__construct($routes, $request, $assetRoot);
+    }
+
+    /**
      * Generate an absolute URL to the given path.
      *
      * @param  string  $path
