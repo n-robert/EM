@@ -22,7 +22,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind(UrlGenerator::class, EMUrlGenerator::class);
+//        $this->app->bind(UrlGenerator::class, EMUrlGenerator::class);
         $this->app->bind(Redirector::class, EMRedirector::class);
 
         if ($this->app->environment('local')) {
