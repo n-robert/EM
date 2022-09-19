@@ -35,6 +35,10 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        if (!$this->app->environment('local')) {
+            app('url')->forceScheme('https');
+        }
+
         $this->configureRateLimiting();
 
         $this->routes(function () {

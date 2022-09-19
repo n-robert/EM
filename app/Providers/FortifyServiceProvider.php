@@ -21,7 +21,9 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        if (!$this->app->environment('local')) {
+            app('url')->forceScheme('https');
+        }
     }
 
     /**
