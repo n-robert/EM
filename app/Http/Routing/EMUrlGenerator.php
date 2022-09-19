@@ -9,19 +9,18 @@ use Illuminate\Routing\UrlGenerator;
 class EMUrlGenerator extends UrlGenerator
 {
     /**
-     * Create a new URL Generator instance.
+     * Generate an absolute URL to the given path.
      *
-     * @param  \Illuminate\Routing\RouteCollectionInterface  $routes
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string|null  $assetRoot
-     * @return void
+     * @param  string  $path
+     * @param  mixed  $extra
+     * @param  bool|null  $secure
+     * @return string
      */
-    public function __construct(RouteCollectionInterface $routes, Request $request, $assetRoot = null)
+    public function to($path, $extra = [], $secure = null)
     {
-        parent::__construct($routes, $request, $assetRoot);
+        // First we will get rid of scheme
+        $path = preg_replace('~^(https://|http://|//)(.+)~', '$2', $path);
 
-        if (!app()->environment('local')) {
-            $this->forceScheme('https');
-        }
+        return parent::to($path, $extra, $secure);
     }
 }
