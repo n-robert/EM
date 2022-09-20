@@ -7,19 +7,4 @@ use Illuminate\Routing\Redirector;
 
 class EMRedirector extends Redirector
 {
-    /**
-     * Create a new redirect response to the given path.
-     *
-     * @param  string  $path
-     * @param  int  $status
-     * @param  array  $headers
-     * @param  bool|null  $secure
-     * @return RedirectResponse
-     */
-    public function to($path, $status = 302, $headers = [], $secure = null)
-    {
-        $path = to_https($path);
-
-        return $this->createRedirect($this->generator->to($path, [], $secure), $status, $headers);
-    }
 }

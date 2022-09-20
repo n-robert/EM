@@ -22,6 +22,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        # Register custom UrlGenerator
         $this->app->extend('url', function (UrlGenerator $urlGenerator) {
             return new EMUrlGenerator(
                 $this->app->make('router')->getRoutes(),
@@ -30,11 +31,20 @@ class AppServiceProvider extends ServiceProvider
             );
         });
 
+        # Register custom Redirector
+        $this->app->extend('redirect', function (Redirector $redirector) {
+            $emRedirector = new EMRedirector($redirector->getUrlGenerator());
+
+            if (isset($this->app['session.store'])) {
+                $emRedirector->setSession($this->app['session.store']);
+            }
+
+            return $emRedirector;
+        });
+
         if ($this->app->environment('local')) {
             $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
             $this->app->register(TelescopeServiceProvider::class);
-        } else {
-            $this->app->make('url')->forceScheme('https');
         }
     }
 
