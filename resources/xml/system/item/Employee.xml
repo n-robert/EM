@@ -228,8 +228,8 @@
         <field
                 name="resident_document"
                 type="select">
-            <option value="RESIDENT_CARD"/>
-            <option value="TEMPORARY_RESIDENT_LICENSE"/>
+            <option value="RESIDENT"/>
+            <option value="TEMPORARY_RESIDENCE"/>
         </field>
         <field
                 name="resident_document_serie"

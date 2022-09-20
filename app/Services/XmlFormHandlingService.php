@@ -50,7 +50,7 @@ class XmlFormHandlingService
      */
     public static function checkDocList($name, &$modal, &$docList)
     {
-        $docPath = config('app.xml_form_path')['doc'];
+        $docPath = config('app.xml_form_path.doc');
 
         if (
             isset($docPath[$name]) &&

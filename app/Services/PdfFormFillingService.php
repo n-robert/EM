@@ -15,64 +15,9 @@ use mikehaertl\pdftk\Pdf;
 
 class PdfFormFillingService
 {
-    static $actions = [
-        'RENEW'  => 'renew',
-        'ISSUE'  => 'issue',
-        'EXTEND' => 'extend'
-    ];
+    static $legalEmployers = ['LEGAL_RUS', 'LEGAL_SEMI'];
 
-    static $visaTypes = [
-        'MULTI'     => 'multi',
-        'DOUBLE'    => 'double',
-        'SINGLE'    => 'single',
-        'RESIDENT'  => 'resident',
-        'TRANSIT'   => 'transit',
-        'COMMON'    => 'common',
-        'PRIVATE'   => 'private',
-        'BUSINESS'  => 'business',
-        'STUDY'     => 'study',
-        'WORK'      => 'work',
-        'HUMAN'     => 'human',
-        'TOURIST'   => 'tourist',
-        'GROUP'     => 'group',
-        'IMMIGRANT' => 'immigrant',
-        'SERVICE'   => 'service',
-        'OTHER'     => 'other'
-    ];
-
-    static $residenceTypes = [
-        'RESIDENT_CARD'              => 'residence',
-        'TEMPORARY_RESIDENT_LICENSE' => 'temporary_residence'
-    ];
-
-    static $genders = [
-        'MALE'   => 'male',
-        'FEMALE' => 'female'
-    ];
-
-    static $employerTypes = [
-        'LEGAL_RUS'      => 'legal',
-        'LEGAL_SEMI'     => 'legal',
-        'INDIVIDUAL'     => 'individual',
-        'FOREIGN_REP'    => 'foreign_rep',
-        'LAWYER'         => 'lawyer',
-        'FOREIGN_BRANCH' => 'foreign_branch',
-        'PRIVATE'        => 'russian_individual',
-        'NOTARY'         => 'notary',
-        'OTHER'          => 'other'
-    ];
-
-    static $hostTypes = [
-        'LEGAL_RUS'      => 'legal',
-        'LEGAL_SEMI'     => 'legal',
-        'INDIVIDUAL'     => 'individual',
-        'FOREIGN_REP'    => 'legal',
-        'LAWYER'         => 'legal',
-        'FOREIGN_BRANCH' => 'legal',
-        'PRIVATE'        => 'individual',
-        'NOTARY'         => 'legal',
-        'OTHER'          => 'legal'
-    ];
+    static $individualHosts = ['INDIVIDUAL', 'PRIVATE'];
 
     static $CIS = [
         15,
@@ -433,20 +378,50 @@ class PdfFormFillingService
 
     /**
      * Get data fields
-     * @param string $doc
+     * @param $doc
+     * @param $data
+     * @param $docData
      * @return array
      */
-    public static function getDataFields($doc)
+    public static function getDataFields($doc, $data, $docData = null)
     {
         $pdf = new Pdf(static::getTemplate($doc));
-        $dataFields = $pdf->getDataFields()->__toArray();
+        $allFields = $pdf->getDataFields()->__toArray();
 
-        foreach ($dataFields as $key => $field) {
-            $dataFields[$field['FieldName']] = $field;
-            unset($dataFields[$key]);
+        foreach ($allFields as $key => $field) {
+            $allFields[$field['FieldName']] = $field;
+            unset($allFields[$key]);
         }
 
-        return $dataFields;
+        $splitFields = array_intersect_ukey(
+            $data,
+            $allFields,
+            function ($dataKey, $dataFieldKey) {
+                if (preg_match('~^' . $dataKey . '_\d$~', $dataFieldKey)) {
+                    return 0;
+                } elseif ($dataKey > $dataFieldKey) {
+                    return 1;
+                } else {
+                    return -1;
+                }
+            }
+        );
+
+        if ($splitFields) {
+            $options = [];
+            $options['justify'] = $docData['justify'] ?? true;
+            $options['split_word'] = $docData['split_word'] ?? false;
+            $options['cells'] = $docData['cells'] ?? false;
+
+            array_walk(
+                $splitFields,
+                function (&$value, $key) use ($options) {
+                    $value = ['text' => $value, 'options' => $options];
+                }
+            );
+        }
+
+        return ['all' => $allFields, 'split' => $splitFields];
     }
 
     public static function getEmailRecipientsByEmployee($employee)
@@ -551,44 +526,6 @@ class PdfFormFillingService
             ->loadAssocList('id', 'name');
 
         return $occupations;
-    }
-
-    /**
-     * Get splited fields
-     * @param string $doc
-     * @param array $data
-     * @return array
-     */
-    public static function getSplitFields($doc, $data, $docData = null)
-    {
-        $options = [];
-        $options['justify'] = $docData['justify'] ?? true;
-        $options['split_word'] = $docData['split_word'] ?? false;
-        $options['cells'] = $docData['cells'] ?? false;
-
-        $dataFields = static::getDataFields($doc);
-        $splitFields = array_intersect_ukey(
-            $data,
-            $dataFields,
-            function ($dataKey, $dataFieldKey) {
-                if (preg_match('~^' . $dataKey . '_\d$~', $dataFieldKey)) {
-                    return 0;
-                } elseif ($dataKey > $dataFieldKey) {
-                    return 1;
-                } else {
-                    return -1;
-                }
-            }
-        );
-
-        array_walk(
-            $splitFields,
-            function (&$value, $key) use ($options) {
-                $value = ['text' => $value, 'options' => $options];
-            }
-        );
-
-        return $splitFields;
     }
 
     public static function getTemplate($doc)
@@ -733,27 +670,33 @@ class PdfFormFillingService
     }
 
     /**
-     * Split fields to fit rows
+     * Prepare data for PDF-form
      * @param string $doc
      * @param $docData
      * @param array $data
      * @return array $data
      */
-    public static function populateSplitFields($doc, $docData, $data)
+    public static function prepareData($doc, $docData, $data)
     {
         if (isset($docData['upper_case']) && validate_boolean($docData['upper_case'], true)) {
             $data = to_upper_case($data);
         }
 
-        $splitFields = static::getSplitFields($doc, $data, $docData);
-        $dataFields = static::getDataFields($doc);
+        $dataFields = static::getDataFields($doc, $data, $docData);
+        $allFields = $dataFields['all'];
+        $splitFields = $dataFields['split'];
 
+        if (!$splitFields) {
+            return $data;
+        }
+
+        # Split fields to fit rows
         foreach ($splitFields as $key => $value) {
             $count = 1;
             $rows = [];
 
-            while (isset($dataFields[$key . '_' . $count])) {
-                $rows[] = $dataFields[$key . '_' . $count]['FieldMaxLength'];
+            while (isset($allFields[$key . '_' . $count])) {
+                $rows[] = $allFields[$key . '_' . $count]['FieldMaxLength'];
                 $count++;
             }
 
@@ -784,6 +727,11 @@ class PdfFormFillingService
 
         $employer = Employer::find($employee->employer_id);
         $employerType = Type::find($employer->type_id)->code;
+
+        if (in_array($employerType, self::$individualHosts)) {
+            $employerType = 'INDIVIDUAL';
+        }
+
         $employerAddress = Address::find($employer->address_id)->name_ru;
         $director = Employee::find($employer->director_id);
 
@@ -826,82 +774,82 @@ class PdfFormFillingService
 
         $data =
             [
-                'last_name_ru'                               => $employee->last_name_ru,
-                'first_name_ru'                              => $employee->first_name_ru,
-                'middle_name_ru'                             => $employee->middle_name_ru,
-                'guest_last_name_ru'                         => $employee->last_name_ru,
-                'guest_first_name_ru'                        => $employee->first_name_ru,
-                'guest_middle_name_ru'                       => $employee->middle_name_ru,
-                'citizenship'                                => $citizenship->name_ru,
-                'guest_citizenship'                          => $citizenship->name_ru,
-                self::$genders[$employee->gender]            => 'X',
-                'guest_' . self::$genders[$employee->gender] => 'X',
-                'passport'                                   => $passport,
-                'guest_passport'                             => $passport,
-                'passport_serie'                             => $employee->passport_serie,
-                'guest_passport_serie'                       => $employee->passport_serie,
-                'passport_number'                            => $employee->passport_number,
-                'guest_passport_number'                      => $employee->passport_number,
-                'phone'                                      => self::handlePhones($employee->phone),
-                'occupation'                                 => $occupation,
-                'migr_card_serie'                            => $employee->migr_card_serie,
-                'migr_card_number'                           => $employee->migr_card_number,
-                'destination_district'                       => $regAddress['district'],
-                'actual_destination_district'                => $regAddress['district'],
-                'guest_destination_district'                 => $regAddress['district'],
-                'destination_city'                           => $destinationCity,
-                'actual_destination_city'                    => $destinationCity,
-                'guest_destination_city'                     => $destinationCity,
-                'destination_street'                         => $regAddress['street'],
-                'guest_destination_street'                   => $regAddress['street'],
-                'destination_house_type'                     => $regAddress['houseType'],
-                'guest_destination_house_type'               => $regAddress['houseType'],
-                'destination_house'                          => $regAddress['house'],
-                'guest_destination_house'                    => $regAddress['house'],
-                'destination_building'                       => $regAddress['building'],
-                'guest_destination_building'                 => $regAddress['building'],
-                'destination_sub_building'                   => $regAddress['subBuilding'],
-                'guest_destination_sub_building'             => $regAddress['subBuilding'],
-                'destination_room_type'                      => $regAddress['roomType'],
-                'guest_destination_room_type'                => $regAddress['roomType'],
-                'destination_room'                           => $regAddress['room'],
-                'guest_destination_room'                     => $regAddress['room'],
-                self::$hostTypes[$employerType]              => 'X',
-                'director_last_name'                         => $director->last_name_ru,
-                'director_first_name'                        => $director->first_name_ru,
-                'director_middle_name'                       => $director->middle_name_ru,
-                'host_last_name'                             => $director->last_name_ru,
-                'host_first_name'                            => $director->first_name_ru,
-                'host_middle_name'                           => $director->middle_name_ru,
-                'director_passport'                          => $passport,
-                'director_passport_serie'                    => $director->passport_serie,
-                'director_passport_number'                   => $director->passport_number,
-                'director_district'                          => $directorAddress['district'],
-                'director_city'                              => implode(', ', $directorCity),
-                'director_street'                            => $directorAddress['street'],
-                'director_house'                             => $directorAddress['house'],
-                'director_building'                          => $directorAddress['building'],
-                'director_sub_building'                      => $directorAddress['subBuilding'],
-                'director_room'                              => $directorAddress['room'],
-                'director_phone'                             => self::handlePhones($director->phone),
-                'employer_taxpayer_id'                       => $employer->taxpayer_id,
-                'birth_place'                                => $birthPlace,
-                'guest_birth_place'                          => $birthPlace,
-                'destination_region'                         => $regAddress['region'],
-                'actual_destination_region'                  => $regAddress['region'],
-                'guest_destination_region'                   => $regAddress['region'],
-                'usage_permit'                               => $usage_permit,
-                'representatives'                            => $representatives,
-                'existing_address'                           => $existingAddress,
-                'director_region'                            => $directorAddress['region'],
-                'employer_name'                              => $employer->name_ru,
-                'employer_address'                           => $employerAddress,
+                'last_name_ru'                           => $employee->last_name_ru,
+                'first_name_ru'                          => $employee->first_name_ru,
+                'middle_name_ru'                         => $employee->middle_name_ru,
+                'guest_last_name_ru'                     => $employee->last_name_ru,
+                'guest_first_name_ru'                    => $employee->first_name_ru,
+                'guest_middle_name_ru'                   => $employee->middle_name_ru,
+                'citizenship'                            => $citizenship->name_ru,
+                'guest_citizenship'                      => $citizenship->name_ru,
+                strtolower($employee->gender)            => 'X',
+                'guest_' . strtolower($employee->gender) => 'X',
+                'passport'                               => $passport,
+                'guest_passport'                         => $passport,
+                'passport_serie'                         => $employee->passport_serie,
+                'guest_passport_serie'                   => $employee->passport_serie,
+                'passport_number'                        => $employee->passport_number,
+                'guest_passport_number'                  => $employee->passport_number,
+                'phone'                                  => self::handlePhones($employee->phone),
+                'occupation'                             => $occupation,
+                'migr_card_serie'                        => $employee->migr_card_serie,
+                'migr_card_number'                       => $employee->migr_card_number,
+                'destination_district'                   => $regAddress['district'],
+                'actual_destination_district'            => $regAddress['district'],
+                'guest_destination_district'             => $regAddress['district'],
+                'destination_city'                       => $destinationCity,
+                'actual_destination_city'                => $destinationCity,
+                'guest_destination_city'                 => $destinationCity,
+                'destination_street'                     => $regAddress['street'],
+                'guest_destination_street'               => $regAddress['street'],
+                'destination_house_type'                 => $regAddress['houseType'],
+                'guest_destination_house_type'           => $regAddress['houseType'],
+                'destination_house'                      => $regAddress['house'],
+                'guest_destination_house'                => $regAddress['house'],
+                'destination_building'                   => $regAddress['building'],
+                'guest_destination_building'             => $regAddress['building'],
+                'destination_sub_building'               => $regAddress['subBuilding'],
+                'guest_destination_sub_building'         => $regAddress['subBuilding'],
+                'destination_room_type'                  => $regAddress['roomType'],
+                'guest_destination_room_type'            => $regAddress['roomType'],
+                'destination_room'                       => $regAddress['room'],
+                'guest_destination_room'                 => $regAddress['room'],
+                strtolower($employerType)                => 'X',
+                'director_last_name'                     => $director->last_name_ru,
+                'director_first_name'                    => $director->first_name_ru,
+                'director_middle_name'                   => $director->middle_name_ru,
+                'host_last_name'                         => $director->last_name_ru,
+                'host_first_name'                        => $director->first_name_ru,
+                'host_middle_name'                       => $director->middle_name_ru,
+                'director_passport'                      => $passport,
+                'director_passport_serie'                => $director->passport_serie,
+                'director_passport_number'               => $director->passport_number,
+                'director_district'                      => $directorAddress['district'],
+                'director_city'                          => implode(', ', $directorCity),
+                'director_street'                        => $directorAddress['street'],
+                'director_house'                         => $directorAddress['house'],
+                'director_building'                      => $directorAddress['building'],
+                'director_sub_building'                  => $directorAddress['subBuilding'],
+                'director_room'                          => $directorAddress['room'],
+                'director_phone'                         => self::handlePhones($director->phone),
+                'employer_taxpayer_id'                   => $employer->taxpayer_id,
+                'birth_place'                            => $birthPlace,
+                'guest_birth_place'                      => $birthPlace,
+                'destination_region'                     => $regAddress['region'],
+                'actual_destination_region'              => $regAddress['region'],
+                'guest_destination_region'               => $regAddress['region'],
+                'usage_permit'                           => $usage_permit,
+                'representatives'                        => $representatives,
+                'existing_address'                       => $existingAddress,
+                'director_region'                        => $directorAddress['region'],
+                'employer_name'                          => $employer->name_ru,
+                'employer_address'                       => $employerAddress,
             ];
 
         $visaCategory = 'WORK';
 
         if ($employee->resident_document) {
-            $data[self::$residenceTypes[$employee->resident_document]] = 'X';
+            $data[strtolower($employee->resident_document)] = 'X';
             $data['resident_permit_serie'] = $employee->resident_document_serie;
             $data['resident_permit_number'] = $employee->resident_document_number;
         }
@@ -914,7 +862,7 @@ class PdfFormFillingService
         }
 
 
-        $data[self::$visaTypes[$visaCategory]] = 'X';
+        $data[strtolower($visaCategory)] = 'X';
 
         $dates =
             [
@@ -935,7 +883,7 @@ class PdfFormFillingService
 
         self::splitDate($dates, $data);
 
-        return static::populateSplitFields($doc, $docData, $data);
+        return static::prepareData($doc, $docData, $data);
     }
 
     public static function printDepartureNotice($app, $input, $model, $view, $id, $template = 'departurenotice')
@@ -1040,6 +988,11 @@ class PdfFormFillingService
         $employer = Employer::find($employee->employer_id);
 
         $employerType = Type::find($employer->type_id)->code;
+
+        if (in_array($employerType, self::$legalEmployers)) {
+            $employerType = 'LEGAL';
+        }
+
         $accRegInfo = array_filter(
             [
                 $employer->acc_reg_number,
@@ -1055,12 +1008,7 @@ class PdfFormFillingService
         $birthPlace = implode(', ', [$citizenship->name_ru, $employee->birth_place]);
 
         $director = Employee::find($employer->director_id);
-        $director_name = [
-            $director->last_name_ru,
-            mb_substr($director->first_name_ru, 0, 1) . '.',
-            mb_substr($director->middle_name_ru, 0, 1) . '.'
-        ];
-        $director_name = implode(' ', $director_name);
+        $director_name = self::shortenName($director);
 
         $regInfo = array_filter(
             [$employer->uni_reg_number, $employer->prime_reg_number]
@@ -1069,33 +1017,33 @@ class PdfFormFillingService
 
         $data =
             [
-                self::$employerTypes[$employerType] => 'X',
-                'active_business_type'              => preg_replace(
+                strtolower($employerType) => 'X',
+                'active_business_type'    => preg_replace(
                     '~(\d+)(.\d+)*(\D)*~',
                     '$1$2',
                     $employer->active_business_type
                 ),
-                'acc_reg_info'                      => $accRegInfo,
-                'employer_phone'                    => $employerPhone,
-                'last_name_ru'                      => $employee->last_name_ru,
-                'first_name_ru'                     => $employee->first_name_ru,
-                'middle_name_ru'                    => $employee->middle_name_ru,
-                'citizenship'                       => $citizenship->name_ru,
-                'passport'                          => __('PASSPORT'),
-                'passport_serie'                    => $employee->passport_serie,
-                'passport_number'                   => $employee->passport_number,
-                'director'                          => __('GENERAL_DIRECTOR'),
-                'director_name'                     => $director_name,
-                'recipient'                         => $recipient->name_ru,
-                'employer_name'                     => $employer->full_name_ru,
-                'reg_info'                          => $regInfo,
-                'employer_address'                  => Address::find($employer->address_id)->name_ru,
-                'birth_place'                       => $birthPlace,
-                'issuer'                            => $employee->passport_issuer,
-                'occupation'                        => Occupation::find($employee->occupation_id)->name_ru,
+                'acc_reg_info'            => $accRegInfo,
+                'employer_phone'          => $employerPhone,
+                'last_name_ru'            => $employee->last_name_ru,
+                'first_name_ru'           => $employee->first_name_ru,
+                'middle_name_ru'          => $employee->middle_name_ru,
+                'citizenship'             => $citizenship->name_ru,
+                'passport'                => __('PASSPORT'),
+                'passport_serie'          => $employee->passport_serie,
+                'passport_number'         => $employee->passport_number,
+                'director'                => __('GENERAL_DIRECTOR'),
+                'director_name'           => $director_name,
+                'recipient'               => $recipient->name_ru,
+                'employer_name'           => $employer->full_name_ru,
+                'reg_info'                => $regInfo,
+                'employer_address'        => Address::find($employer->address_id)->name_ru,
+                'birth_place'             => $birthPlace,
+                'issuer'                  => $employee->passport_issuer,
+                'occupation'              => Occupation::find($employee->occupation_id)->name_ru,
             ];
 
-//		$data[self::$genders[$item->gender]] = 'Х';
+//		$data[strtolower($item->gender)] = 'Х';
 
         if (isset($docData['work_contract']) && $docData['work_contract']) {
             $data['work_contract'] = 'X';
@@ -1192,135 +1140,74 @@ class PdfFormFillingService
             static::splitDate(['proxy' => $docData['proxy_date']], $data, true, true);
         }
 
-        return static::populateSplitFields($doc, $docData, $data);
+        return static::prepareData($doc, $docData, $data);
     }
 
-    public static function printInvite($app, $input, $model, $view, $id, $template = 'invite')
+    public static function printInviteMotion($docData, $doc, $id)
     {
-        $invite_form = $input->post->get('invite_form', '', 'string');
-        $employer_id = $input->post->get('employer_id', '', 'string');
-        $trip_purpose = $input->post->get('trip_purpose', '', 'string');
-        $destination_address = $input->post->get('destination_address', 0, 'int');
+        $date = $docData['date'];
+        $inviteForm = $docData['invite_form'];
+        $multiplicity = $docData['visa_multiplicity'];
+        $trip_purpose = $docData['visa_purpose'];
+        $employee = Employee::find($id);
+        $country = Country::find($employee->citizenship_id)->name_ru;
 
-        self::checkRequiredValues(
-            $app,
-            $view,
-            $id,
-            $template,
-            $invite_form,
-            $employer_id,
-            $trip_purpose,
-            $destination_address
-        );
-
-        $form = ['INVITE_FORM_FORM' => 'form', 'INVITE_FORM_DOC' => 'doc'];
-        $multiplicity = $input->post->get('multiplicity', 'MULTI', 'string');
-        $base = !$input->post->get('date') ? date('d.m.Y', time()) : $input->post->get('date');
-        $date = date('dmy', strtotime($base));
-        $desired_date = date('dmy', (strtotime($base) + 60 * 60 * 24 * 30));
-        $supposed_entry_date = $desired_date;
-        $upto = date('dmy', (strtotime($base) + 60 * 60 * 24 * 120));
-
-        $item = $model->getItem($id);
-
-        $file_name = self::getFileName($item, $template);
-
-        $passport_issued = date('dmy', strtotime($item->passport_issued));
-        $passport_expired = date('dmy', strtotime($item->passport_expired));
-        $birth_date = date('dmY', strtotime($item->birth_date));
-        $gender = mb_substr(__($item->gender), 0, 1);
-
-        if (strpos($item->visa_issuer, ',') !== false) {
-            $visa_issuer = explode(',', $item->visa_issuer);
+        if (strpos($employee->visa_issuer, ',') !== false) {
+            $visa_issuer = explode(',', $employee->visa_issuer);
             $visa_issued_country = $visa_issuer[0];
             $visa_issued_region = $visa_issuer[1];
         } else {
-            $visa_issued_country = $item->citizenship_name;
-            $visa_issued_region = $item->visa_issuer;
+            $visa_issued_country = $country;
+            $visa_issued_region = $employee->visa_issuer;
         }
 
-        $employer_model = BaseDatabaseModel::getInstance('Employer', 'FMSDocsModel');
-        $employer = $employer_model->getItem($employer_id, true);
-        $uni_reg_date = date('dmy', strtotime($employer->uni_reg_date));
-        $employer_phone = self::handlePhones($employer->phone, '8', 0);
-        $director_name =
-            $employer->director_last_name_ru .
-            ' ' .
-            mb_substr($employer->director_first_name_ru, 0, 1) .
-            '.' .
-            mb_substr($employer->director_middle_name_ru, 0, 1) .
-            '.';
+        $employer = Employer::find($docData['inviter_id']);
+        $director = Employee::find($employer->director_id);
 
-        $employer_address = self::parseAddress($employer->address_name);
-        $trip_stops = [];
-        $trip_stops[] = __('RUSSIA');
-        $tmp = array_filter([$employer_address['region'], $employer_address['city'], $employer_address['locality']]);
-        $trip_stops = array_merge($trip_stops, $tmp);
-        $trip_stops = implode(', ', $trip_stops);
 
-        $address_model = BaseDatabaseModel::getInstance('Address', 'FMSDocsModel');
-        $address = $address_model->getItem($destination_address);
-        $destination_address = $address->name_ru;
-
-        $special_pass_issuer = '';
-        $special_pass_number = '';
-        $special_pass_date_from = '';
-        $special_pass_date_to = '';
-        $work_place = __('NO');
-        $work_address = __('NO');
-        $occupation = '';
-
-        $fields =
+        $data =
             [
-                'file_name'                     => $file_name,
-                $form[$invite_form]             => 'Х',
-                'date'                          => $date,
-                'taxpayer_id'                   => $employer->taxpayer_id,
-                'prime_reg_number'              => $employer->prime_reg_number,
-                'uni_reg_date'                  => $uni_reg_date,
-                'phone'                         => $employer_phone,
-                'desired_date'                  => $desired_date,
-                'director'                      => $director_name,
-                'trip_purpose'                  => __($trip_purpose),
-                'duration'                      => __('DURATION'),
-                'supposed_entry_date'           => $supposed_entry_date,
-                'up_to'                         => $upto,
-                self::$visaTypes[$multiplicity] => 'Х',
-                self::$visaTypes[$trip_purpose] => 'Х',
-                'special_pass_number'           => '',
-                'special_pass_date_from'        => '',
-                'special_pass_date_to'          => '',
-                'last_name_ru'                  => $item->last_name_ru,
-                'last_name_en'                  => $item->last_name_en,
-                'first_name_ru'                 => $item->first_name_ru,
-                'first_name_en'                 => $item->first_name_en,
-                'middle_name_ru'                => $item->middle_name_ru,
-                'birth_date'                    => $birth_date,
-                'gender'                        => $gender,
-                'citizenship_name'              => $item->citizenship_name,
-                'birth_place_country'           => $item->citizenship_name,
-                'birth_place_region'            => $item->birth_place,
-                'address_country'               => $item->citizenship_name,
-                'address_region'                => $item->birth_place,
-                'visa_issued_country'           => $visa_issued_country,
-                'visa_issued_region'            => $visa_issued_region,
-                'work_place'                    => $work_place,
-                'occupation'                    => $occupation,
-                'passport_serie'                => $item->passport_serie,
-                'passport_number'               => $item->passport_number,
-                'passport_issued'               => $passport_issued,
-                'passport_expired'              => $passport_expired,
-                'host_phone'                    => $employer_phone
+                strtolower($inviteForm)       => 'Х',
+                'date'                    => Carbon::parse($date)->isoFormat('DD.MM.YYYY'),
+                'taxpayer_id'             => $employer->taxpayer_id,
+                'prime_reg_number'        => $employer->prime_reg_number,
+                'uni_reg_date'            => Carbon::parse($employer->uni_reg_date)->isoFormat('DD.MM.YYYY'),
+                'phone'                   => self::handlePhones($employer->phone, '8', 0),
+                'desired_date'            => Carbon::parse($date)->addDays(30)->isoFormat('DD.MM.YYYY'),
+                'director'                => self::shortenName($director),
+                'trip_purpose'            => __($trip_purpose),
+                'duration'                => __('DURATION'),
+                'supposed_entry_date'     => Carbon::parse($date)->addDays(30)->isoFormat('DD.MM.YYYY'),
+                'up_to'                   => Carbon::parse($date)->addDays(120)->isoFormat('DD.MM.YYYY'),
+                strtolower($multiplicity) => 'Х',
+                strtolower($trip_purpose) => 'Х',
+                'special_pass_number'     => '',
+                'special_pass_date_from'  => '',
+                'special_pass_date_to'    => '',
+                'last_name_ru'            => $employee->last_name_ru,
+                'last_name_en'            => $employee->last_name_en,
+                'first_name_ru'           => $employee->first_name_ru,
+                'first_name_en'           => $employee->first_name_en,
+                'middle_name_ru'          => $employee->middle_name_ru,
+                'birth_date'              => Carbon::parse($employee->birth_date)->isoFormat('DD.MM.YYYY'),
+                strtolower($employee->gender)                  => 'X',
+                'citizenship_name'        => $country,
+                'birth_place_country'     => $country,
+                'birth_place_region'      => $employee->birth_place,
+                'address_country'         => $country,
+                'address_region'          => $employee->birth_place,
+                'visa_issued_country'     => $visa_issued_country,
+                'visa_issued_region'      => $visa_issued_region,
+                'work_place'              => __('NO'),
+                'occupation'              => __('NO'),
+                'passport_serie'          => $employee->passport_serie,
+                'passport_number'         => $employee->passport_number,
+                'passport_issued'         => Carbon::parse($employee->passport_issued)->isoFormat('DD.MM.YYYY'),
+                'passport_expired'        => Carbon::parse($employee->passport_expired)->isoFormat('DD.MM.YYYY'),
+                'host_phone'              => self::handlePhones($employer->phone, '8', 0),
             ];
 
-        self::splitText($employer->full_name_ru, 'full_name', $fields, true, false, false, 2, 16, 62);
-        self::splitText($employer->address_name, 'address_name', $fields, true, false, false, 2, 22, 62);
-        self::splitText($trip_stops, 'trip_stops', $fields, true, false, false, 2, 40, 62);
-        self::splitText($destination_address, 'destination_address', $fields, true, false, false, 3, 42, 62, 28);
-        self::splitText($special_pass_issuer, 'special_pass_issuer', $fields, false, false, false, 2, 5, 25);
-        self::splitText($work_address, 'work_address', $fields, true, false, false, 2, 52, 28);
-
-        self::output($template, $fields);
+        return static::prepareData($doc, $docData, $data);
     }
 
     public static function printVisaApplication($docData, $doc, $id)
@@ -1410,33 +1297,33 @@ class PdfFormFillingService
 
         $data =
             [
-                'date'                              => $date,
-                self::$actions[$action]             => '',
-                self::$visaTypes[$visaMultiplicity] => 'Х',
-                self::$visaTypes[$visaCategory]     => 'Х',
-                self::$visaTypes[$visaPurpose]      => 'Х',
-                'last_name_ru'                      => $employee->last_name_ru,
-                'last_name_en'                      => $employee->last_name_en,
-                'first_name_ru'                     => $employee->first_name_ru,
-                'first_name_en'                     => $employee->first_name_en,
-                'middle_name_ru'                    => $employee->middle_name_ru,
-                self::$genders[$employee->gender]   => 'Х',
-                'citizenship_name'                  => $citizenship,
-                'birth_place'                       => $birthPlace,
-                'passport'                          => __('PASSPORT'),
-                'passport_serie'                    => $employee->passport_serie,
-                'passport_number'                   => $employee->passport_number,
-                'existing_visa_serie'               => $employee->visa_serie,
-                'existing_visa_number'              => $employee->visa_number,
-                'existing_invitation_number'        => $employee->invitation_number,
-                'reason'                            => $reason,
-                'inviter'                           => $inviterInfo,
-                'host'                              => $hostInfo,
-                'relatives'                         => $relatives,
-                'destination_address'               => $destination,
-                'trip_stops'                        => $tripStops,
-                'home_address'                      => $homeAddress,
-                'work_info'                         => $workInfo,
+                'date'                        => $date,
+                strtolower($action)           => '',
+                strtolower($visaMultiplicity) => 'Х',
+                strtolower($visaCategory)     => 'Х',
+                strtolower($visaPurpose)      => 'Х',
+                'last_name_ru'                => $employee->last_name_ru,
+                'last_name_en'                => $employee->last_name_en,
+                'first_name_ru'               => $employee->first_name_ru,
+                'first_name_en'               => $employee->first_name_en,
+                'middle_name_ru'              => $employee->middle_name_ru,
+                strtolower($employee->gender) => 'Х',
+                'citizenship_name'            => $citizenship,
+                'birth_place'                 => $birthPlace,
+                'passport'                    => __('PASSPORT'),
+                'passport_serie'              => $employee->passport_serie,
+                'passport_number'             => $employee->passport_number,
+                'existing_visa_serie'         => $employee->visa_serie,
+                'existing_visa_number'        => $employee->visa_number,
+                'existing_invitation_number'  => $employee->invitation_number,
+                'reason'                      => $reason,
+                'inviter'                     => $inviterInfo,
+                'host'                        => $hostInfo,
+                'relatives'                   => $relatives,
+                'destination_address'         => $destination,
+                'trip_stops'                  => $tripStops,
+                'home_address'                => $homeAddress,
+                'work_info'                   => $workInfo,
             ];
 
         $dates =
@@ -1452,7 +1339,7 @@ class PdfFormFillingService
             $data[$key] = Carbon::parse($value)->isoFormat('DD/MM/YYYY');
         });
 
-        return static::populateSplitFields($doc, $docData, $data);
+        return static::prepareData($doc, $docData, $data);
     }
 
     public static function printVisaMotion($docData, $doc, $id)
@@ -1551,7 +1438,7 @@ class PdfFormFillingService
         self::splitText($hostInfo, 'host_info', $data, true, false, false, 4, 35, 45);
         self::splitText($reason, 'reason', $data, true, false, false, 2, 85, 95);
 
-        return static::populateSplitFields($doc, $docData, $data);
+        return static::prepareData($doc, $docData, $data);
     }
 
     public static function printWarranty($app, $input, $model, $view, $id, $template = 'warranty')
@@ -1828,27 +1715,27 @@ class PdfFormFillingService
 
         $data =
             [
-                'recipient'                       => $recipient->name_ru,
-                self::$genders[$employee->gender] => 'Х',
-                'passport'                        => $passport,
-                'passport_number'                 => $employee->passport_number,
-                'taxpayer_id'                     => $employee->taxpayer_id,
-                'employer_taxpayer_id'            => $employee->employer_taxpayer_id,
-                'employer_info'                   => $employerInfo,
-                'permit_info'                     => $permitInfo,
-                'employer_phone'                  => $employerPhone,
-                'last_name'                       => $employee->last_name_ru,
-                'first_name'                      => $employee->first_name_ru,
-                'middle_name'                     => $employee->middle_name_ru,
-                'citizenship'                     => $citizenship,
-                'birth_place'                     => $birthPlace,
-                'address'                         => $address,
-                'issuer'                          => $employee->passport_issuer,
-                'reg_address'                     => $regAddress,
-                'occupation'                      => $occupation,
-                'employer_name'                   => $employer->full_name_ru,
-                'employer_address'                => $employerAddress,
-                'active_business_type'            => preg_replace(
+                'recipient'                   => $recipient->name_ru,
+                strtolower($employee->gender) => 'Х',
+                'passport'                    => $passport,
+                'passport_number'             => $employee->passport_number,
+                'taxpayer_id'                 => $employee->taxpayer_id,
+                'employer_taxpayer_id'        => $employee->employer_taxpayer_id,
+                'employer_info'               => $employerInfo,
+                'permit_info'                 => $permitInfo,
+                'employer_phone'              => $employerPhone,
+                'last_name'                   => $employee->last_name_ru,
+                'first_name'                  => $employee->first_name_ru,
+                'middle_name'                 => $employee->middle_name_ru,
+                'citizenship'                 => $citizenship,
+                'birth_place'                 => $birthPlace,
+                'address'                     => $address,
+                'issuer'                      => $employee->passport_issuer,
+                'reg_address'                 => $regAddress,
+                'occupation'                  => $occupation,
+                'employer_name'               => $employer->full_name_ru,
+                'employer_address'            => $employerAddress,
+                'active_business_type'        => preg_replace(
                     '~(\d+)(.\d+)*(\D)*~',
                     '$1$2',
                     $employer->active_business_type
@@ -1866,7 +1753,7 @@ class PdfFormFillingService
 
         self::splitDate($dates, $data);
 
-        return static::populateSplitFields($doc, $docData, $data);
+        return static::prepareData($doc, $docData, $data);
     }
 
     public static function printWorkPermitMotion($docData, $doc, $id)
@@ -1940,7 +1827,7 @@ class PdfFormFillingService
                 'director'           => $director
             ];
 
-        return static::populateSplitFields($doc, $docData, $data);
+        return static::prepareData($doc, $docData, $data);
     }
 
     /**
@@ -2163,6 +2050,26 @@ class PdfFormFillingService
         }
 
         return $addresses;
+    }
+
+    public static function shortenName($person = null, $last_name = '', $first_name = '', $middle_name = '')
+    {
+        $last_name = $last_name ?: $person->last_name_ru;
+        $first_name = $first_name ?: $person->first_name_ru;
+        $middle_name = $middle_name ?: $person->middle_name_ru;
+        $name = [$last_name];
+
+        $first_name = explode(' ', $first_name);
+
+        foreach ($first_name as $part) {
+            $name[] = mb_substr($part, 0, 1) . '.';
+        }
+
+        if ($middle_name) {
+            $name[] = mb_substr($middle_name, 0, 1) . '.';
+        }
+
+        return implode(' ', $name);
     }
 
     public static function splitDate($dates, &$data, $fullMonthFormat = false, $shortYear = false)

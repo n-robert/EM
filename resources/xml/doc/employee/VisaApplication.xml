@@ -2,27 +2,27 @@
 <root upper_case="false" justify="false" split_word="false" cells="false">
     <fieldgroup name="general" show="true">
         <field
-                name="date"
-                required="true"
-                type="date"/>
+            name="date"
+            required="true"
+            type="date"/>
         <field
-                name="inviter_id"
-                type="select"
-                required="true"
-                model="Employer"/>
+            name="inviter_id"
+            type="select"
+            required="true"
+            model="Employer"/>
         <field
-                name="action"
-                type="select"
-                required="true">
+            name="action"
+            type="select"
+            required="true">
             <option value="RENEW"/>
             <option value="ISSUE"/>
             <option value="EXTEND"/>
         </field>
         <field
-                name="reason"
-                type="select"
-                required="true"
-                onchange="toggleVisibility(this.value, true, 'reasons')">
+            name="reason"
+            type="select"
+            required="true"
+            onchange="toggleVisibility(this.value, true, 'reasons')">
             <option value="NEW_WORK_PERMIT"/>
             <option value="EXPIRED_VISA"/>
             <option value="NEW_PASSPORT"/>
@@ -30,48 +30,48 @@
 
         <fieldset name="reasons" show="true">
             <field
-                    name="work_permit"
-                    parent_id="NEW_WORK_PERMIT"
-                    show="false"
-                    model="Employee:work_permit_serie:work_permit_number"/>
+                name="work_permit"
+                parent_id="NEW_WORK_PERMIT"
+                show="false"
+                model="Employee:work_permit_serie:work_permit_number"/>
             <field
-                    name="visa"
-                    parent_id="EXPIRED_VISA"
-                    show="false"
-                    model="Employee:visa_serie:visa_number"/>
+                name="visa"
+                parent_id="EXPIRED_VISA"
+                show="false"
+                model="Employee:visa_serie:visa_number"/>
             <field
-                    name="passport"
-                    parent_id="NEW_PASSPORT"
-                    show="false"
-                    model="Employee:passport_serie:passport_number"/>
+                name="passport"
+                parent_id="NEW_PASSPORT"
+                show="false"
+                model="Employee:passport_serie:passport_number"/>
         </fieldset>
     </fieldgroup>
 
     <fieldgroup name="visa_details">
         <field
-                name="visa_purpose"
-                type="select"
-                required="true">
+            name="visa_purpose"
+            type="select"
+            required="true">
             <option value="WORK"/>
             <option value="BUSINESS"/>
         </field>
         <field
-                name="visa_multiplicity"
-                type="select"
-                required="true">
+            name="visa_multiplicity"
+            type="select"
+            required="true">
             <option value="MULTI"/>
             <option value="SINGLE"/>
         </field>
         <field
-                name="visa_category"
-                type="select"
-                required="true">
+            name="visa_category"
+            type="select"
+            required="true">
             <option value="COMMON"/>
         </field>
         <field
-                name="destination_id"
-                type="select"
-                required="true"
-                model="Address"/>
+            name="destination_id"
+            type="select"
+            required="true"
+            model="Address"/>
     </fieldgroup>
 </root>

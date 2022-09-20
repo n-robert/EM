@@ -1,19 +1,19 @@
 <?xml version="1.0"?>
 <root upper_case="true" justify="false" split_word="false" cells="true">
     <field
-            name="authority_id"
-            type="select"
-            required="true"
-            onchange="getPerson(this);"
-            model="Employer:FMS"/>
+        name="authority_id"
+        type="select"
+        required="true"
+        onchange="getPerson(this);"
+        model="Employer:FMS"/>
     <field
-            name="employ_permit_id"
-            type="select"
-            required="true"
-            model="Permit:Valid"/>
+        name="employ_permit_id"
+        type="select"
+        required="true"
+        model="Permit:Valid"/>
     <field
-            name="date"
-            required="true"
-            type="date"
-            format="dd-MM-yyyy"/>
+        name="date"
+        required="true"
+        type="date"
+        format="dd-MM-yyyy"/>
 </root>

@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<root upper_case="false" justify="false" split_word="false" cells="false">
+    <field
+        name="date"
+        required="true"
+        type="date"/>
+    <field
+        name="invite_form"
+        type="select"
+        required="true">
+        <option value="PAPER"/>
+        <option value="ELECTRONIC"/>
+    </field>
+    <field
+        name="inviter_id"
+        type="select"
+        required="true"
+        model="Employer"/>
+    <field
+        name="visa_multiplicity"
+        type="select"
+        required="true">
+        <option value="MULTI"/>
+        <option value="SINGLE"/>
+    </field>
+    <field
+        name="visa_purpose"
+        type="select"
+        required="true">
+        <option value="WORK"/>
+        <option value="BUSINESS"/>
+    </field>
+    <field
+        name="destination_id"
+        type="select"
+        required="true"
+        model="Address"/>
+</root>

@@ -1,38 +1,38 @@
 <?xml version="1.0"?>
 <root upper_case="true" justify="false" split_word="false" cells="true">
     <field
-            name="authority_id"
-            type="select"
-            required="true"
-            model="Employer:FMS"/>
+        name="authority_id"
+        type="select"
+        required="true"
+        model="Employer:FMS"/>
     <field
-            name="date"
-            required="true"
-            type="date"
-            format="dd-MM-yyyy"/>
+        name="date"
+        required="true"
+        type="date"
+        format="dd-MM-yyyy"/>
     <field
-            name="work_contract"
-            type="checkbox"
-            value="1"
-            checked="true"/>
+        name="work_contract"
+        type="checkbox"
+        value="1"
+        checked="true"/>
     <field
-            name="toggle_proxy"
-            type="checkbox"
-            value="1"
-            onclick="toggleVisibility('hiring-proxy', this.checked)"
-            checked="false"/>
+        name="toggle_proxy"
+        type="checkbox"
+        value="1"
+        onclick="toggleVisibility('hiring-proxy', this.checked)"
+        checked="false"/>
 
     <fieldset name="hiring-proxy" show="false">
         <field
-                name="proxy_number"
-                type="text"/>
+            name="proxy_number"
+            type="text"/>
         <field
-                name="proxy_date"
-                type="date"
-                format="dd-MM-yyyy"/>
+            name="proxy_date"
+            type="date"
+            format="dd-MM-yyyy"/>
         <field
-                name="agent_id"
-                type="select"
-                model="Employee:Agent"/>
+            name="agent_id"
+            type="select"
+            model="Employee:Agent"/>
     </fieldset>
 </root>
