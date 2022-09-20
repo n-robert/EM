@@ -30,7 +30,13 @@ class AppServiceProvider extends ServiceProvider
             );
         });
         $this->app->extend('redirect', function (Redirector $redirector) {
-            return new EMRedirector($redirector->getUrlGenerator());
+            $emRedirector = new EMRedirector($redirector->getUrlGenerator());
+
+            if (isset($this->app['session.store'])) {
+                $emRedirector->setSession($this->app['session.store']);
+            }
+
+            return $emRedirector;
         });
 
         if ($this->app->environment('local')) {
