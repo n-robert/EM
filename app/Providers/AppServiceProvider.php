@@ -43,7 +43,7 @@ class AppServiceProvider extends ServiceProvider
             $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
             $this->app->register(TelescopeServiceProvider::class);
         } else {
-            URL::forceScheme('https');
+            $this->app->make('url')->forceScheme('https');
         }
     }
 

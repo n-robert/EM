@@ -95,7 +95,7 @@ class BaseModel extends Model implements ModelInterface
     /**
      * BaseModel constructor.
      *
-     * @param  array $attributes
+     * @param array $attributes
      * @return void
      */
     public function __construct(array $attributes = [])
@@ -202,7 +202,7 @@ class BaseModel extends Model implements ModelInterface
     /**
      * Scope a query to applied filters.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder $builder
+     * @param \Illuminate\Database\Eloquent\Builder $builder
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeApplyFilters($builder)
@@ -273,7 +273,7 @@ class BaseModel extends Model implements ModelInterface
     /**
      * Scope a query to default order by.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder $builder
+     * @param \Illuminate\Database\Eloquent\Builder $builder
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeApplyDefaultOrder($builder)
@@ -296,7 +296,7 @@ class BaseModel extends Model implements ModelInterface
     /**
      * Scope a query to model's custom clauses.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder $builder
+     * @param \Illuminate\Database\Eloquent\Builder $builder
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeApplyCustomClauses($builder)
@@ -328,11 +328,11 @@ class BaseModel extends Model implements ModelInterface
         $pagination = [];
         $pagination['links'] = $items->toArray()['links'];
 
-//        if (!app()->environment('local')) {
-//            array_walk($pagination['links'], function (&$link, $key) {
-//                $link['url'] = to_https($link['url']);
-//            });
-//        }
+        array_walk($pagination['links'], function (&$link, $key) {
+            $link['url'] = app('url')->to(
+                ($link['url'])
+            );
+        });
 
         $pagination['previous'] = array_shift($pagination['links']);
         $pagination['next'] = array_pop($pagination['links']);
@@ -448,8 +448,8 @@ class BaseModel extends Model implements ModelInterface
     /**
      * Handle dynamic method calls into the model.
      *
-     * @param  string $method
-     * @param  array $parameters
+     * @param string $method
+     * @param array $parameters
      * @return mixed
      */
     public function __call($method, $parameters)
@@ -481,7 +481,7 @@ class BaseModel extends Model implements ModelInterface
     /**
      * Save the model to the database.
      *
-     * @param  array $options
+     * @param array $options
      * @return bool
      */
     public function save(array $options = [])
