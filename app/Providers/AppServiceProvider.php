@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Http\Routing\EMRedirector;
 use App\Http\Routing\EMUrlGenerator;
+use Illuminate\Routing\Redirector;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
@@ -28,8 +29,8 @@ class AppServiceProvider extends ServiceProvider
                 $this->app->make('config')->get('app.asset_url')
             );
         });
-        $this->app->extend('redirect', function (EMUrlGenerator $generator) {
-            return new EMRedirector($generator);
+        $this->app->extend('redirect', function (Redirector $redirector) {
+            return new EMRedirector($redirector->getUrlGenerator());
         });
 
         if ($this->app->environment('local')) {
