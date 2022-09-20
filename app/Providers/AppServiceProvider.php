@@ -29,15 +29,6 @@ class AppServiceProvider extends ServiceProvider
                 $this->app->make('config')->get('app.asset_url')
             );
         });
-        $this->app->extend('redirect', function (Redirector $redirector) {
-            $emRedirector = new EMRedirector($redirector->getUrlGenerator());
-
-            if (isset($this->app['session.store'])) {
-                $emRedirector->setSession($this->app['session.store']);
-            }
-
-            return $emRedirector;
-        });
 
         if ($this->app->environment('local')) {
             $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);

@@ -328,6 +328,7 @@ class BaseModel extends Model implements ModelInterface
         $pagination = [];
         $pagination['links'] = $items->toArray()['links'];
 
+        # Generate absolute link URLs according to scheme
         array_walk($pagination['links'], function (&$link, $key) {
             $link['url'] = app('url')->to(
                 ($link['url'])
