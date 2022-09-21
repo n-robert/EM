@@ -345,6 +345,7 @@
     "Staff": "Штатный состав",
     "This action will permanently delete \":account\" from database. Are you sure?": "Будет безвозвратно удалена запись \":account\" из БД. Вы уверены, что хотите ее удалить?",
     "Arrival notice": "Уведомление о прибытии",
+    "Departure notice": "Уведомление об убытии",
     "Work permit motion": "Ходатайство о продлении разрешения на работу",
     "Officer": "Кому адресован документ",
     "officer_id": "Кому адресован документ",
@@ -447,5 +448,7 @@
     "visa_purpose": "вид визы",
     "destination_id": "адрес места прибывания",
     "reg_address_id": "адрес регистрации",
-    "invite_form": "форма приглашения"
+    "invite_form": "форма приглашения",
+    "rep_id": "представитель организации",
+    "departure_date": "Дата убытия"
 }

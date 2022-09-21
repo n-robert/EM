@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<root upper_case="true" justify="false" split_word="false" cells="true">
+    <field
+        name="departure_date"
+        required="true"
+        type="date"
+        format="dd-MM-yyyy"/>
+    <field
+        name="rep_id"
+        type="select"
+        required="true"
+        model="Employee:Agent"/>
+</root>
