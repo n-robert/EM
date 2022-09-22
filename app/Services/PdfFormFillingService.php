@@ -1183,7 +1183,7 @@ class PdfFormFillingService
                 'supposed_entry_date'         => $supposedEntryDate,
                 'up_to'                       => $upToDate,
                 strtolower($multiplicity)     => 'Х',
-                strtolower($tripPurpose)     => 'Х',
+                strtolower($tripPurpose)      => 'Х',
                 'special_pass_number'         => '',
                 'special_pass_date_from'      => '',
                 'special_pass_date_to'        => '',
@@ -1217,7 +1217,6 @@ class PdfFormFillingService
     {
         $action = $docData['action'];
         $visaPurpose = $docData['visa_purpose'];
-        $reason = $docData['reason'];
         $inviterId = $docData['inviter_id'];
         $destinationId = $docData['destination_id'];
 
@@ -1230,29 +1229,7 @@ class PdfFormFillingService
         $birthPlace = $employee->birth_place;
         $homeAddress = implode(', ', [$citizenship, $birthPlace]);
         $occupation = Occupation::find($employee->occupation_id)->name_ru;
-
-        switch ($reason) {
-            case 'EXPIRED_VISA':
-                $suffix = $docData['visa'];
-                break;
-            case 'NEW_PASSPORT':
-                $suffix = $docData['passport'];
-                break;
-            case 'NEW_WORK_PERMIT':
-            default:
-                $suffix = $docData['work_permit'];
-                break;
-        }
-
-        $suffix = explode(' ', $suffix);
-        $format =
-            count($suffix) > 1 ?
-                __('SERIE_NUMBER_SPRINTF') : __('NUMBER_SPRINTF');
-
-        $reason =
-            __($reason) .
-            sprintf($format, ...$suffix);
-
+        $reason = static::getReason($docData);
         $inviter = Employer::find($inviterId);
         $inviterPhone = self::handlePhones($inviter->phone, '8');
         $inviterAddress = Address::find($inviter->address_id)->name_ru;
@@ -1348,98 +1325,68 @@ class PdfFormFillingService
     public static function printVisaMotion($docData, $doc, $id)
     {
         $recipient = Employer::find($docData['authority_id']);
+        $recipientName = static::declension($recipient->name_ru, 2, '', '', 1);
         $recipientDirectorId = $docData['officer_id'] ?: $recipient->director_id;
         $recipientDirector = Employee::find($recipientDirectorId);
-        $recipientDirector =
-            [
-                self::declension($recipientDirector->last_name_ru, 3, $recipientDirector->gender, 'name'),
-                mb_substr($recipientDirector->first_name_ru, 0, 1) . '.',
-                mb_substr($recipientDirector->middle_name_ru, 0, 1) . '.'
-            ];
-        $recipientDirector = implode(' ', $recipientDirector);
-
+        $recipientDirector = static::shortenName(
+            null,
+            self::declension($recipientDirector->last_name_ru, 3, $recipientDirector->gender, 'name'),
+            mb_substr($recipientDirector->first_name_ru, 0, 1) . '.',
+            mb_substr($recipientDirector->middle_name_ru, 0, 1) . '.'
+        );
         $employee = Employee::find($id);
         $employer = Employer::find($employee->employer_id);
-
-        $hostInfo = [
+        $hostInfo = implode(', ', [
             $employer->name_ru,
             __('TAXPAYER_ID') . ' ' . $employer->taxpayer_id,
             Address::find($employer->address_id)->name_ru,
             $employer->phone
-        ];
-        $hostInfo = implode(', ', $hostInfo);
-
-        $action = $docData['action'];
-        $actions = ['extend', 'renew'];
-        $gender = ['MALE' => 'male', 'FEMALE' => 'female'];
-        $birth_date = '';
-
-        if (trim($employee->birth_date) != '0000-00-00') {
-            $birth_date = date('d/m/Y', strtotime($employee->birth_date));
-        }
-
-        $documents = ['work_contract', 'work_permit', 'visa'];
-        $reason = [];
-        $reason[] = __($docData['reason']);
-        $reason[] = __('SHORT_NUMBER');
-        $reason[] = $docData[$documents[$reason]];
-        $reason[] = __('VALID_FROM_LC');
-        $from = $docData[$documents[$reason] . '_from'];
-        $reason[] = date('d/m/Y', strtotime($from));
-        $reason[] = __('VALID_UNTIL_LC');
-        $until = $docData[$documents[$reason] . '_until'];
-        $reason[] = date('d/m/Y', strtotime($until));
-        $reason = implode(' ', $reason);
-
-        $date = $docData['date'];
-        $date = $date ? date('d/m/Y', strtotime($date)) : '';
-
+        ]);
+        $birth_date =
+            is_null($employee->birth_date) ? '' : Carbon::parse($employee->birth_date)->isoFormat('d/m/Y');
+        $passportIssued =
+            is_null($employee->passport_issued_date) ?
+                '' : Carbon::parse($employee->passport_issued_date)->isoFormat('d/m/Y');
+        $passportExpired =
+            is_null($employee->passport_expired_date) ?
+                '' : Carbon::parse($employee->passport_expired_date)->isoFormat('d/m/Y');
+        $visaStarted =
+            is_null($employee->visa_started) ? '' : Carbon::parse($employee->visa_started)->isoFormat('d/m/Y');
+        $visaExpired =
+            is_null($employee->visa_expired) ? '' : Carbon::parse($employee->visa_expired)->isoFormat('d/m/Y');
+        $reason = static::getReason($docData);
+        $date = $docData['date'] ? date('d/m/Y', strtotime($docData['date'])) : '';
         $director = __('GENERAL_DIRECTOR');
-        $directorName = [
-            $employee->director_last_name_ru,
-            mb_substr($employee->director_first_name_ru, 0, 1) . '.',
-            $employee->director_middle_name_ru ? mb_substr($employee->director_middle_name_ru, 0, 1) . '.' : ''
-        ];
+        $directorName = static::shortenName(Employee::find($employer->director_id));
 
         $data =
             [
-                'recipient'                         => $recipient->name_ru,
-                'recipient_director'                => $recipientDirector,
-                strtolower($docData['action'])      => '',
-                'last_name_ru'                      => $employee->last_name_ru,
-                'first_name_ru'                     => $employee->first_name_ru,
-                'middle_name_ru'                    => $employee->middle_name_ru,
-                'last_name_en'                      => $employee->last_name_en,
-                'first_name_en'                     => $employee->first_name_en,
-                'middle_name_en'                    => $employee->middle_name_en,
-                'birth_date'                        => $birth_date,
-                'citizenship_name'                  => $employee->citizenship_name,
-                static::$genders[$employee->gender] => 'X',
-                'passport_serie'                    => $employee->passport_serie,
-                'passport_number'                   => $employee->passport_number,
-                'passport_issued'                   => date('d/m/Y', strtotime($employee->passport_issued_date)),
-                'passport_expired'                  => date('d/m/Y', strtotime($employee->passport_expired_date)),
-                'visa_serie'                        => $employee->visa_serie,
-                'visa_number'                       => $employee->visa_number,
-                'visa_started'                      => date('d/m/Y', strtotime($employee->visa_started)),
-                'visa_expired'                      => date('d/m/Y', strtotime($employee->visa_expired)),
-                'date'                              => $date,
-                'director'                          => $director,
-                'director_name'                     => implode(' ', $directorName)
+                'recipient'                    => $recipientName,
+                'recipient_director'           => $recipientDirector,
+                'host_info'                    => $hostInfo,
+                strtolower($docData['action']) => '___________',
+                'last_name_ru'                 => $employee->last_name_ru,
+                'first_name_ru'                => $employee->first_name_ru,
+                'middle_name_ru'               => $employee->middle_name_ru,
+                'last_name_en'                 => $employee->last_name_en,
+                'first_name_en'                => $employee->first_name_en,
+                'middle_name_en'               => $employee->middle_name_en,
+                'birth_date'                   => $birth_date,
+                'citizenship_name'             => $employee->citizenship_name,
+                strtolower($employee->gender)  => 'X',
+                'passport_serie'               => $employee->passport_serie,
+                'passport_number'              => $employee->passport_number,
+                'passport_issued'              => $passportIssued,
+                'passport_expired'             => $passportExpired,
+                'visa_serie'                   => $employee->visa_serie,
+                'visa_number'                  => $employee->visa_number,
+                'visa_started'                 => $visaStarted,
+                'visa_expired'                 => $visaExpired,
+                'date'                         => $date,
+                'director'                     => $director,
+                'director_name'                => $directorName,
+                'reason'                       => $reason,
             ];
-
-        self::splitText(
-            self::declension($recipient->name_ru, 2, '', '', 1),
-            'recipient',
-            $data,
-            true,
-            false,
-            false,
-            2,
-            45
-        );
-        self::splitText($hostInfo, 'host_info', $data, true, false, false, 4, 35, 45);
-        self::splitText($reason, 'reason', $data, true, false, false, 2, 85, 95);
 
         return static::prepareData($doc, $docData, $data);
     }
@@ -1794,7 +1741,7 @@ class PdfFormFillingService
 
         if ($employee->birth_date) {
             $guestInfo[] =
-                Carbon::parse($employee->birth_date)->isoFormat('DD/MM/YYYY'). __('BIRTH_DATE_SUFFIX');
+                Carbon::parse($employee->birth_date)->isoFormat('DD/MM/YYYY') . __('BIRTH_DATE_SUFFIX');
         }
 
         $guestInfo[] = implode(
@@ -2055,6 +2002,29 @@ class PdfFormFillingService
         }
 
         return $addresses;
+    }
+
+    public static function getReason($docData, $reason = 'reason')
+    {
+        switch ($docData[$reason]) {
+            case 'EXPIRED_VISA':
+                $suffix = $docData['visa'];
+                break;
+            case 'NEW_PASSPORT':
+                $suffix = $docData['passport'];
+                break;
+            case 'NEW_WORK_PERMIT':
+            default:
+                $suffix = $docData['work_permit'];
+                break;
+        }
+
+        $suffix = explode(' ', $suffix);
+        $format =
+            count($suffix) > 1 ?
+                __('SERIE_NUMBER_SPRINTF') : __('NUMBER_SPRINTF');
+
+        return __($docData[$reason]) . sprintf($format, ...$suffix);
     }
 
     public static function shortenName($person = null, $last_name = '', $first_name = '', $middle_name = '')

@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<root upper_case="false" justify="true" split_word="false" cells="false">
+    <field
+        name="date"
+        required="true"
+        type="date"
+        format="dd-MM-yyyy"/>
+    <field
+        name="authority_id"
+        type="select"
+        required="true"
+        onchange="getPerson(this);"
+        model="Employer:FMS"/>
+    <field
+        name="officer_id"
+        type="select"
+        required="true"
+        model="Employee:Officer"/>
+    <field
+        name="action"
+        type="select"
+        required="true">
+        <option value="EXTEND"/>
+        <option value="RENEW"/>
+    </field>
+    <field
+        name="reason"
+        type="select"
+        required="true"
+        onchange="toggleVisibility(this.value, true, 'reasons')">
+        <option value="NEW_WORK_PERMIT"/>
+        <option value="EXPIRED_VISA"/>
+        <option value="NEW_PASSPORT"/>
+    </field>
+
+    <fieldset name="reasons" show="true">
+        <field
+            name="work_permit"
+            parent_id="NEW_WORK_PERMIT"
+            show="false"
+            model="Employee:work_permit_serie:work_permit_number"/>
+        <field
+            name="visa"
+            parent_id="EXPIRED_VISA"
+            show="false"
+            model="Employee:visa_serie:visa_number"/>
+        <field
+            name="passport"
+            parent_id="NEW_PASSPORT"
+            show="false"
+            model="Employee:passport_serie:passport_number"/>
+    </fieldset>
+</root>
