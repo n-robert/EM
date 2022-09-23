@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   db:
-    container_name: pgsql
+    container_name: pgsql-em
     build: ./docker/pgsql
     image: pgsql
     ports:
@@ -34,7 +34,7 @@ services:
       - internal
 
   nginx:
-    container_name: nginx
+    container_name: nginx-em
     build:
       context: docker/nginx
     image: nginx
@@ -49,7 +49,7 @@ services:
       - internal
 
   #db:
-    #container_name: mysql
+    #container_name: mysql-em
     #build: ./docker/mysql
     #image: mysql
     #ports:
