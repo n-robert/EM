@@ -19,7 +19,7 @@ services:
       - internal
 
   php-fpm:
-    container_name: php-fpm
+    container_name: php-fpm-em
     build:
       context: docker/php-fpm
     image: php-fpm
