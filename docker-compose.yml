@@ -1,7 +1,7 @@
 version: '3.7'
 
 services:
-  db-em:
+  db:
     container_name: pgsql
     build: ./docker/pgsql
     image: pgsql
@@ -29,7 +29,7 @@ services:
       XDEBUG_CONFIG: "remote_host=192.168.220.1 remote_enable=1"
       PHP_IDE_CONFIG: "serverName=Docker"
     depends_on:
-      - db-em
+      - db
     networks:
       - internal
 
@@ -48,7 +48,7 @@ services:
     networks:
       - internal
 
-  #db-em:
+  #db:
     #container_name: mysql
     #build: ./docker/mysql
     #image: mysql
@@ -72,11 +72,11 @@ services:
     volumes:
       - ./backup:/backups
     links:
-      - db-em:db-em
+      - db:db
     depends_on:
-      - db-em
+      - db
     environment:
-      - POSTGRES_HOST=db-em
+      - POSTGRES_HOST=db
       - POSTGRES_DB=${DB_DATABASE_PG}
       - POSTGRES_USER=${DB_USERNAME_PG}
       - POSTGRES_PASSWORD=${DB_PASSWORD_PG}
