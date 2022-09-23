@@ -1,7 +1,7 @@
 git clone git@github.com:n-robert/em.nginx
 docker compose up --build --remove-orphans
 
-docker exec -it php-fpm bash
+docker exec -it php-fpm-em bash
 
 [//]: # (    first installation)
     chown -R www-data:www-data ./
@@ -17,5 +17,4 @@ docker exec -it php-fpm bash
 [//]: # (    always)
     npm run dev
 
-exit
-
+exi
