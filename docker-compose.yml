@@ -1,20 +1,18 @@
 version: '3.7'
 
 services:
-  db:
-    container_name: pgsql-em
-    build: ./docker/pgsql
-    image: pgsql
-    ports:
-      - "5434:5432"
+  nginx:
+    container_name: nginx-em
+    build:
+      context: docker/nginx
+    image: nginx
     volumes:
-#      - ./docker/pgsql/init:/docker-entrypoint-initdb.d
-      - ./backup/daily/em_pg-latest.sql.gz:/docker-entrypoint-initdb.d/em_pg-latest.sql.gz
-      - ./docker/pgsql/pgdata:/var/lib/postgresql
-    environment:
-      - POSTGRES_DB=${DB_DATABASE_PG}
-      - POSTGRES_USER=${DB_USERNAME_PG}
-      - POSTGRES_PASSWORD=${DB_PASSWORD_PG}
+      - ./:/var/www
+      - ./storage/app/public/:/var/www/public/storage/
+    ports:
+      - "8001:80"
+    depends_on:
+      - php-fpm
     networks:
       - internal
 
@@ -33,37 +31,22 @@ services:
     networks:
       - internal
 
-  nginx:
-    container_name: nginx-em
-    build:
-      context: docker/nginx
-    image: nginx
-    volumes:
-      - ./:/var/www
-      - ./storage/app/public/:/var/www/public/storage/
+  db:
+    container_name: pgsql-em  # mysql-em
+    build: ./docker/pgsql     # mysql
+    image: pgsql              # mysql
     ports:
-      - "8001:80"
-    depends_on:
-      - php-fpm
+      - "5434:5432"           # "3308:3306"
+    volumes:
+#      - ./docker/pgsql/init:/docker-entrypoint-initdb.d       # mysql
+      - ./backup/daily/em_pg-latest.sql.gz:/docker-entrypoint-initdb.d/em_pg-latest.sql.gz        # my
+      - ./docker/pgsql/pgdata:/var/lib/postgresql       # mysql
+    environment:
+      - POSTGRES_DB=${DB_DATABASE_PG}       # MYSQL_DB
+      - POSTGRES_USER=${DB_USERNAME_PG}     # MYSQL_USER
+      - POSTGRES_PASSWORD=${DB_PASSWORD_PG} # MYSQL_PASSWORD
     networks:
       - internal
-
-  #db:
-    #container_name: mysql-em
-    #build: ./docker/mysql
-    #image: mysql
-    #ports:
-      #- "3308:3306"
-    #volumes:
-      #- ./docker/mysql/init:/docker-entrypoint-initdb.d
-      #- ./docker/mysql/mydata:/var/lib/mysql
-    #environment:
-      #- MYSQL_DB=${DB_DATABASE}
-      #- MYSQL_USER=${DB_USERNAME}
-      #- MYSQL_PASSWORD=${DB_PASSWORD}
-      #- MYSQL_ALLOW_EMPTY_PASSWORD=true
-    #networks:
-      #- internal
 
   pgbackup:
     container_name: backup-em
@@ -72,7 +55,7 @@ services:
     volumes:
       - ./backup:/backups
     links:
-      - db:db
+      - db
     depends_on:
       - db
     environment:
