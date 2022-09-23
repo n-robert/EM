@@ -4,7 +4,7 @@ docker compose up --build --remove-orphans
 docker exec -it php-fpm-em bash
 
 [//]: # (    first installation)
-    chown -R www-data:www-data ./
+    chown -R www-data:www-data storage bootstrap/cache
     chgrp -R www-data storage bootstrap/cache
     chmod -R ug+rwx storage bootstrap/cache
     composer install
@@ -17,4 +17,4 @@ docker exec -it php-fpm-em bash
 [//]: # (    always)
     npm run dev
 
-exi
+exit
