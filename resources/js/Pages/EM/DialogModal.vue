@@ -17,35 +17,34 @@
 </template>
 
 <script>
-    import EMButton from './Button';
-    import Modal from './Modal';
+import EMButton from './Button';
+import Modal from './Modal';
 
-    export default {
-        components: {
-            EMButton,
-            Modal,
-        },
+export default {
+    components: {
+        EMButton,
+        Modal,
+    },
 
-        props: {
-            show: {
-                default: false,
-            },
-            maxWidth: {
-                default: '2xl',
-            },
-            closeable: {
-                default: true,
-            },
-            id: {
-                default: null,
-            },
+    props: {
+        show: {
+            default: false,
         },
+        maxWidth: {
+            default: '2xl',
+        },
+        closeable: {
+            default: true,
+        },
+        id: {
+            default: null,
+        },
+    },
 
-        methods: {
-            closeModal()
-            {
-                this.$emit('closeModalFromDialog', this.id);
-            },
+    methods: {
+        closeModal() {
+            this.$emit('closeModalFromDialog', this.id);
         },
-    };
+    },
+};
 </script>

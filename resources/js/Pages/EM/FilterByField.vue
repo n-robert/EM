@@ -10,33 +10,31 @@
 </template>
 
 <script>
-    export default {
-        props: [
-            'element',
-        ],
+export default {
+    props: [
+        'element',
+    ],
 
-        inject: [
-            'filterFieldDefaultClass',
-            'filterFieldIsChecked',
-            'controllerNames',
-        ],
+    inject: [
+        'filterFieldDefaultClass',
+        'filterFieldIsChecked',
+        'controllerNames',
+    ],
 
-        data()
-        {
-            return {
-                id: (
-                    this.element.field.replace(/_id|_/, '')
-                    + '-'
-                    + this.element.value.toString().replace(/["\[\]]/gi, '').toLowerCase()
-                ),
-            };
+    data() {
+        return {
+            id: (
+                this.element.field.replace(/_id|_/, '')
+                + '-'
+                + this.element.value.toString().replace(/["\[\]]/gi, '').toLowerCase()
+            ),
+        };
+    },
+
+    methods: {
+        submit() {
+            this.$inertia.post('/' + this.controllerNames, new FormData(this.$refs[this.id]));
         },
-
-        methods: {
-            submit()
-            {
-                this.$inertia.post('/' + this.controllerNames, new FormData(this.$refs[this.id]));
-            },
-        },
-    };
+    },
+};
 </script>

@@ -87,7 +87,7 @@ class ExpatManagerServiceProvider extends ServiceProvider
             });
         });
 
-        // Add custom language file
+        // Add custom language file to Carbon
         $translator = Carbon::getTranslator();
         $translator->addResource('array', require base_path('resources/lang/ru/customCarbonRu.php'), 'ru');
 

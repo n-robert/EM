@@ -30,27 +30,26 @@
 </template>
 
 <script>
-    export default {
-        props: {
-            show: {
-                default: false,
-            },
-            maxWidth: {
-                default: '2xl',
-            },
-            closeable: {
-                default: true,
-            },
+export default {
+    props: {
+        show: {
+            default: false,
         },
+        maxWidth: {
+            default: '2xl',
+        },
+        closeable: {
+            default: true,
+        },
+    },
 
-        methods: {
-            close()
-            {
-                if (this.closeable) {
-                    this.$emit('close');
-                }
-            },
+    methods: {
+        close() {
+            if (this.closeable) {
+                this.$emit('close');
+            }
         },
+    },
 
 //        watch: {
 //            show: {
@@ -65,33 +64,31 @@
 //            },
 //        },
 
-        created()
-        {
-            const closeOnEscape = (e) => {
-                if (e.key === 'Escape' && this.show) {
-                    this.close();
-                }
-            };
+    created() {
+        const closeOnEscape = (e) => {
+            if (e.key === 'Escape' && this.show) {
+                this.close();
+            }
+        };
 
-            document.addEventListener('keydown', closeOnEscape);
+        document.addEventListener('keydown', closeOnEscape);
 
-            this.$once('hook:destroyed', () => {
-                document.removeEventListener('keydown', closeOnEscape);
-            });
+        this.$once('hook:destroyed', () => {
+            document.removeEventListener('keydown', closeOnEscape);
+        });
+    },
+
+    computed: {
+        maxWidthClass() {
+            return {
+                'sm': 'sm:max-w-sm',
+                'md': 'sm:max-w-md',
+                'lg': 'sm:max-w-lg',
+                'xl': 'sm:max-w-xl',
+                '2xl': 'sm:max-w-2xl',
+                'full': 'sm:max-w-full',
+            }[this.maxWidth];
         },
-
-        computed: {
-            maxWidthClass()
-            {
-                return {
-                    'sm': 'sm:max-w-sm',
-                    'md': 'sm:max-w-md',
-                    'lg': 'sm:max-w-lg',
-                    'xl': 'sm:max-w-xl',
-                    '2xl': 'sm:max-w-2xl',
-                    'full': 'sm:max-w-full',
-                }[this.maxWidth];
-            },
-        },
-    };
+    },
+};
 </script>

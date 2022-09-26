@@ -21,7 +21,7 @@
                                               :key="view"
                                               :href="'/' + view.pluralize()"
                                               :active="($page.props.currentRouteName === 'gets.' + view) || ($page.props.currentRouteName === 'gets.' + view.pluralize())">
-                                    {{__(view.ucFirst().pluralize())}}
+                                    {{ __(view.ucFirst().pluralize()) }}
                                 </e-m-nav-link>
                             </div>
                         </div>
@@ -56,7 +56,7 @@
 
                                                 <!-- Team Settings -->
                                                 <jet-dropdown-link
-                                                        :href="route('teams.show', $page.props.user.current_team)">
+                                                    :href="route('teams.show', $page.props.user.current_team)">
                                                     Team Settings
                                                 </jet-dropdown-link>
 
@@ -81,7 +81,8 @@
                                                                      stroke-linecap="round" stroke-linejoin="round"
                                                                      stroke-width="2" stroke="currentColor"
                                                                      viewBox="0 0 24 24">
-                                                                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                                    <path
+                                                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                                                 </svg>
                                                                 <div>{{ team.name }}</div>
                                                             </div>
@@ -123,16 +124,16 @@
                                     <template #content>
                                         <!-- Account Management -->
                                         <div class="block px-4 py-2 text-xs text-gray-400">
-                                            Manage Account
+                                            {{ __('Manage Account') }}
                                         </div>
 
                                         <jet-dropdown-link :href="route('profile.show')">
-                                            Profile
+                                            {{ __('Profile') }}
                                         </jet-dropdown-link>
 
                                         <jet-dropdown-link :href="route('api-tokens.index')"
                                                            v-if="$page.props.jetstream.hasApiFeatures">
-                                            API Tokens
+                                            {{ __('API Tokens') }}
                                         </jet-dropdown-link>
 
                                         <div class="border-t border-gray-100"></div>
@@ -140,7 +141,7 @@
                                         <!-- Authentication -->
                                         <form @submit.prevent="logout">
                                             <jet-dropdown-link as="button">
-                                                Logout
+                                                {{ __('Logout') }}
                                             </jet-dropdown-link>
                                         </form>
                                     </template>
@@ -153,12 +154,14 @@
                             <button @click="showingNavigationDropdown = ! showingNavigationDropdown"
                                     class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
                                 <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                                    <path :class="{'hidden': showingNavigationDropdown, 'inline-flex': ! showingNavigationDropdown }"
-                                          stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                          d="M4 6h16M4 12h16M4 18h16"/>
-                                    <path :class="{'hidden': ! showingNavigationDropdown, 'inline-flex': showingNavigationDropdown }"
-                                          stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                          d="M6 18L18 6M6 6l12 12"/>
+                                    <path
+                                        :class="{'hidden': showingNavigationDropdown, 'inline-flex': ! showingNavigationDropdown }"
+                                        stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 6h16M4 12h16M4 18h16"/>
+                                    <path
+                                        :class="{'hidden': ! showingNavigationDropdown, 'inline-flex': showingNavigationDropdown }"
+                                        stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M6 18L18 6M6 6l12 12"/>
                                 </svg>
                             </button>
                         </div>
@@ -171,7 +174,7 @@
                     <div class="pt-2 pb-3 space-y-1">
                         <jet-responsive-nav-link :href="route('gets.employees')"
                                                  :active="route().current('gets.employees')">
-                            {{__('Employees')}}
+                            {{ __('Employees') }}
                         </jet-responsive-nav-link>
                     </div>
 
@@ -275,68 +278,64 @@
 </template>
 
 <script>
-    import JetApplicationMark from '@/Jetstream/ApplicationMark';
-    import JetBanner from '@/Jetstream/Banner';
-    import JetDropdown from '@/Jetstream/Dropdown';
-    import JetDropdownLink from '@/Jetstream/DropdownLink';
-    import EMNavLink from '../Pages/EM/NavLink';
-    import JetResponsiveNavLink from '@/Jetstream/ResponsiveNavLink';
+import JetApplicationMark from '@/Jetstream/ApplicationMark';
+import JetBanner from '@/Jetstream/Banner';
+import JetDropdown from '@/Jetstream/Dropdown';
+import JetDropdownLink from '@/Jetstream/DropdownLink';
+import EMNavLink from '../Pages/EM/NavLink';
+import JetResponsiveNavLink from '@/Jetstream/ResponsiveNavLink';
 
-    export default {
-        components: {
-            JetApplicationMark,
-            JetBanner,
-            JetDropdown,
-            JetDropdownLink,
-            EMNavLink,
-            JetResponsiveNavLink,
+export default {
+    components: {
+        JetApplicationMark,
+        JetBanner,
+        JetDropdown,
+        JetDropdownLink,
+        EMNavLink,
+        JetResponsiveNavLink,
+    },
+
+    provide: {
+        filterFieldDefaultClass: 'm-1 p-1 rounded cursor-pointer bg-indigo-100 hover:bg-indigo-500 hover:text-white text-sm',
+        filterFieldIsChecked: 'bg-indigo-400 text-white',
+        paginationActive: 'bg-indigo-400 text-white rounded-md',
+        paginationNull: 'bg-white text-gray-500',
+        leftColumn: 'table-cell text-right p-1 w-60',
+        rightColumn: 'table-cell text-left p-1',
+        warningClass: 'text-red-600',
+        labelDefaultClass: 'text-sm',
+        inputDefaultClass: 'rounded-md shadow-sm max-w-xs',
+        fieldWarningClass: 'rounded-md shadow-sm max-w-xs border border-red-600',
+        pDefaultClass: 'text-xs',
+    },
+
+    data() {
+        return {
+            showingNavigationDropdown: false,
+            views: this.$page.props.views,
+        };
+    },
+
+    methods: {
+        switchToTeam(team) {
+            this.$inertia.put('/current-team', {
+                'team_id': team.id,
+            }, {
+                preserveState: false,
+            });
         },
 
-        provide: {
-            filterFieldDefaultClass: 'm-1 p-1 rounded cursor-pointer bg-indigo-100 hover:bg-indigo-500 hover:text-white text-sm',
-            filterFieldIsChecked: 'bg-indigo-400 text-white',
-            paginationActive: 'bg-indigo-400 text-white rounded-md',
-            paginationNull: 'bg-white text-gray-500',
-            leftColumn: 'table-cell text-right p-1 w-60',
-            rightColumn: 'table-cell text-left p-1',
-            warningClass: 'text-red-600',
-            labelDefaultClass: 'text-sm',
-            inputDefaultClass: 'rounded-md shadow-sm max-w-xs',
-            fieldWarningClass: 'rounded-md shadow-sm max-w-xs border border-red-600',
-            pDefaultClass: 'text-xs',
+        logout() {
+            axios.post('/logout').then(response => {
+                window.location = '/';
+            });
         },
+    },
 
-        data()
-        {
-            return {
-                showingNavigationDropdown: false,
-                views: this.$page.props.views,
-            };
+    computed: {
+        path() {
+            return window.location.pathname;
         },
-
-        methods: {
-            switchToTeam(team)
-            {
-                this.$inertia.put('/current-team', {
-                    'team_id': team.id,
-                }, {
-                    preserveState: false,
-                });
-            },
-
-            logout()
-            {
-                axios.post('/logout').then(response => {
-                    window.location = '/';
-                });
-            },
-        },
-
-        computed: {
-            path()
-            {
-                return window.location.pathname;
-            },
-        },
-    };
+    },
+};
 </script>

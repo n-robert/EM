@@ -2,23 +2,23 @@
     <app-layout>
         <template #header>
             <centered-item :width="centeredItemWidth">
-                <h1 class="font-bold text-indigo-600 text-xl">{{__(controllerNames.toString().toPhrase())}}</h1>
+                <h1 class="font-bold text-indigo-600 text-xl">{{ __(controllerNames.toString().toPhrase()) }}</h1>
             </centered-item>
         </template>
 
         <centered-item :width="centeredItemWidth">
             <div class="max-w-7xl mx-auto">
                 <dropdown
-                        v-if="filters.length !== 0"
-                        align="left" width="9/12"
-                        :buttonCustomClass="customClass"
-                        :buttonOpenText="__('Open filters')"
-                        :buttonCloseText="__('Close filters')">
+                    v-if="filters.length !== 0"
+                    align="left" width="9/12"
+                    :buttonCustomClass="customClass"
+                    :buttonOpenText="__('Open filters')"
+                    :buttonCloseText="__('Close filters')">
                     <template #trigger></template>
 
                     <template #content>
                         <div v-for="(elements, field) in filters" class="p-2 my-4 border rounded-lg w-full">
-                            <div class="font-bold text-indigo-600">{{field && __(field).ucFirst()}}</div>
+                            <div class="font-bold text-indigo-600">{{ field && __(field).ucFirst() }}</div>
 
                             <div v-for="element in elements" class="inline-flex">
                                 <filter-by-field :element="element"></filter-by-field>
@@ -34,13 +34,13 @@
                 <div class="p-2 m-1 bg-white shadow-xl sm:rounded-lg">
                     <div class="p-2">
                         <div class="text-right text-xs pr-5">
-                            {{pageInfo}}
+                            {{ pageInfo }}
                         </div>
 
                         <inertia-link v-if="needAdditionalButton" :href="'/' + controllerName + '/new'"
                                       class="px-4 py-2 border border-gray-300 rounded-md text-white bg-indigo-400
                                       hover:bg-indigo-500">
-                            {{createNewItem}}
+                            {{ createNewItem }}
                         </inertia-link>
                     </div>
 
@@ -49,10 +49,10 @@
                             <div class="table-row">
                                 <div v-for="field in formFields" class="p-2 align-middle table-cell">
                                     <div v-if="field.name === 'default_name'" class="pl-6 text-left">
-                                        {{field.label && __(field.label).ucFirst()}}
+                                        {{ field.label && __(field.label).ucFirst() }}
                                     </div>
 
-                                    <div v-else>{{field.label && __(field.label).ucFirst()}}</div>
+                                    <div v-else>{{ field.label && __(field.label).ucFirst() }}</div>
                                 </div>
 
                                 <div class="p-2 align-middle table-cell"></div>
@@ -66,13 +66,15 @@
                                     <h2 v-if="field.name === 'default_name'"
                                         class="pl-6 py-1 text-indigo-800 hover:text-indigo-500 text-left">
                                         <inertia-link :href="'/' + controllerName + '/' + item.id">
-                                            {{item.default_name}}
+                                            {{ item.default_name }}
                                         </inertia-link>
                                     </h2>
 
                                     <div v-else>
-                                        {{field.name && field.name.endsWith('_date') ? formatDate(item[field.name]) :
-                                        __(item[field.name])}}
+                                        {{
+                                            field.name && field.name.endsWith('_date') ?
+                                                formatDate(item[field.name]) : __(item[field.name])
+                                        }}
                                     </div>
                                 </div>
 
@@ -81,7 +83,7 @@
                                       @submit.prevent="deleteItem(item)"
                                       class="p-2 align-middle table-cell">
                                     <e-m-button class="hover:text-white hover:bg-indigo-500">
-                                        {{__('Delete')}}
+                                        {{ __('Delete') }}
                                     </e-m-button>
                                 </form>
 
@@ -90,7 +92,7 @@
                                     <e-m-button :type="'button'"
                                                 class="hover:text-white hover:bg-indigo-500"
                                                 @click.native="openModalFromItems(item.id)">
-                                        {{__('Print documents')}}
+                                        {{ __('Print documents') }}
                                     </e-m-button>
                                 </div>
 
@@ -111,11 +113,11 @@
                         <inertia-link :href="'/' + controllerName + '/new'"
                                       class="px-4 py-2 border border-gray-300 rounded-md text-white bg-indigo-400
                                       hover:bg-indigo-500">
-                            {{createNewItem}}
+                            {{ createNewItem }}
                         </inertia-link>
 
                         <div class="text-right text-xs pr-5">
-                            {{pageInfo}}
+                            {{ pageInfo }}
                         </div>
                     </div>
                 </div>
@@ -129,104 +131,104 @@
 </template>
 
 <script>
-    import AppLayout from '../../Layouts/AppLayout';
-    import EMButton from './Button';
-    import CenteredItem from './CenteredItem';
-    import DialogModal from './DialogModal';
-    import DocList from './DocList';
-    import Pagination from './Pagination';
-    import FilterByField from './FilterByField';
-    import Dropdown from './Dropdown';
+import AppLayout from '../../Layouts/AppLayout';
+import EMButton from './Button';
+import CenteredItem from './CenteredItem';
+import DialogModal from './DialogModal';
+import DocList from './DocList';
+import Pagination from './Pagination';
+import FilterByField from './FilterByField';
+import Dropdown from './Dropdown';
 
-    export default {
-        components: {
-            AppLayout,
-            EMButton,
-            CenteredItem,
-            DialogModal,
-            DocList,
-            Pagination,
-            FilterByField,
-            Dropdown,
+export default {
+    components: {
+        AppLayout,
+        EMButton,
+        CenteredItem,
+        DialogModal,
+        DocList,
+        Pagination,
+        FilterByField,
+        Dropdown,
+    },
+
+    props: [
+        'items',
+        'filters',
+        'hasFilters',
+        'pagination',
+        'modal',
+        'docList',
+        'formFields',
+        'controllerName',
+        'controllerNames',
+    ],
+
+    provide() {
+        return {
+            controllerName: this.controllerName,
+            controllerNames: this.controllerNames,
+        };
+    },
+
+    data() {
+        return {
+            centeredItemWidth: {
+                md: 'full',
+                xl: '3/4',
+            },
+            needAdditionalButton: this.items.length > 7,
+            createNewItem: this.__('New ' + this.controllerName),
+            itemCount: [
+                this.pagination.firstItem + '-' + this.pagination.lastItem,
+                this.__('from'),
+                this.pagination.total
+            ].join(' '),
+        };
+    },
+
+    computed: {
+        customClass: function () {
+            return 'inline-flex text-white' + (
+                this.hasFilters ? ' bg-green-500 hover:bg-green-600' : ' bg-indigo-400 hover:bg-indigo-500'
+            );
         },
 
-        props: [
-            'items',
-            'filters',
-            'hasFilters',
-            'pagination',
-            'modal',
-            'docList',
-            'formFields',
-            'controllerName',
-            'controllerNames',
-        ],
+        pageInfo: function () {
+            return [this.pagination.firstItem + '-' + this.pagination.lastItem, this.__('from'), this.pagination.total].join(' ');
+        },
+    },
 
-        provide() {
-            return {
-                controllerName: this.controllerName,
-                controllerNames: this.controllerNames,
-            };
+    methods: {
+        deleteItem(item) {
+            const
+                form = document.getElementById('delete-' + item.id),
+                confirm =
+                    window.confirm(
+                        this.__(
+                            'This action will permanently delete ":account" from database. Are you sure?',
+                            {account: item.default_name},
+                        ),
+                    );
+
+            let formData = new FormData(form);
+
+            formData.append('id', item.id);
+
+            confirm && this.$inertia.post('/' + this.controllerName + '/delete', formData);
         },
 
-        data() {
-            return {
-                centeredItemWidth: {
-                    md: 'full',
-                    xl: '3/4',
-                },
-                needAdditionalButton: this.items.length > 7,
-                createNewItem: this.__('New ' + this.controllerName),
-                itemCount: [
-                    this.pagination.firstItem + '-' + this.pagination.lastItem,
-                    this.__('from'),
-                    this.pagination.total
-                ].join(' '),
-            };
+        openModalFromItems(doc) {
+            this.modal[doc] = true;
         },
 
-        computed: {
-            customClass: function () {
-                return 'inline-flex text-white' + (
-                    this.hasFilters ? ' bg-green-500 hover:bg-green-600' : ' bg-indigo-400 hover:bg-indigo-500'
-                );
-            },
-
-            pageInfo: function () {
-                return [this.pagination.firstItem + '-' + this.pagination.lastItem, this.__('from'), this.pagination.total].join(' ');
-            },
+        closeModalFromItems(doc) {
+            this.modal[doc] = false;
         },
 
-        methods: {
-            deleteItem(item) {
-                const
-                    form = document.getElementById('delete-' + item.id),
-                    confirm =
-                        window.confirm(
-                            this.__(
-                                'This action will permanently delete ":account" from database. Are you sure?',
-                                {account: item.default_name},
-                            ),
-                        );
-
-                let formData = new FormData(form);
-
-                formData.append('id', item.id);
-
-                confirm && this.$inertia.post('/' + this.controllerName + '/delete', formData);
-            },
-
-            openModalFromItems(doc) {
-                this.modal[doc] = true;
-            },
-
-            closeModalFromItems(doc) {
-                this.modal[doc] = false;
-            },
-
-            addFieldToDocList(doc, id) {
-                this.docList[doc][id] = true;
-            },
+        addFieldToDocList(doc, id) {
+            this.docList[doc][id] = true;
         },
-    };
+    },
+};
 </script>

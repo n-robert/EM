@@ -6478,15 +6478,15 @@ var render = function render() {
       fn: function fn() {
         return [_c("div", {
           staticClass: "block px-4 py-2 text-xs text-gray-400"
-        }, [_vm._v("\n                                        Manage Account\n                                    ")]), _vm._v(" "), _c("jet-dropdown-link", {
+        }, [_vm._v("\n                                        " + _vm._s(_vm.__("Manage Account")) + "\n                                    ")]), _vm._v(" "), _c("jet-dropdown-link", {
           attrs: {
             href: _vm.route("profile.show")
           }
-        }, [_vm._v("\n                                        Profile\n                                    ")]), _vm._v(" "), _vm.$page.props.jetstream.hasApiFeatures ? _c("jet-dropdown-link", {
+        }, [_vm._v("\n                                        " + _vm._s(_vm.__("Profile")) + "\n                                    ")]), _vm._v(" "), _vm.$page.props.jetstream.hasApiFeatures ? _c("jet-dropdown-link", {
           attrs: {
             href: _vm.route("api-tokens.index")
           }
-        }, [_vm._v("\n                                        API Tokens\n                                    ")]) : _vm._e(), _vm._v(" "), _c("div", {
+        }, [_vm._v("\n                                        " + _vm._s(_vm.__("API Tokens")) + "\n                                    ")]) : _vm._e(), _vm._v(" "), _c("div", {
           staticClass: "border-t border-gray-100"
         }), _vm._v(" "), _c("form", {
           on: {
@@ -6499,7 +6499,7 @@ var render = function render() {
           attrs: {
             as: "button"
           }
-        }, [_vm._v("\n                                            Logout\n                                        ")])], 1)];
+        }, [_vm._v("\n                                            " + _vm._s(_vm.__("Logout")) + "\n                                        ")])], 1)];
       },
       proxy: true
     }])
@@ -7267,14 +7267,14 @@ var render = function render() {
     }
   }), _vm._v(" "), _c("span", {
     staticClass: "ml-2 text-sm text-gray-600"
-  }, [_vm._v("Remember me")])], 1)]), _vm._v(" "), _c("div", {
+  }, [_vm._v(_vm._s(_vm.__("Remember me")))])], 1)]), _vm._v(" "), _c("div", {
     staticClass: "flex items-center justify-end mt-4"
   }, [_vm.canResetPassword ? _c("inertia-link", {
     staticClass: "underline text-sm text-gray-600 hover:text-gray-900",
     attrs: {
       href: _vm.route("password.request")
     }
-  }, [_vm._v("\n                Forgot your password?\n            ")]) : _vm._e(), _vm._v(" "), _c("jet-button", {
+  }, [_vm._v("\n                " + _vm._s(_vm.__("Forgot your password?")) + "\n            ")]) : _vm._e(), _vm._v(" "), _c("jet-button", {
     staticClass: "ml-4",
     "class": {
       "opacity-25": _vm.form.processing
@@ -7282,7 +7282,7 @@ var render = function render() {
     attrs: {
       disabled: _vm.form.processing
     }
-  }, [_vm._v("\n                Login\n            ")])], 1)])], 1);
+  }, [_vm._v("\n                " + _vm._s(_vm.__("Login")) + "\n            ")])], 1)])], 1);
 };
 
 var staticRenderFns = [];
@@ -9385,13 +9385,13 @@ var render = function render() {
     scopedSlots: _vm._u([{
       key: "title",
       fn: function fn() {
-        return [_vm._v("\n        Delete Account\n    ")];
+        return [_vm._v("\n        " + _vm._s(_vm.__("Delete Account")) + "\n    ")];
       },
       proxy: true
     }, {
       key: "description",
       fn: function fn() {
-        return [_vm._v("\n        Permanently delete your account.\n    ")];
+        return [_vm._v("\n        " + _vm._s(_vm.__("Permanently delete your account.")) + "\n    ")];
       },
       proxy: true
     }, {
@@ -9399,7 +9399,7 @@ var render = function render() {
       fn: function fn() {
         return [_c("div", {
           staticClass: "max-w-xl text-sm text-gray-600"
-        }, [_vm._v("\n            Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.\n        ")]), _vm._v(" "), _c("div", {
+        }, [_vm._v("\n            " + _vm._s(_vm.__("Once your account is deleted, all of its resources and data will be permanently deleted. Before" + " deleting your account, please download any data or information that you wish to retain.")) + "\n        ")]), _vm._v(" "), _c("div", {
           staticClass: "mt-5"
         }, [_c("jet-danger-button", {
           nativeOn: {
@@ -9407,7 +9407,7 @@ var render = function render() {
               return _vm.confirmUserDeletion.apply(null, arguments);
             }
           }
-        }, [_vm._v("\n                Delete Account\n            ")])], 1), _vm._v(" "), _c("jet-dialog-modal", {
+        }, [_vm._v("\n                " + _vm._s(_vm.__("Delete Account")) + "\n            ")])], 1), _vm._v(" "), _c("jet-dialog-modal", {
           attrs: {
             show: _vm.confirmingUserDeletion
           },
@@ -9417,13 +9417,13 @@ var render = function render() {
           scopedSlots: _vm._u([{
             key: "title",
             fn: function fn() {
-              return [_vm._v("\n                Delete Account\n            ")];
+              return [_vm._v("\n                " + _vm._s(_vm.__("Delete Account")) + "\n            ")];
             },
             proxy: true
           }, {
             key: "content",
             fn: function fn() {
-              return [_vm._v("\n                Are you sure you want to delete your account? Once your account is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.\n\n                "), _c("div", {
+              return [_vm._v("\n                " + _vm._s(_vm.__("Are you sure you want to delete your account? Once your account is deleted, all of its" + " resources and data will be permanently deleted. Please enter your password to confirm" + " you would like to permanently delete your account.")) + "\n\n                "), _c("div", {
                 staticClass: "mt-4"
               }, [_c("jet-input", {
                 ref: "password",
@@ -9462,7 +9462,7 @@ var render = function render() {
                     return _vm.closeModal.apply(null, arguments);
                   }
                 }
-              }, [_vm._v("\n                    Nevermind\n                ")]), _vm._v(" "), _c("jet-danger-button", {
+              }, [_vm._v("\n                    " + _vm._s(_vm.__("Nevermind")) + "\n                ")]), _vm._v(" "), _c("jet-danger-button", {
                 staticClass: "ml-2",
                 "class": {
                   "opacity-25": _vm.form.processing
@@ -9475,7 +9475,7 @@ var render = function render() {
                     return _vm.deleteUser.apply(null, arguments);
                   }
                 }
-              }, [_vm._v("\n                    Delete Account\n                ")])];
+              }, [_vm._v("\n                    " + _vm._s(_vm.__("Delete Account")) + "\n                ")])];
             },
             proxy: true
           }])
@@ -9512,13 +9512,13 @@ var render = function render() {
     scopedSlots: _vm._u([{
       key: "title",
       fn: function fn() {
-        return [_vm._v("\n        Browser Sessions\n    ")];
+        return [_vm._v("\n        " + _vm._s(_vm.__("Browser Sessions")) + "\n    ")];
       },
       proxy: true
     }, {
       key: "description",
       fn: function fn() {
-        return [_vm._v("\n        Manage and logout your active sessions on other browsers and devices.\n    ")];
+        return [_vm._v("\n        " + _vm._s(_vm.__("Manage and logout your active sessions on other browsers and devices.")) + "\n    ")];
       },
       proxy: true
     }, {
@@ -9526,7 +9526,7 @@ var render = function render() {
       fn: function fn() {
         return [_c("div", {
           staticClass: "max-w-xl text-sm text-gray-600"
-        }, [_vm._v("\n            If necessary, you may logout of all of your other browser sessions across all of your devices. Some of your recent sessions are listed below; however, this list may not be exhaustive. If you feel your account has been compromised, you should also update your password.\n        ")]), _vm._v(" "), _vm.sessions.length > 0 ? _c("div", {
+        }, [_vm._v("\n            " + _vm._s(_vm.__("If necessary, you may logout of all of your other browser sessions across all of your devices." + " Some of your recent sessions are listed below; however, this list may not be exhaustive. If" + " you feel your account has been compromised, you should also update your password.")) + "\n        ")]), _vm._v(" "), _vm.sessions.length > 0 ? _c("div", {
           staticClass: "mt-5 space-y-6"
         }, _vm._l(_vm.sessions, function (session, i) {
           return _c("div", {
@@ -9562,7 +9562,7 @@ var render = function render() {
               d: "M0 0h24v24H0z",
               stroke: "none"
             }
-          }), _c("rect", {
+          }), _vm._v(" "), _c("rect", {
             attrs: {
               x: "7",
               y: "4",
@@ -9570,7 +9570,7 @@ var render = function render() {
               height: "16",
               rx: "1"
             }
-          }), _c("path", {
+          }), _vm._v(" "), _c("path", {
             attrs: {
               d: "M11 5h2M12 17v.01"
             }
@@ -9582,7 +9582,7 @@ var render = function render() {
             staticClass: "text-xs text-gray-500"
           }, [_vm._v("\n                            " + _vm._s(session.ip_address) + ",\n\n                            "), session.is_current_device ? _c("span", {
             staticClass: "text-green-500 font-semibold"
-          }, [_vm._v("This device")]) : _c("span", [_vm._v("Last active " + _vm._s(session.last_active))])])])])]);
+          }, [_vm._v(_vm._s(_vm.__("This device")))]) : _c("span", [_vm._v("Last active " + _vm._s(session.last_active))])])])])]);
         }), 0) : _vm._e(), _vm._v(" "), _c("div", {
           staticClass: "flex items-center mt-5"
         }, [_c("jet-button", {
@@ -9591,12 +9591,12 @@ var render = function render() {
               return _vm.confirmLogout.apply(null, arguments);
             }
           }
-        }, [_vm._v("\n                Logout Other Browser Sessions\n            ")]), _vm._v(" "), _c("jet-action-message", {
+        }, [_vm._v("\n                " + _vm._s(_vm.__("Logout Other Browser Sessions")) + "\n            ")]), _vm._v(" "), _c("jet-action-message", {
           staticClass: "ml-3",
           attrs: {
             on: _vm.form.recentlySuccessful
           }
-        }, [_vm._v("\n                Done.\n            ")])], 1), _vm._v(" "), _c("jet-dialog-modal", {
+        }, [_vm._v("\n                " + _vm._s(_vm.__("Done.")) + "\n            ")])], 1), _vm._v(" "), _c("jet-dialog-modal", {
           attrs: {
             show: _vm.confirmingLogout
           },
@@ -9606,13 +9606,13 @@ var render = function render() {
           scopedSlots: _vm._u([{
             key: "title",
             fn: function fn() {
-              return [_vm._v("\n                Logout Other Browser Sessions\n            ")];
+              return [_vm._v("\n                " + _vm._s(_vm.__("Logout Other Browser Sessions")) + "\n            ")];
             },
             proxy: true
           }, {
             key: "content",
             fn: function fn() {
-              return [_vm._v("\n                Please enter your password to confirm you would like to logout of your other browser sessions across all of your devices.\n\n                "), _c("div", {
+              return [_vm._v("\n                " + _vm._s(_vm.__("Please enter your password to confirm you would like to logout of your other browser" + "sessions across all of your devices.")) + "\n\n                "), _c("div", {
                 staticClass: "mt-4"
               }, [_c("jet-input", {
                 ref: "password",
@@ -9651,7 +9651,7 @@ var render = function render() {
                     return _vm.closeModal.apply(null, arguments);
                   }
                 }
-              }, [_vm._v("\n                    Nevermind\n                ")]), _vm._v(" "), _c("jet-button", {
+              }, [_vm._v("\n                    " + _vm._s(_vm.__("Nevermind")) + "\n                ")]), _vm._v(" "), _c("jet-button", {
                 staticClass: "ml-2",
                 "class": {
                   "opacity-25": _vm.form.processing
@@ -9664,7 +9664,7 @@ var render = function render() {
                     return _vm.logoutOtherBrowserSessions.apply(null, arguments);
                   }
                 }
-              }, [_vm._v("\n                    Logout Other Browser Sessions\n                ")])];
+              }, [_vm._v("\n                    " + _vm._s(_vm.__("Logout Other Browser Sessions")) + "\n                ")])];
             },
             proxy: true
           }])
@@ -9703,7 +9703,7 @@ var render = function render() {
       fn: function fn() {
         return [_c("h2", {
           staticClass: "font-semibold text-xl text-gray-800 leading-tight"
-        }, [_vm._v("\n            Profile\n        ")])];
+        }, [_vm._v("\n            " + _vm._s(_vm.__("Profile")) + "\n        ")])];
       },
       proxy: true
     }])
@@ -9753,13 +9753,13 @@ var render = function render() {
     scopedSlots: _vm._u([{
       key: "title",
       fn: function fn() {
-        return [_vm._v("\n        Two Factor Authentication\n    ")];
+        return [_vm._v("\n        " + _vm._s(_vm.__("Two Factor Authentication")) + "\n    ")];
       },
       proxy: true
     }, {
       key: "description",
       fn: function fn() {
-        return [_vm._v("\n        Add additional security to your account using two factor authentication.\n    ")];
+        return [_vm._v("\n        " + _vm._s(_vm.__("Add additional security to your account using two factor authentication.")) + "\n    ")];
       },
       proxy: true
     }, {
@@ -9767,15 +9767,15 @@ var render = function render() {
       fn: function fn() {
         return [_vm.twoFactorEnabled ? _c("h3", {
           staticClass: "text-lg font-medium text-gray-900"
-        }, [_vm._v("\n            You have enabled two factor authentication.\n        ")]) : _c("h3", {
+        }, [_vm._v("\n            " + _vm._s(_vm.__("You have enabled two factor authentication.")) + "\n        ")]) : _c("h3", {
           staticClass: "text-lg font-medium text-gray-900"
-        }, [_vm._v("\n            You have not enabled two factor authentication.\n        ")]), _vm._v(" "), _c("div", {
+        }, [_vm._v("\n            " + _vm._s(_vm.__("You have not enabled two factor authentication.")) + "\n        ")]), _vm._v(" "), _c("div", {
           staticClass: "mt-3 max-w-xl text-sm text-gray-600"
-        }, [_c("p", [_vm._v("\n                When two factor authentication is enabled, you will be prompted for a secure, random token during authentication. You may retrieve this token from your phone's Google Authenticator application.\n            ")])]), _vm._v(" "), _vm.twoFactorEnabled ? _c("div", [_vm.qrCode ? _c("div", [_c("div", {
+        }, [_c("p", [_vm._v("\n                " + _vm._s(_vm.__("When two factor authentication is enabled, you will be prompted for a secure, random " + "token during authentication. You may retrieve this token from your phone's Google " + "Authenticator application.")) + "\n            ")])]), _vm._v(" "), _vm.twoFactorEnabled ? _c("div", [_vm.qrCode ? _c("div", [_c("div", {
           staticClass: "mt-4 max-w-xl text-sm text-gray-600"
         }, [_c("p", {
           staticClass: "font-semibold"
-        }, [_vm._v("\n                        Two factor authentication is now enabled. Scan the following QR code using your phone's authenticator application.\n                    ")])]), _vm._v(" "), _c("div", {
+        }, [_vm._v("\n                        " + _vm._s(_vm.__("Two factor authentication is now enabled. Scan the following QR code using " + "your phone's authenticator application.")) + "\n                    ")])]), _vm._v(" "), _c("div", {
           staticClass: "mt-4 dark:p-4 dark:w-56 dark:bg-white",
           domProps: {
             innerHTML: _vm._s(_vm.qrCode)
@@ -9784,7 +9784,7 @@ var render = function render() {
           staticClass: "mt-4 max-w-xl text-sm text-gray-600"
         }, [_c("p", {
           staticClass: "font-semibold"
-        }, [_vm._v("\n                        Store these recovery codes in a secure password manager. They can be used to recover access to your account if your two factor authentication device is lost.\n                    ")])]), _vm._v(" "), _c("div", {
+        }, [_vm._v("\n                        " + _vm._s(_vm.__("Store these recovery codes in a secure password manager. They can be used to " + "recover access to your account if your two factor authentication device is lost.")) + "\n                    ")])]), _vm._v(" "), _c("div", {
           staticClass: "grid gap-1 max-w-xl mt-4 px-4 py-4 font-mono text-sm bg-gray-100 rounded-lg"
         }, _vm._l(_vm.recoveryCodes, function (code) {
           return _c("div", {
@@ -9804,13 +9804,13 @@ var render = function render() {
             type: "button",
             disabled: _vm.enabling
           }
-        }, [_vm._v("\n                        Enable\n                    ")])], 1)], 1) : _c("div", [_c("jet-confirms-password", {
+        }, [_vm._v("\n                        " + _vm._s(_vm.__("Enable")) + "\n                    ")])], 1)], 1) : _c("div", [_c("jet-confirms-password", {
           on: {
             confirmed: _vm.regenerateRecoveryCodes
           }
         }, [_vm.recoveryCodes.length > 0 ? _c("jet-secondary-button", {
           staticClass: "mr-3"
-        }, [_vm._v("\n                        Regenerate Recovery Codes\n                    ")]) : _vm._e()], 1), _vm._v(" "), _c("jet-confirms-password", {
+        }, [_vm._v("\n                        " + _vm._s(_vm.__("Regenerate Recovery Codes")) + "\n                    ")]) : _vm._e()], 1), _vm._v(" "), _c("jet-confirms-password", {
           on: {
             confirmed: _vm.showRecoveryCodes
           }
@@ -9827,7 +9827,7 @@ var render = function render() {
           attrs: {
             disabled: _vm.disabling
           }
-        }, [_vm._v("\n                        Disable\n                    ")])], 1)], 1)])];
+        }, [_vm._v("\n                        " + _vm._s(_vm.__("Disable")) + "\n                    ")])], 1)], 1)])];
       },
       proxy: true
     }])
@@ -9863,13 +9863,13 @@ var render = function render() {
     scopedSlots: _vm._u([{
       key: "title",
       fn: function fn() {
-        return [_vm._v("\n        Update Password\n    ")];
+        return [_vm._v("\n        " + _vm._s(_vm.__("Update Password")) + "\n    ")];
       },
       proxy: true
     }, {
       key: "description",
       fn: function fn() {
-        return [_vm._v("\n        Ensure your account is using a long, random password to stay secure.\n    ")];
+        return [_vm._v("\n        " + _vm._s(_vm.__("Ensure your account is using a long, random password to stay secure.")) + "\n    ")];
       },
       proxy: true
     }, {
@@ -9880,7 +9880,7 @@ var render = function render() {
         }, [_c("jet-label", {
           attrs: {
             "for": "current_password",
-            value: "Current Password"
+            value: _vm.__("Current Password")
           }
         }), _vm._v(" "), _c("jet-input", {
           ref: "current_password",
@@ -9907,7 +9907,7 @@ var render = function render() {
         }, [_c("jet-label", {
           attrs: {
             "for": "password",
-            value: "New Password"
+            value: _vm.__("New Password")
           }
         }), _vm._v(" "), _c("jet-input", {
           ref: "password",
@@ -9934,7 +9934,7 @@ var render = function render() {
         }, [_c("jet-label", {
           attrs: {
             "for": "password_confirmation",
-            value: "Confirm Password"
+            value: _vm.__("Confirm Password")
           }
         }), _vm._v(" "), _c("jet-input", {
           staticClass: "mt-1 block w-full",
@@ -9966,14 +9966,14 @@ var render = function render() {
           attrs: {
             on: _vm.form.recentlySuccessful
           }
-        }, [_vm._v("\n            Saved.\n        ")]), _vm._v(" "), _c("jet-button", {
+        }, [_vm._v("\n            " + _vm._s(_vm.__("Saved.")) + "\n        ")]), _vm._v(" "), _c("jet-button", {
           "class": {
             "opacity-25": _vm.form.processing
           },
           attrs: {
             disabled: _vm.form.processing
           }
-        }, [_vm._v("\n            Save\n        ")])];
+        }, [_vm._v("\n            " + _vm._s(_vm.__("Save")) + "\n        ")])];
       },
       proxy: true
     }])
@@ -10009,13 +10009,13 @@ var render = function render() {
     scopedSlots: _vm._u([{
       key: "title",
       fn: function fn() {
-        return [_vm._v("\n        Profile Information\n    ")];
+        return [_vm._v("\n        " + _vm._s(_vm.__("Profile Information")) + "\n    ")];
       },
       proxy: true
     }, {
       key: "description",
       fn: function fn() {
-        return [_vm._v("\n        Update your account's profile information and email address.\n    ")];
+        return [_vm._v("\n        " + _vm._s(_vm.__("Update your account's profile information and email address.")) + "\n    ")];
       },
       proxy: true
     }, {
@@ -10035,7 +10035,7 @@ var render = function render() {
         }), _vm._v(" "), _c("jet-label", {
           attrs: {
             "for": "photo",
-            value: "Photo"
+            value: _vm.__("Photo")
           }
         }), _vm._v(" "), _c("div", {
           directives: [{
@@ -10073,7 +10073,7 @@ var render = function render() {
               return _vm.selectNewPhoto.apply(null, arguments);
             }
           }
-        }, [_vm._v("\n                Select A New Photo\n            ")]), _vm._v(" "), _vm.user.profile_photo_path ? _c("jet-secondary-button", {
+        }, [_vm._v("\n                " + _vm._s(_vm.__("Select A New Photo")) + "\n            ")]), _vm._v(" "), _vm.user.profile_photo_path ? _c("jet-secondary-button", {
           staticClass: "mt-2",
           attrs: {
             type: "button"
@@ -10084,7 +10084,7 @@ var render = function render() {
               return _vm.deletePhoto.apply(null, arguments);
             }
           }
-        }, [_vm._v("\n                Remove Photo\n            ")]) : _vm._e(), _vm._v(" "), _c("jet-input-error", {
+        }, [_vm._v("\n                " + _vm._s(_vm.__("Remove Photo")) + "\n            ")]) : _vm._e(), _vm._v(" "), _c("jet-input-error", {
           staticClass: "mt-2",
           attrs: {
             message: _vm.form.errors.photo
@@ -10094,7 +10094,7 @@ var render = function render() {
         }, [_c("jet-label", {
           attrs: {
             "for": "name",
-            value: "Name"
+            value: _vm.__("Name")
           }
         }), _vm._v(" "), _c("jet-input", {
           staticClass: "mt-1 block w-full",
@@ -10120,7 +10120,7 @@ var render = function render() {
         }, [_c("jet-label", {
           attrs: {
             "for": "email",
-            value: "Email"
+            value: _vm.__("Email")
           }
         }), _vm._v(" "), _c("jet-input", {
           staticClass: "mt-1 block w-full",
@@ -10151,14 +10151,14 @@ var render = function render() {
           attrs: {
             on: _vm.form.recentlySuccessful
           }
-        }, [_vm._v("\n            Saved.\n        ")]), _vm._v(" "), _c("jet-button", {
+        }, [_vm._v("\n            " + _vm._s(_vm.__("Saved.")) + "\n        ")]), _vm._v(" "), _c("jet-button", {
           "class": {
             "opacity-25": _vm.form.processing
           },
           attrs: {
             disabled: _vm.form.processing
           }
-        }, [_vm._v("\n            Save\n        ")])];
+        }, [_vm._v("\n            " + _vm._s(_vm.__("Save")) + "\n        ")])];
       },
       proxy: true
     }])

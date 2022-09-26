@@ -5,14 +5,14 @@
 </template>
 
 <script>
-    export default {
-        props: {
-            selected: {default: false},
-        },
-        computed: {
-           isActive: function () {
-               return this.selected;
-           }
-        },
-    };
+export default {
+    props: {
+        selected: {default: false},
+    },
+    computed: {
+        isActive: function () {
+            return this.selected;
+        }
+    },
+};
 </script>

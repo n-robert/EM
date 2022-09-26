@@ -4,9 +4,10 @@
 
         <div v-else>
             <span :class="leftColumn">
-                <e-m-label :text="(hasLabel && hasLabel !== 'false' && labelText) ? (__(labelText).toPhrase() + ': ') : ''"
-                               :for="name"
-                               :class="[isRequired && (!modelValue || $page.props.errors[name]) ? warningClass : '', labelDefaultClass]"></e-m-label>
+                <e-m-label
+                    :text="(hasLabel && hasLabel !== 'false' && labelText) ? (__(labelText).toPhrase() + ': ') : ''"
+                    :for="name"
+                    :class="[isRequired && (!modelValue || $page.props.errors[name]) ? warningClass : '', labelDefaultClass]"></e-m-label>
             </span>
 
             <span :class="rightColumn">
@@ -18,7 +19,7 @@
                         :disabled="! $page.props.canEdit"
                         class="form-select"
                         :class="isRequired && (!modelValue || $page.props.errors[name]) ? fieldWarningClass : inputDefaultClass">
-                    <option v-for="option in options" :value="option.value">{{__(option.text)}}</option>
+                    <option v-for="option in options" :value="option.value">{{ __(option.text) }}</option>
                 </select>
 
                 <datepicker v-else-if="type === 'date'"
@@ -41,12 +42,12 @@
                           :class="isRequired && (!modelValue || $page.props.errors[name]) ? fieldWarningClass : inputDefaultClass"></textarea>
 
                 <e-m-button v-else-if="type === 'button' || type === 'submit'"
-                                :type="type"
-                                :onclick="onclick"
-                                :open="open"
-                                :originalText="__(value)"
-                                :disabled="! $page.props.canEdit"
-                                :customClass="customClass">
+                            :type="type"
+                            :onclick="onclick"
+                            :open="open"
+                            :originalText="__(value)"
+                            :disabled="! $page.props.canEdit"
+                            :customClass="customClass">
                 </e-m-button>
 
                 <input v-else-if="type === 'checkbox'"
@@ -71,7 +72,7 @@
 
                 <p v-if="isRequired && (!modelValue || $page.props.errors[name])"
                    :class="[warningClass, pDefaultClass]">
-                    {{$page.props.errors[name] ? $page.props.errors[name] : errorMessage}}
+                    {{ $page.props.errors[name] ? $page.props.errors[name] : errorMessage }}
                 </p>
             </span>
         </div>
@@ -79,95 +80,95 @@
 </template>
 
 <script>
-    import EMLabel from './Label';
-    import EMButton from './Button';
-    import Datepicker from 'vuejs-datepicker';
-    import {ru} from 'vuejs-datepicker/dist/locale';
+import EMLabel from './Label';
+import EMButton from './Button';
+import Datepicker from 'vuejs-datepicker';
+import {ru} from 'vuejs-datepicker/dist/locale';
 
-    export default {
-        components: {
-            EMLabel,
-            EMButton,
-            Datepicker,
+export default {
+    components: {
+        EMLabel,
+        EMButton,
+        Datepicker,
+    },
+
+    inject: [
+        'leftColumn',
+        'rightColumn',
+        'warningClass',
+        'labelDefaultClass',
+        'inputDefaultClass',
+        'fieldWarningClass',
+        'pDefaultClass',
+    ],
+
+    props: {
+        name: {
+            default: null,
         },
-
-        inject: [
-            'leftColumn',
-            'rightColumn',
-            'warningClass',
-            'labelDefaultClass',
-            'inputDefaultClass',
-            'fieldWarningClass',
-            'pDefaultClass',
-        ],
-
-        props: {
-            name: {
-                default: null,
-            },
-            type: {
-                default: 'text',
-            },
-            value: {
-                default: null,
-            },
-            options: {
-                default: null,
-            },
-            checked: {
-                default: false,
-            },
-            id: {
-                default: null,
-            },
-            onclick: {
-                default: null,
-            },
-            onchange: {
-                default: null,
-            },
-            open: {
-                default: false,
-            },
-            label: {
-                default: null,
-            },
-            hasLabel: {
-                default: true,
-            },
-            isRequired: {
-                default: false,
-            },
-            customClass: {
-                default: null,
-            },
-            parenId: {
-                default: null,
-            },
-            show: {
-                default: true,
-            },
+        type: {
+            default: 'text',
         },
-
-        data() {
-            const labelText = this.label || this.name || '';
-
-            return {
-                ru: ru,
-                modelValue:
-                    this.type === 'checkbox' ? this.checked : this.value || null,
-                labelText: labelText.toString().replace(/[^\w\s]/gi, ''),
-                clearButton: true,
-                errorMessage: this.__(
-                    'Field ":fieldName" is required.',
-                    {fieldName: this.__(this.name)}
-                ),
-                highlighted: {
-                        from: new Date().setDate(new Date().getDate() - 1),
-                        to: new Date(),
-                },
-            };
+        value: {
+            default: null,
         },
+        options: {
+            default: null,
+        },
+        checked: {
+            default: false,
+        },
+        id: {
+            default: null,
+        },
+        onclick: {
+            default: null,
+        },
+        onchange: {
+            default: null,
+        },
+        open: {
+            default: false,
+        },
+        label: {
+            default: null,
+        },
+        hasLabel: {
+            default: true,
+        },
+        isRequired: {
+            default: false,
+        },
+        customClass: {
+            default: null,
+        },
+        parenId: {
+            default: null,
+        },
+        show: {
+            default: true,
+        },
+    },
+
+    data() {
+        const labelText = this.label || this.name || '';
+
+        return {
+            ru: ru,
+            modelValue:
+                this.type === 'checkbox' ? this.checked : this.value || null,
+            labelText: labelText.toString().replace(/[^\w\s]/gi, ''),
+            clearButton: true,
+            errorMessage: this.__(
+                'Field ":fieldName" is required.',
+                {fieldName: this.__(this.name)}
+            ),
+            highlighted: {
+                from: new Date().setDate(new Date().getDate() - 1),
+                to: new Date(),
+            },
+        };
+    },
 
 //        watch: {
 //            error: {
@@ -177,5 +178,5 @@
 //                },
 //            },
 //        },
-    };
+};
 </script>

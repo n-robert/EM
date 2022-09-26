@@ -6,7 +6,7 @@
                     <span v-if="pagination.onFirstPage"
                           class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white
                           border border-gray-300 cursor-default leading-5 rounded-md">
-                        {{pagination.previous.label}}
+                        {{ pagination.previous.label }}
                     </span>
 
                     <inertia-link v-else :href="pagination.previous.url"
@@ -14,7 +14,7 @@
                                   border-gray-300 leading-5 rounded-md focus:outline-none focus:shadow-outline-indigo
                                   focus:border-indigo-300 hover:bg-indigo-500 hover:text-white active:bg-indigo-500
                                   active:text-white transition ease-in-out duration-150">
-                        {{pagination.previous.label}}
+                        {{ pagination.previous.label }}
                     </inertia-link>
 
                     <span v-for="link in pagination.links">
@@ -22,7 +22,7 @@
                               class="active relative inline-flex items-center px-4 py-2 -ml-px text-sm font-medium
                               border border-gray-300 cursor-default leading-5"
                               :class="[link.active ? [paginationActive] : [paginationNull]]">
-                            {{link.label}}
+                            {{ link.label }}
                         </span>
 
                         <inertia-link v-else :href="link.url"
@@ -30,7 +30,7 @@
                                       border-gray-300 leading-5 rounded-md focus:outline-none focus:shadow-outline-indigo
                                       focus:border-indigo-300 hover:bg-indigo-500 hover:text-white active:bg-indigo-500
                                       active:text-white transition ease-in-out duration-150">
-                            {{link.label}}
+                            {{ link.label }}
                         </inertia-link>
                     </span>
 
@@ -39,13 +39,13 @@
                                   border-gray-300 leading-5 rounded-md focus:outline-none focus:shadow-outline-indigo
                                   focus:border-indigo-300 hover:bg-indigo-500 hover:text-white active:bg-indigo-500
                                   active:text-white transition ease-in-out duration-150">
-                        {{pagination.next.label}}
+                        {{ pagination.next.label }}
                     </inertia-link>
 
                     <span v-else
                           class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500
                           bg-white border border-gray-300 cursor-default leading-5 rounded-md">
-                        {{pagination.next.label}}
+                        {{ pagination.next.label }}
                     </span>
 
                 </span>
@@ -54,14 +54,14 @@
 </template>
 
 <script>
-    export default {
-        props: [
-            'pagination',
-        ],
+export default {
+    props: [
+        'pagination',
+    ],
 
-        inject: [
-            'paginationActive',
-            'paginationNull',
-        ],
-    };
+    inject: [
+        'paginationActive',
+        'paginationNull',
+    ],
+};
 </script>

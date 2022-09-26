@@ -5,24 +5,23 @@
 </template>
 
 <script>
-    export default {
-        props: {
-            width: {
-                default: {def: 'auto'},
-            }
+export default {
+    props: {
+        width: {
+            default: {def: 'auto'},
+        }
+    },
+
+    computed: {
+        widthClass() {
+            let widthClass = [];
+
+            Object.keys(this.width).map(key => {
+                widthClass.push((key + ':').replace('def:', '') + 'w-' + this.width[key]);
+            });
+
+            return widthClass.join(' ');
         },
-
-        computed: {
-            widthClass()
-            {
-                let widthClass = [];
-
-                Object.keys(this.width).map(key => {
-                    widthClass.push((key + ':').replace('def:', '') + 'w-' + this.width[key]);
-                });
-
-                return widthClass.join(' ');
-            },
-        },
-    };
+    },
+};
 </script>
