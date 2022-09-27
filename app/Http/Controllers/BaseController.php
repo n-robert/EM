@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Contracts\ControllerInterface;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controller;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -11,6 +12,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\URL;
+use Inertia\Response as InertiaResponse;
 use Laravel\Jetstream\Jetstream;
 use Illuminate\Support\Str;
 use App\Services\PdfFormFillingService;
@@ -203,9 +205,9 @@ class BaseController extends Controller implements ControllerInterface
      * Show item screen.
      *
      * @param  int|string $id
-     * @return \Inertia\Response
+     * @return InertiaResponse
      */
-    public function show($id)
+    public function show($id): InertiaResponse
     {
         if (is_numeric($id)) {
             $item = $this->model->findOrFail($id);
@@ -248,9 +250,9 @@ class BaseController extends Controller implements ControllerInterface
     /**
      * Show items list.
      *
-     * @return \Inertia\Response
+     * @return InertiaResponse
      */
-    public function showAll()
+    public function showAll(): InertiaResponse
     {
         $query =
             $this->model
@@ -300,9 +302,9 @@ class BaseController extends Controller implements ControllerInterface
     /**
      * Store new record.
      *
-     * @return mixed
+     * @return RedirectResponse
      */
-    public function store()
+    public function store(): RedirectResponse
     {
         return $this->save();
     }
@@ -311,9 +313,9 @@ class BaseController extends Controller implements ControllerInterface
      * Bind request data and save model
      *
      * @param Model|null $model
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
-    public function save(Model $model = null): \Illuminate\Http\RedirectResponse
+    public function save(Model $model = null): RedirectResponse
     {
         $attributes = $this->requestValidation->except('type');
 
@@ -337,9 +339,9 @@ class BaseController extends Controller implements ControllerInterface
      * Update existing record.
      *
      * @param Model $model
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
-    public function update(Model $model): \Illuminate\Http\RedirectResponse
+    public function update(Model $model): RedirectResponse
     {
         return $this->save($model);
     }

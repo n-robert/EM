@@ -71,11 +71,9 @@ class PdfFormFillingService
                 foreach ($limited_users as $limited_user) {
                     if ($limited_user['user_id'] == $user_id) {
                         $limited_addresses =
-                            isset($limited_user['limited_addresses']) ? $limited_user['limited_addresses'] :
-                                $limited_addresses;
+                            $limited_user['limited_addresses'] ?? $limited_addresses;
                         $limited_employers =
-                            isset($limited_user['limited_employers']) ? $limited_user['limited_employers'] :
-                                $limited_employers;
+                            $limited_user['limited_employers'] ?? $limited_employers;
                         break;
                     }
                 }

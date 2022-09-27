@@ -13,15 +13,15 @@ class XmlFormHandlingService
      * @param Collection $data
      * @return Collection
      */
-    public static function buildSelectOptions(Collection $data)
+    public static function buildSelectOptions(Collection $data): Collection
     {
         $firstItem = $data->first();
 
         if (
-            $firstItem &&
-            is_object($firstItem) &&
-            isset($firstItem->value) &&
-            isset($firstItem->text)
+            $firstItem
+            && is_object($firstItem)
+            && isset($firstItem->value)
+            && isset($firstItem->text)
         ) {
             return $data->sortBy('text');
         }
@@ -53,8 +53,8 @@ class XmlFormHandlingService
         $docPath = config('app.xml_form_path.doc');
 
         if (
-            isset($docPath[$name]) &&
-            $docs = app('files')->files($docPath[$name])
+            isset($docPath[$name])
+            && $docs = app('files')->files($docPath[$name])
         ) {
             foreach ($docs as $doc) {
                 $docName = $doc->getBasename('.' . $doc->getExtension());
@@ -208,7 +208,12 @@ class XmlFormHandlingService
      * @param bool $hasAncestor
      * @return void
      */
-    public static function addFieldToCollection($field, $fieldName, &$formFields, &$tmpField, &$hasFieldGroup, &$hasFieldSet)
+    public static function addFieldToCollection($field,
+                                                $fieldName,
+                                                &$formFields,
+                                                &$tmpField,
+                                                &$hasFieldGroup,
+                                                &$hasFieldSet)
     {
         $hasFieldGroup = $field->xpath('ancestor::fieldgroup[@name]/@name');
         $hasFieldSet = $field->xpath('ancestor::fieldset[@name]/@name');
