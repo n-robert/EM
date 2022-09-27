@@ -24,12 +24,12 @@
 
     <fieldset name="hiring-proxy" show="false">
         <field
-            name="proxy_number"
-            type="text"/>
-        <field
             name="proxy_date"
             type="date"
             format="dd-MM-yyyy"/>
+        <field
+            name="proxy_number"
+            type="text"/>
         <field
             name="agent_id"
             type="select"
