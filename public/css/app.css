@@ -33284,6 +33284,10 @@ select {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.form-input {
+  line-height: 20px;
+}
+
 @media (min-width: 640px) {
   .sm\:container {
     width: 100%;
