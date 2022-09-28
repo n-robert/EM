@@ -63,7 +63,7 @@ services:
       - POSTGRES_DB=${DB_DATABASE_PG}
       - POSTGRES_USER=${DB_USERNAME_PG}
       - POSTGRES_PASSWORD=${DB_PASSWORD_PG}
-      - POSTGRES_EXTRA_OPTS=-Z9 --schema=public --blobs
+      - POSTGRES_EXTRA_OPTS=-Z9
       - SCHEDULE=@daily
       - BACKUP_KEEP_DAYS=7
       - BACKUP_KEEP_WEEKS=4
