@@ -33284,8 +33284,14 @@ select {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.form-input {
-  line-height: 20px;
+.vdp-datepicker__calendar {
+  font-size: 0.8em;
+  border-radius: 7px !important;
+}
+
+.vdp-datepicker__calendar header, .vdp-datepicker__calendar .cell {
+  height: 24px !important;
+  line-height: 24px !important;
 }
 
 @media (min-width: 640px) {

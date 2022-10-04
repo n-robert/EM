@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<root upper_case="false" justify="true" split_word="false" cells="false">
+    <field
+        name="date"
+        required="true"
+        type="date"
+        format="dd-MM-yyyy"/>
+    <field
+        name="recipient_id"
+        type="select"
+        required="true"
+        onchange="getPerson(this);"
+        model="Employer:FMS"/>
+    <field
+        name="recipient_person_id"
+        type="select"
+        required="true"
+        model="Employee:Officer"/>
+    <field
+        name="reg_num"
+        type="text"/>
+    <field
+        name="employer_id"
+        type="select"
+        required="true"
+        model="Employer:LEGAL"/>
+    <field
+        name="destination_id"
+        type="select"
+        required="true"
+        model="Address"/>
+</root>

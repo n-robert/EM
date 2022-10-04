@@ -649,20 +649,22 @@ class PdfFormFillingService
         return $result;
     }
 
-    public static function parseDate($date, $full_format_month = false, $format = 'd-m-Y', $delimiter = '-')
+    public static function parseDate($date, $fullFormatMonth = false, $format = 'd-m-Y', $delimiter = '-')
     {
-        $date = str_replace(['.', '/'], '-', $date);
-        $tmp = explode($delimiter, $date);
-        $format_array = explode('-', strtolower($format));
-        $format_array = array_flip($format_array);
+        $date = str_replace(['.', '/'], $delimiter, $date);
+        $format = str_replace(['.', '/'], $delimiter, $format);
 
-        $date
-            = !empty(array_sum($tmp)) ?
-            explode($delimiter, date($format, strtotime($date))) :
-            ['', '', ''];
-        $date[$format_array['m']] =
-            (!empty(array_sum($tmp)) && $full_format_month) ?
-                __('MONTH_' . $date[$format_array['m']]) : $date[$format_array['m']];
+        if (!array_sum(explode($delimiter, $date))) {
+            return ['', '', ''];
+        }
+
+        $date = explode($delimiter, date($format, strtotime($date)));
+
+        if ($fullFormatMonth) {
+            $formatArray = explode($delimiter, strtolower($format));
+            $formatArray = array_flip($formatArray);
+            $date[$formatArray['m']] = __('MONTH_' . $date[$formatArray['m']]);
+        }
 
         return $date;
     }
@@ -1275,7 +1277,6 @@ class PdfFormFillingService
 
         $data =
             [
-                'date'                        => $date,
                 strtolower($action)           => '',
                 strtolower($visaMultiplicity) => 'Х',
                 strtolower($visaCategory)     => 'Х',
@@ -1306,6 +1307,7 @@ class PdfFormFillingService
 
         $dates =
             [
+                'date'                  => $date,
                 'birth_date'            => $employee->birth_date,
                 'passport_issued_date'  => $employee->passport_issued_date,
                 'passport_expired_date' => $employee->passport_expired_date,
@@ -1326,12 +1328,7 @@ class PdfFormFillingService
         $recipientName = static::declension($recipient->name_ru, 2, '', '', 1);
         $recipientDirectorId = $docData['officer_id'] ?: $recipient->director_id;
         $recipientDirector = Employee::find($recipientDirectorId);
-        $recipientDirector = static::shortenName(
-            null,
-            self::declension($recipientDirector->last_name_ru, 3, $recipientDirector->gender, 'name'),
-            mb_substr($recipientDirector->first_name_ru, 0, 1) . '.',
-            mb_substr($recipientDirector->middle_name_ru, 0, 1) . '.'
-        );
+        $recipientDirector = static::shortenName($recipientDirector, '', '', '', 3);
         $employee = Employee::find($id);
         $employer = Employer::find($employee->employer_id);
         $hostInfo = implode(', ', [
@@ -1341,17 +1338,17 @@ class PdfFormFillingService
             $employer->phone
         ]);
         $birth_date =
-            is_null($employee->birth_date) ? '' : Carbon::parse($employee->birth_date)->isoFormat('d/m/Y');
+            is_null($employee->birth_date) ? '' : date('d/m/Y', strtotime($employee->birth_date));
         $passportIssued =
             is_null($employee->passport_issued_date) ?
-                '' : Carbon::parse($employee->passport_issued_date)->isoFormat('d/m/Y');
+                '' : date('d/m/Y', strtotime($employee->passport_issued_date));
         $passportExpired =
             is_null($employee->passport_expired_date) ?
-                '' : Carbon::parse($employee->passport_expired_date)->isoFormat('d/m/Y');
+                '' : date('d/m/Y', strtotime($employee->passport_expired_date));
         $visaStarted =
-            is_null($employee->visa_started) ? '' : Carbon::parse($employee->visa_started)->isoFormat('d/m/Y');
+            is_null($employee->visa_started) ? '' : date('d/m/Y', strtotime($employee->visa_started));
         $visaExpired =
-            is_null($employee->visa_expired) ? '' : Carbon::parse($employee->visa_expired)->isoFormat('d/m/Y');
+            is_null($employee->visa_expired) ? '' : date('d/m/Y', strtotime($employee->visa_expired));
         $reason = static::getReason($docData);
         $date = $docData['date'] ? date('d/m/Y', strtotime($docData['date'])) : '';
         $director = __('GENERAL_DIRECTOR');
@@ -1389,135 +1386,94 @@ class PdfFormFillingService
         return static::prepareData($doc, $docData, $data);
     }
 
-    public static function printWarranty($app, $input, $model, $view, $id, $template = 'warranty')
+    public static function printWarranty($docData, $doc, $id)
     {
-        $recipient_id = $input->post->get('recipient_id', '', 'string');
-        $employer_id = $input->post->get('employer_id', '', 'string');
-        $destination_address = $input->post->get('destination_address', 0, 'int');
+        $recipientId = $docData['recipient_id'];
+        $recipientPersonId = $docData['recipient_person_id'];
+        $employerId = $docData['employer_id'];
+        $destinationAddress = $docData['destination_id'];
+        $date = $docData['date'];
+        $reg_num = $docData['reg_num'];
 
-        self::checkRequiredValues($app, $view, $id, $template, $recipient_id, $employer_id, $destination_address);
+        $recipient = Employer::find($recipientId);
+        $recipientPerson = Employee::find($recipientPersonId);
+        $recipientPersonName = static::shortenName($recipientPerson, '', '', '', 3);
 
-        $item = $model->getItem($id);
-        $file_name = self::getFileName($item, $template);
+        $employer = Employer::find($employerId);
+        $taxpayerId = __('TAXPAYER_ID') . ' ' . $employer->taxpayer_id;
+        $primeRegNumber = __('PRIME_REG_NUMBER') . ' ' . $employer->prime_reg_number;
+        $taxpayerCode = __('TAXPAYER_CODE') . ' ' . $employer->taxpayer_code;
+        $employerPhone = self::handlePhones($employer->phone, '8');
+        $phone = __('PHONE_LC') . ': ' . $employerPhone;
 
-        $recipient = $item->recipient[$recipient_id];
-        $recipient_person_id = $input->post->get('recipient_person_id', $recipient->director, 'int');
-        $recipient_person = $model->getItem($recipient_person_id);
-        $recipient_person_name = [
-            self::declension($recipient_person->last_name_ru, 3, $recipient_person->gender, 'name'),
-            mb_substr($recipient_person->first_name_ru, 0, 1) . '.',
-            mb_substr($recipient_person->middle_name_ru, 0, 1) . '.'
-        ];
-        $recipient_person_name = implode(' ', $recipient_person_name);
-
-        $date = $input->post->get('date', '', 'string');
-        $date = $date ? $date : date('Y-m-d', time());
-        $reg_num = $input->post->get('reg_num', '', 'string');
-
-        $employer_model = BaseDatabaseModel::getInstance('Employer', 'FMSDocsModel');
-        $employer = $employer_model->getItem($employer_id, true);
-        $taxpayer_id = __('TAXPAYER_ID') . ' ' . $employer->taxpayer_id;
-        $prime_reg_number = __('PRIME_REG_NUMBER') . ' ' . $employer->prime_reg_number;
-        $taxpayer_code = __('TAXPAYER_CODE') . ' ' . $employer->taxpayer_code;
-        $employer_phone = self::handlePhones($employer->phone, '8');
-        $phone = __('PHONE_LC') . ': ' . $employer_phone;
-
-        $host_info = [
+        $hostInfo = [
             $employer->full_name_ru,
             $employer->address_name,
-            $taxpayer_id . '/' . $prime_reg_number . '/' . $taxpayer_code,
+            $taxpayerId . '/' . $primeRegNumber . '/' . $taxpayerCode,
             $phone
         ];
-        $host_info = implode(', ', $host_info);
+        $hostInfo = implode(', ', $hostInfo);
 
-        if (!empty($item->citizenship)) {
-            $state = ['foreigner_1' => '', 'foreigner_2' => ''];
-        } else {
-            $state = ['stateless' => ''];
-        }
+        $director = Employee::find($employer->director_id);
+        $directorName = static::shortenName($director);
 
-        $director = $model->getItem($employer->director);
-        $director_name = [
-            $director->last_name_ru,
-            mb_substr($director->first_name_ru, 0, 1) . '.',
-            mb_substr($director->middle_name_ru, 0, 1) . '.'
-        ];
-        $director_name = implode(' ', $director_name);
+        $employee = Employee::find($id);
 
-        if (!empty($item->citizenship)) {
-            $country_model = BaseDatabaseModel::getInstance('Country', 'FMSDocsModel');
-            $country = $country_model->getItem($item->citizenship);
+        if (!empty($employee->citizenship_id)) {
+            $country = Country::find($employee->citizenship_id);
             $citizenship = self::declension($country->name_ru, 2, '', 'name');
         } else {
             $citizenship = '';
         }
 
-        $name = $item->last_name_ru . ' ' . $item->first_name_ru;
-        $name .= $item->middle_name_ru ? (' ' . $item->middle_name_ru) : '';
+        $name = $employee->last_name_ru . ' ' . $employee->first_name_ru;
+        $name .= $employee->middle_name_ru ? (' ' . $employee->middle_name_ru) : '';
 
-        $birth_date = explode('-', $item->birth_date);
-        $birth_date = !empty(array_sum($birth_date)) ? $birth_date : ['', '', ''];
-        $birth_date
-            = $birth_date[2] . '/' . $birth_date[1] . '/' . $birth_date[0] . __('BIRTH_DATE_SUFFIX');
+        $birthDate = date('d/m/Y', strtotime($employee->birth_date)) . __('BIRTH_DATE_SUFFIX');
+        $passportIssued = date('d/m/Y', strtotime($employee->passport_issued_date));
+        $passportExpired = date('d/m/Y', strtotime($employee->passport_expired_date));
 
-        $passport_issued = explode('-', $item->passport_issued_date);
-        $passport_issued = $passport_issued[2] . '/' . $passport_issued[1] . '/' . $passport_issued[0];
-        $passport_expired = explode('-', $item->passport_expired_date);
-        $passport_expired = $passport_expired[2] . '/' . $passport_expired[1] . '/' . $passport_expired[0];
-
-        $passport_info = [
+        $passportInfo = [
             __('PASSPORT_LC'),
-            ' ' . $item->passport_number,
+            ' ' . $employee->passport_number,
             __('ISSUED_BY_LC'),
-            $passport_issued,
-            ' ' . $item->passport_issuer,
+            $passportIssued,
+            ' ' . $employee->passport_issuer,
             __('VALID_UNTIL_LC'),
-            $passport_expired
+            $passportExpired
         ];
 
-        $guest_info = [
+        $guestInfo = [
             $citizenship . ':  ' . $name,
-            $birth_date,
-            implode($passport_info)
+            $birthDate,
+            implode($passportInfo)
         ];
-        $guest_info = implode(', ', array_filter($guest_info));
+        $guestInfo = implode(', ', array_filter($guestInfo));
 
-        $address_model = BaseDatabaseModel::getInstance('Address', 'FMSDocsModel');
-        $address = $address_model->getItem($destination_address);
-        $address = $address->name_ru;
+        $address = Address::find($destinationAddress)->name_ru;
 
-        $fields =
-            [
-                'file_name'          => $file_name,
-                'recipient_director' => $recipient_person_name,
-                'date'               => date('d/m/Y', strtotime($date)),
-                'host_name'          => $employer->name_ru,
-                'director'           => $director_name
-            ];
+        $data = [
+            'recipient'          => self::declension($recipient->name_ru, 2, '', '', 1),
+            'recipient_director' => $recipientPersonName,
+            'date'               => date('d/m/Y', $date ? strtotime($date) : time()),
+            'host_name'          => $employer->name_ru,
+            'director'           => $directorName,
+            'reg_num'            => $reg_num,
+            'host_info'          => $hostInfo,
+            'guest_info'         => $guestInfo,
+            'address'            => $address,
+        ];
 
-        if (!empty($reg_num)) {
-            $fields['reg_num'] = $reg_num;
+        if ($employee->citizenship_id) {
+            $data['foreigner_1'] = '';
+            $data['foreigner_2'] = '';
+        } else {
+            $data['stateless'] = '';
         }
 
-        $fields = array_merge($fields, $state);
+        static::splitDate(['date' => $date], $data, true, 'y-m-d');
 
-        self::splitDate(array('date' => $date), $fields, true, 'y-m-d');
-
-        self::splitText(
-            self::declension($recipient->name_ru, 2, '', '', 1),
-            'recipient',
-            $fields,
-            true,
-            false,
-            false,
-            2,
-            48
-        );
-        self::splitText($host_info, 'host_info', $fields, true, false, false, 3, 84);
-        self::splitText($guest_info, 'guest_info', $fields, true, false, false, 3, 46, 84);
-        self::splitText($address, 'address', $fields, true, false, false, 2, 84);
-
-        self::output($template, $fields);
+        return static::prepareData($doc, $docData, $data);
     }
 
     public static function printWorkContract($app, $input, $model, $view, $id, $template = 'workcontract')
@@ -2025,12 +1981,20 @@ class PdfFormFillingService
         return __($docData[$reason]) . sprintf($format, ...$suffix);
     }
 
-    public static function shortenName($person = null, $last_name = '', $first_name = '', $middle_name = '')
+    public static function shortenName(
+        $person = null,
+        $last_name = '',
+        $first_name = '',
+        $middle_name = '',
+        $case = 1,
+        $gender = ''
+    )
     {
-        $last_name = $last_name ?: $person->last_name_ru;
-        $first_name = $first_name ?: $person->first_name_ru;
-        $middle_name = $middle_name ?: $person->middle_name_ru;
-        $name = [$last_name];
+        $last_name = $last_name ?: $person ? $person->last_name_ru : '';
+        $first_name = $first_name ?: $person ? $person->first_name_ru : '';
+        $middle_name = $middle_name ?: $person ? $person->middle_name_ru : '';
+        $gender = $gender ?: $person ? $person->genrder : '';
+        $name = [static::declension($last_name, $case, $gender, 'name')];
 
         $first_name = explode(' ', $first_name);
 

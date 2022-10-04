@@ -277,8 +277,6 @@
     </div>
 </template>
 
-<link rel="stylesheet" href="../../css/em.css"/>
-
 <script>
 import JetApplicationMark from '@/Jetstream/ApplicationMark';
 import JetBanner from '@/Jetstream/Banner';

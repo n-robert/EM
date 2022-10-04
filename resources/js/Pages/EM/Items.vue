@@ -189,8 +189,9 @@ export default {
 
     computed: {
         customClass: function () {
-            return 'inline-flex text-white' + (
-                this.hasFilters ? ' bg-green-500 hover:bg-green-600' : ' bg-indigo-400 hover:bg-indigo-500'
+            return 'inline-flex hover:text-white' + (
+                this.hasFilters ?
+                    ' bg-indigo-400 hover:bg-indigo-500 text-white' : ' bg-white hover:bg-indigo-500 text-gray-500'
             );
         },
 
