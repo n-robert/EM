@@ -191,7 +191,7 @@ export default {
         customClass: function () {
             return 'inline-flex hover:text-white' + (
                 this.hasFilters ?
-                    ' bg-indigo-400 hover:bg-indigo-500 text-white' : ' bg-white hover:bg-indigo-500 text-gray-500'
+                    ' bg-indigo-400 text-white hover:bg-indigo-500' : ' bg-white text-gray-500 hover:bg-indigo-500'
             );
         },
 

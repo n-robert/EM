@@ -16,17 +16,24 @@ class StatusSeeder extends Seeder
      */
     public function run()
     {
-        $statuses = DB::connection('mysql')->table('statuses_source')->get(['id', 'name_ru', 'name_en']);
-        Status::truncate();
+//        $statuses = DB::connection('mysql')->table('statuses_source')->get(['id', 'name_ru', 'name_en']);
+//        Status::truncate();
+//
+//        foreach ($statuses as $status) {
+//            Status::insert([
+//                'id' => $status->id,
+//                'name_ru' => $status->name_ru,
+//                'name_en' => $status->name_en,
+//                'user_ids' => '{2}',
+//                'created_at' => Carbon::now()
+//            ]);
+//        }
 
-        foreach ($statuses as $status) {
-            Status::insert([
-                'id' => $status->id,
-                'name_ru' => $status->name_ru,
-                'name_en' => $status->name_en,
-                'user_ids' => '{2}',
-                'created_at' => Carbon::now()
-            ]);
-        }
+        Status::insert([
+            'name_ru'    => 'В отпуске',
+            'name_en'    => 'Furlough',
+            'user_ids'   => '{2}',
+            'created_at' => Carbon::now()
+        ]);
     }
 }

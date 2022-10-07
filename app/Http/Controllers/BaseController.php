@@ -187,7 +187,7 @@ class BaseController extends Controller implements ControllerInterface
      * @param int $id
      * @return void
      */
-    public function printDoc($doc, $id)
+    public function printDoc(string $doc, int $id)
     {
         $docData = $this->request->input();
 

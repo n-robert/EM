@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<root upper_case="true" justify="false" split_word="false" cells="true">
+    <field
+        name="date_from"
+        required="true"
+        type="date"
+        format="dd-MM-yyyy"/>
+    <field
+        name="date_to"
+        type="date"
+        format="dd-MM-yyyy"/>
+    <field
+        name="employer_id"
+        type="select"
+        required="true"
+        model="Employer:LEGAL"/>
+    <field
+        name="salary"
+        required="true"
+        type="text"/>
+    <field
+        name="contract_number"
+        type="text"/>
+</root>

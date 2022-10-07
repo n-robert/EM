@@ -2761,8 +2761,8 @@ __webpack_require__.r(__webpack_exports__);
     filterFieldIsChecked: 'bg-indigo-400 text-white',
     paginationActive: 'bg-indigo-400 text-white rounded-md',
     paginationNull: 'bg-white text-gray-500',
-    leftColumn: 'table-cell text-right p-1 w-60',
-    rightColumn: 'table-cell text-left p-1',
+    leftColumn: 'table-cell align-middle text-right p-1 w-60',
+    rightColumn: 'table-cell align-middle text-left p-1',
     warningClass: 'text-red-600',
     labelDefaultClass: 'text-sm',
     inputDefaultClass: 'rounded-md shadow-sm max-w-xs',
@@ -4196,7 +4196,7 @@ __webpack_require__.r(__webpack_exports__);
   },
   computed: {
     customClass: function customClass() {
-      return 'inline-flex hover:text-white' + (this.hasFilters ? ' bg-indigo-400 hover:bg-indigo-500 text-white' : ' bg-white hover:bg-indigo-500 text-gray-500');
+      return 'inline-flex hover:text-white' + (this.hasFilters ? ' bg-indigo-400 text-white hover:bg-indigo-500' : ' bg-white text-gray-500 hover:bg-indigo-500');
     },
     pageInfo: function pageInfo() {
       return [this.pagination.firstItem + '-' + this.pagination.lastItem, this.__('from'), this.pagination.total].join(' ');
@@ -8326,8 +8326,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "render": () => (/* binding */ render),
 /* harmony export */   "staticRenderFns": () => (/* binding */ staticRenderFns)
 /* harmony export */ });
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 var render = function render() {
   var _vm = this,
       _c = _vm._self._c;
@@ -8356,7 +8354,7 @@ var render = function render() {
   }, [_c("e-m-label", {
     "class": [_vm.isRequired && (!_vm.modelValue || _vm.$page.props.errors[_vm.name]) ? _vm.warningClass : "", _vm.labelDefaultClass],
     attrs: {
-      text: _vm.hasLabel && _vm.hasLabel !== "false" && _vm.labelText ? _vm.__(_vm.labelText).toPhrase() + ": " : "",
+      text: _vm.hasLabel && _vm.hasLabel !== "false" && _vm.labelText ? _vm.__(_vm.labelText).toPhrase(true) : "",
       "for": _vm.name
     }
   })], 1), _vm._v(" "), _c("span", {
@@ -8368,7 +8366,6 @@ var render = function render() {
       value: _vm.modelValue,
       expression: "modelValue"
     }],
-    staticClass: "form-select",
     "class": _vm.isRequired && (!_vm.modelValue || _vm.$page.props.errors[_vm.name]) ? _vm.fieldWarningClass : _vm.inputDefaultClass,
     attrs: {
       name: _vm.name,
@@ -8394,16 +8391,16 @@ var render = function render() {
       }
     }, [_vm._v(_vm._s(_vm.__(option.text)))]);
   }), 0) : _vm.type === "date" ? _c("datepicker", {
-    attrs: _defineProperty({
+    attrs: {
       placeholder: _vm.__("Select Date"),
       name: _vm.name,
       id: _vm.id,
       language: _vm.ru,
       format: _vm.$page.props.defaultDateFormat,
       "clear-button": _vm.clearButton,
-      "input-class": "form-input",
-      highlighted: _vm.highlighted
-    }, "input-class", _vm.isRequired && (!_vm.modelValue || _vm.$page.props.errors[_vm.name]) ? _vm.fieldWarningClass : _vm.inputDefaultClass),
+      highlighted: _vm.highlighted,
+      "input-class": _vm.isRequired && (!_vm.modelValue || _vm.$page.props.errors[_vm.name]) ? _vm.fieldWarningClass : _vm.inputDefaultClass
+    },
     model: {
       value: _vm.modelValue,
       callback: function callback($$v) {
@@ -8418,7 +8415,6 @@ var render = function render() {
       value: _vm.modelValue,
       expression: "modelValue"
     }],
-    staticClass: "form-textarea h-28 resize",
     "class": _vm.isRequired && (!_vm.modelValue || _vm.$page.props.errors[_vm.name]) ? _vm.fieldWarningClass : _vm.inputDefaultClass,
     attrs: {
       name: _vm.name,
@@ -8449,7 +8445,6 @@ var render = function render() {
       value: _vm.modelValue,
       expression: "modelValue"
     }],
-    staticClass: "form-checkbox",
     "class": _vm.isRequired && (!_vm.modelValue || _vm.$page.props.errors[_vm.name]) ? _vm.fieldWarningClass : _vm.inputDefaultClass,
     attrs: {
       name: _vm.name,
@@ -8488,7 +8483,6 @@ var render = function render() {
       value: _vm.modelValue,
       expression: "modelValue"
     }],
-    staticClass: "form-checkbox",
     "class": _vm.isRequired && (!_vm.modelValue || _vm.$page.props.errors[_vm.name]) ? _vm.fieldWarningClass : _vm.inputDefaultClass,
     attrs: {
       name: _vm.name,
@@ -8512,7 +8506,6 @@ var render = function render() {
       value: _vm.modelValue,
       expression: "modelValue"
     }],
-    staticClass: "form-checkbox",
     "class": _vm.isRequired && (!_vm.modelValue || _vm.$page.props.errors[_vm.name]) ? _vm.fieldWarningClass : _vm.inputDefaultClass,
     attrs: {
       name: _vm.name,
@@ -8537,7 +8530,6 @@ var render = function render() {
       value: _vm.modelValue,
       expression: "modelValue"
     }],
-    staticClass: "form-input",
     "class": _vm.isRequired && (!_vm.modelValue || _vm.$page.props.errors[_vm.name]) ? _vm.fieldWarningClass : _vm.inputDefaultClass,
     attrs: {
       name: _vm.name,
@@ -8576,7 +8568,6 @@ var render = function render() {
       value: _vm.modelValue,
       expression: "modelValue"
     }],
-    staticClass: "form-input",
     "class": _vm.isRequired && (!_vm.modelValue || _vm.$page.props.errors[_vm.name]) ? _vm.fieldWarningClass : _vm.inputDefaultClass,
     attrs: {
       name: _vm.name,
@@ -8600,7 +8591,6 @@ var render = function render() {
       value: _vm.modelValue,
       expression: "modelValue"
     }],
-    staticClass: "form-input",
     "class": _vm.isRequired && (!_vm.modelValue || _vm.$page.props.errors[_vm.name]) ? _vm.fieldWarningClass : _vm.inputDefaultClass,
     attrs: {
       name: _vm.name,
@@ -10718,8 +10708,10 @@ module.exports = {
 };
 
 String.prototype.toLowerCaseArray = function () {
-  return this.match(/[A-ZА-Я]+(?=[A-ZА-Я][a-zа-я]+[0-9]*|\b)|[A-ZА-Я]?[a-zа-я]+[0-9]*|[A-ZА-Я]|[0-9]+/g).map(function (word) {
-    return word.toLowerCase();
+  var smart = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+  var pattern = /(\(?)([A-ZА-Я]+(?=[A-ZА-Я][a-zа-я]+[0-9]*|\b)|[A-ZА-Я]?[a-zа-я]+[0-9]*|[A-ZА-Я]+|[0-9]+)(\)?)/g;
+  return this.match(pattern).map(function (word) {
+    return smart && /(\(?)([A-ZА-Я]+)(\)?)/.test(word) ? word : word.toLowerCase();
   });
 };
 
@@ -10734,19 +10726,23 @@ String.prototype.ucFirst = function () {
 };
 
 String.prototype.toPhrase = function () {
-  return this.toLowerCaseArray().join(' ').ucFirst();
+  var smart = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+  return this.toLowerCaseArray(smart).join(' ').ucFirst();
 };
 
 String.prototype.toSnakeCase = function () {
-  return this.toLowerCaseArray().join('_');
+  var smart = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+  return this.toLowerCaseArray(smart).join('_');
 };
 
 String.prototype.toKebabCase = function () {
-  return this.toLowerCaseArray().join('-');
+  var smart = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+  return this.toLowerCaseArray(smart).join('-');
 };
 
 String.prototype.toPascalCase = function () {
-  return this.toLowerCaseArray().map(function (word) {
+  var smart = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+  return this.toLowerCaseArray(smart).map(function (word) {
     return word.ucFirst();
   }).join('');
 };

@@ -228,8 +228,8 @@
         <field
                 name="resident_document"
                 type="select">
-            <option value="RESIDENT"/>
-            <option value="TEMPORARY_RESIDENCE"/>
+            <option value="RESIDENT_CARD"/>
+            <option value="TEMPORARY_RESIDENT_LICENSE"/>
         </field>
         <field
                 name="resident_document_serie"
@@ -242,7 +242,7 @@
                 type="select"
                 model="Employer:FMS"/>
         <field
-                name="resident_document_expired_date"
+                name="resident_document_issued_date"
                 type="date"
                 format="dd-MM-YYYY"/>
         <field

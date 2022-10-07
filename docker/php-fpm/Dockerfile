@@ -8,7 +8,9 @@ RUN apt-get update \
     && docker-php-ext-install gd \
     && docker-php-ext-install pdo_pgsql \
     && docker-php-ext-install pgsql \
-    && docker-php-ext-enable pgsql
+    && docker-php-ext-enable pgsql \
+    && docker-php-ext-install mysqli \
+    && docker-php-ext-install pdo_mysql
 
 #pdftk
 RUN mkdir -p /usr/share/man/man1/ \

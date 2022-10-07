@@ -90,7 +90,7 @@ class EmployeeSeeder extends Seeder
 
         $columns = array_merge($columns, $changedColumns);
         $oldData = DB::connection('mysqlx')->table('fmsdocs_employees')->get();
-        $statuses = DB::connection('mysql')->table('statuses')->pluck('id', 'name_en');
+        $statuses = DB::connection('pgsql')->table('statuses')->pluck('id', 'name_en');
         Employee::truncate();
 
         foreach ($oldData as $oldDatum) {

@@ -65,12 +65,12 @@ return [
 
         'mysqlx' => [
             'driver' => env('DB_CONNECTION_EXTRA'),
-            'url' => env('DATABASE_URL'),
-            'host' => env('DB_HOST', '127.0.0.1'),
-            'port' => env('DB_PORT', '3306'),
+            'url' => env('DATABASE_URL_EXTRA'),
+            'host' => env('DB_HOST_EXTRA', '127.0.0.1'),
+            'port' => env('DB_PORT_EXTRA', '3306'),
             'database' => env('DB_DATABASE_EXTRA', 'forge'),
-            'username' => env('DB_USERNAME', 'forge'),
-            'password' => env('DB_PASSWORD', ''),
+            'username' => env('DB_USERNAME_EXTRA', 'forge'),
+            'password' => env('DB_PASSWORD_EXTRA', ''),
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',
@@ -85,8 +85,8 @@ return [
 
         'pgsql' => [
             'driver' => env('DB_CONNECTION_PG'),
-            'url' => env('DATABASE_URL'),
-            'host' => env('DB_HOST', '127.0.0.1'),
+            'url' => env('DATABASE_URL_PG'),
+            'host' => env('DB_HOST_PG', '127.0.0.1'),
             'port' => env('DB_PORT_PG', '5432'),
             'database' => env('DB_DATABASE_PG', 'forge'),
             'username' => env('DB_USERNAME_PG', 'forge'),

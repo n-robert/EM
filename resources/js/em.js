@@ -3,11 +3,10 @@ module.exports = {
         /**
          * Translate the given key.
          */
-        __(key, replace = {})
-        {
+        __(key, replace = {}) {
             let translation = this.$page.props.language[key] ?? key;
 
-            Object.keys(replace).forEach(function(k) {
+            Object.keys(replace).forEach(function (k) {
                 translation = translation.replace(':' + k, replace[k]);
             });
 
@@ -17,8 +16,7 @@ module.exports = {
         /**
          * Translate the given key with basic pluralization.
          */
-        __n(key, number, replace = {})
-        {
+        __n(key, number, replace = {}) {
             const options = key.split('|');
 
             key = options[1];
@@ -30,8 +28,7 @@ module.exports = {
             return this.__(key, replace);
         },
 
-        formatDate(date, format = 'YYYY-MM-DD')
-        {
+        formatDate(date, format = 'YYYY-MM-DD') {
             let
                 delimiters = ['-', '.', '/'],
                 currentDelimiter = this.getDelimiter(this.$page.props.defaultDateFormat, delimiters);
@@ -57,8 +54,7 @@ module.exports = {
             return date;
         },
 
-        getDelimiter(date, delimiters)
-        {
+        getDelimiter(date, delimiters) {
             let delimiter;
 
             for (const char of delimiters) {
@@ -71,8 +67,7 @@ module.exports = {
             return delimiter;
         },
 
-        getYearMonthDayOrder(format, delimiter)
-        {
+        getYearMonthDayOrder(format, delimiter) {
             let order = {};
 
             format.split(delimiter).forEach((value, index) => {
@@ -109,35 +104,41 @@ module.exports = {
     },
 };
 
-String.prototype.toLowerCaseArray = function() {
-    return this.match(/[A-ZА-Я]+(?=[A-ZА-Я][a-zа-я]+[0-9]*|\b)|[A-ZА-Я]?[a-zа-я]+[0-9]*|[A-ZА-Я]|[0-9]+/g).map(word => word.toLowerCase());
+String.prototype.toLowerCaseArray = function (smart = false) {
+    let pattern = /(\(?)([A-ZА-Я]+(?=[A-ZА-Я][a-zа-я]+[0-9]*|\b)|[A-ZА-Я]?[a-zа-я]+[0-9]*|[A-ZА-Я]+|[0-9]+)(\)?)/g;
+    return this
+        .match(pattern)
+        .map(word => smart && (/(\(?)([A-ZА-Я]+)(\)?)/).test(word) ? word : word.toLowerCase());
 };
 
-String.prototype.pluralize = function() {
-    return (this + 's').replace(/ys$/, 'ies').replace(/ss$/, 'ses').replace(/(staff)s$/i, '$1');
+String.prototype.pluralize = function () {
+    return (this + 's')
+        .replace(/ys$/, 'ies')
+        .replace(/ss$/, 'ses')
+        .replace(/(staff)s$/i, '$1');
 };
 
-String.prototype.ucFirst = function() {
+String.prototype.ucFirst = function () {
     return this.replace(/^./, chr => chr.toUpperCase());
 };
 
-String.prototype.toPhrase = function() {
-    return this.toLowerCaseArray().join(' ').ucFirst();
+String.prototype.toPhrase = function (smart = false) {
+    return this.toLowerCaseArray(smart).join(' ').ucFirst();
 };
 
-String.prototype.toSnakeCase = function() {
-    return this.toLowerCaseArray().join('_');
+String.prototype.toSnakeCase = function (smart = false) {
+    return this.toLowerCaseArray(smart).join('_');
 };
 
-String.prototype.toKebabCase = function() {
-    return this.toLowerCaseArray().join('-');
+String.prototype.toKebabCase = function (smart = false) {
+    return this.toLowerCaseArray(smart).join('-');
 };
 
-String.prototype.toPascalCase = function() {
-    return this.toLowerCaseArray().map(word => word.ucFirst()).join('');
+String.prototype.toPascalCase = function (smart = false) {
+    return this.toLowerCaseArray(smart).map(word => word.ucFirst()).join('');
 };
 
-toggleVisibility = function(id, checked = true, parent = null) {
+toggleVisibility = function (id, checked = true, parent = null) {
     if (parent) {
         document.getElementById(parent).childNodes.forEach(el => {
             if (el.style) {
@@ -148,4 +149,3 @@ toggleVisibility = function(id, checked = true, parent = null) {
 
     document.getElementById(id).style.display = checked ? 'block' : 'none';
 };
-

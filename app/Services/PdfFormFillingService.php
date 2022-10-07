@@ -34,125 +34,6 @@ class PdfFormFillingService
     ];
 
     /**
-     * @param $user_ids
-     * @param $main_user
-     * @param $limited_users
-     * @param $tables
-     * @return bool|void
-     */
-    public static function addRelatedRecords($user_ids, $main_user, $limited_users, $tables)
-    {
-        if (!is_array($user_ids)) {
-            $user_ids = [$user_ids];
-        }
-
-        if (empty($user_ids) || empty($tables)) {
-            return;
-        }
-
-        $db = Factory::getDbo();
-        $addrress_column =
-            [
-                'addresses' => 'id',
-                'employee'  => 'reg_address'
-            ];
-        $employer_column =
-            [
-                'employers' => 'id',
-                'employee'  => 'employer_id'
-            ];
-
-        foreach ($user_ids as $user_id) {
-            $limited_addresses = [];
-            $limited_employers = [];
-            $user_tables = $tables;
-
-            if (!empty($limited_users)) {
-                foreach ($limited_users as $limited_user) {
-                    if ($limited_user['user_id'] == $user_id) {
-                        $limited_addresses =
-                            $limited_user['limited_addresses'] ?? $limited_addresses;
-                        $limited_employers =
-                            $limited_user['limited_employers'] ?? $limited_employers;
-                        break;
-                    }
-                }
-            }
-
-            if (!empty($limited_addresses) || !empty($limited_employers)) {
-                $user_tables = ['addresses', 'employee', 'employers'];
-            }
-
-            foreach ($user_tables as $table) {
-                $query = $db->getQuery(true);
-
-                $where_pattern_1 = '"';
-                $where_pattern_1 .= '^' . $main_user . '$';
-                $where_pattern_1 .= '|';
-                $where_pattern_1 .= '^' . $main_user . ',';
-                $where_pattern_1 .= '|';
-                $where_pattern_1 .= ',' . $main_user . ',';
-                $where_pattern_1 .= '|';
-                $where_pattern_1 .= ',' . $main_user . '$';
-                $where_pattern_1 .= '"';
-
-                $concat = $db->QuoteName('user_ids');
-                $concat .= ', ';
-                $concat .= '"';
-                $concat .= ',' . $user_id;
-                $concat .= '"';
-
-                $where_pattern_2 = '"';
-                $where_pattern_2 .= '^' . $user_id . '$';
-                $where_pattern_2 .= '|';
-                $where_pattern_2 .= '^' . $user_id . ',';
-                $where_pattern_2 .= '|';
-                $where_pattern_2 .= ',' . $user_id . ',';
-                $where_pattern_2 .= '|';
-                $where_pattern_2 .= ',' . $user_id . '$';
-                $where_pattern_2 .= '"';
-
-                $query
-                    ->update($db->QuoteName('#__fmsdocs_' . $table))
-                    ->set(
-                        $db->QuoteName('user_ids') . ' = CONCAT(' . $concat . ')'
-                    )
-                    ->where($db->QuoteName('user_ids') . ' REGEXP ' . $where_pattern_1)
-                    ->where($db->QuoteName('user_ids') . ' NOT REGEXP ' . $where_pattern_2);
-
-                if (!empty($limited_addresses) && isset($addrress_column[$table])) {
-                    $query->where(
-                        $db->QuoteName($addrress_column[$table]) . 'IN(' . implode(', ', $limited_addresses) . ')'
-                    );
-                }
-
-                if (!empty($limited_employers) && isset($employer_column[$table])) {
-                    $query->where(
-                        $db->QuoteName($employer_column[$table]) . 'IN(' . implode(', ', $limited_employers) . ')'
-                    );
-                }
-
-                $db->setQuery($query)->execute();
-            }
-        }
-
-        return true;
-    }
-
-    public static function checkRequiredValues()
-    {
-        $args = func_get_args();
-
-        for ($i = 4; $i < count($args); $i++) {
-            if (!($args[$i])) {
-                $url = 'index.php?option=com_fmsdocs&view=' . $args[1] . '&mode=' . $args[3] . '&id=' . $args[2];
-                $url = $args[0]->isClient('administrator') ? $url : Route::_($url);
-                $args[0]->redirect($url);
-            }
-        }
-    }
-
-    /**
      * Method to decline word suffix
      * @param String $string
      * @param Integer $case (2, 3, 4, 5, 6)
@@ -217,32 +98,6 @@ class PdfFormFillingService
         return implode(' ', $string);
     }
 
-    public static function deleteFile($app, $input, $model, $view, $id, $template)
-    {
-        $file_name = $input->get('file_name', '');
-        $file = JPATH_ROOT . '/components/com_fmsdocs/files/' . $view . '/' . $id . '/' . $file_name;
-
-        try {
-            if (!File::delete($file)) {
-                throw new Exception(Text::sprintf('FILE_NOT_DELETED', $file_name));
-            }
-
-            $db = Factory::getDbo();
-            $query = $db->getQuery(true);
-
-            $query
-                ->delete('#__fmsdocs_files')
-                ->where('file_folder = "' . $view . '"')
-                ->where('item_id = ' . $id)
-                ->where('file_name = "' . $file_name . '"');
-            $db->setQuery($query)->execute();
-
-            $app->enqueueMessage(Text::sprintf('FILE_DELETE_SUCCEED', $file_name));
-        } catch (Exception $e) {
-            $app->enqueueMessage($e->getMessage(), 'error');
-        }
-    }
-
     public static function downloadFile($app, $input, $model, $view, $id, $template)
     {
         $file_name = $input->get('file_name', '');
@@ -258,7 +113,7 @@ class PdfFormFillingService
                 'jpg'  => 'image/jpg',
                 'jpeg' => 'image/jpg'
             ];
-        $file = JPATH_ROOT . '/components/com_fmsdocs/files/' . $view . '/' . $id . '/' . $file_name;
+        $file = '/components/com_fmsdocs/files/' . $view . '/' . $id . '/' . $file_name;
 
         ob_end_clean();
         header('Content-Description: File Transfer');
@@ -649,24 +504,24 @@ class PdfFormFillingService
         return $result;
     }
 
-    public static function parseDate($date, $fullFormatMonth = false, $format = 'd-m-Y', $delimiter = '-')
+    public static function parseDate(
+        $date,
+        $fullMonthFormat = false,
+        $fullYear = true
+    )
     {
-        $date = str_replace(['.', '/'], $delimiter, $date);
-        $format = str_replace(['.', '/'], $delimiter, $format);
-
-        if (!array_sum(explode($delimiter, $date))) {
-            return ['', '', ''];
+        if ($date == '') {
+            return ['d' => '', 'm' => '', 'y' => ''];
         }
 
-        $date = explode($delimiter, date($format, strtotime($date)));
+        $date = Carbon::parse($date);
 
-        if ($fullFormatMonth) {
-            $formatArray = explode($delimiter, strtolower($format));
-            $formatArray = array_flip($formatArray);
-            $date[$formatArray['m']] = __('MONTH_' . $date[$formatArray['m']]);
-        }
+        $result['d'] = $date->isoFormat('DD');
+        $result['m'] =
+            $fullMonthFormat ? $date->getTranslatedMonthName('MMMM', '_full') : $date->isoFormat('MM');
+        $result['y'] = $fullYear ? $date->isoFormat('YYYY') : $date->isoFormat('YY');
 
-        return $date;
+        return $result;
     }
 
     /**
@@ -1386,7 +1241,7 @@ class PdfFormFillingService
         return static::prepareData($doc, $docData, $data);
     }
 
-    public static function printWarranty($docData, $doc, $id)
+    public static function printInviteWarranty($docData, $doc, $id)
     {
         $recipientId = $docData['recipient_id'];
         $recipientPersonId = $docData['recipient_person_id'];
@@ -1476,120 +1331,110 @@ class PdfFormFillingService
         return static::prepareData($doc, $docData, $data);
     }
 
-    public static function printWorkContract($app, $input, $model, $view, $id, $template = 'workcontract')
+    public static function printWorkContract($docData, $doc, $id)
     {
-        $item = $model->getItem($id, true);
-
-        $employer_id = $input->post->get('employer_id', $item->employer_id, 'int');
-        $date_from = $input->post->get('date_from', date('d.m.Y', time()), 'string');
-        $work_permit_expired = !empty($item->work_permit_expired) ?
-            date('d.m.Y', strtotime($item->work_permit_expired)) : '';
-        $date_to = $input->post->get('date_to', $work_permit_expired, 'string');
-        $salary = $input->post->get('salary', '', 'int');
-
-        $preserved_values = [];
-        $preserved_values['employer_id'] = $employer_id;
-        $preserved_values['date_from'] = $date_from;
-        $preserved_values['date_to'] = $date_to;
-
-        foreach ($preserved_values as $key => $value) {
-            $app->setUserState('com_fmsdocs.workcontrack.' . $key . $id, $value);
-        }
-
-        self::checkRequiredValues($app, $view, $id, $template, $employer_id, $date_from, $date_to, $salary);
-
-        $file_name = self::getFileName($item, $template);
-        $contract_number = $input->post->get('contract_number', '', 'string');
-
-        $employer_model = BaseDatabaseModel::getInstance('Employer', 'FMSDocsModel');
-        $employer = $employer_model->getItem($employer_id, true);
-
-        $address = self::parseAddress($employer->address_name);
+        $employee = Employee::find($id);
+        $dateFrom = $docData['date_from'];
+        $workPermitExpired = $employee->work_permit_expired ?
+            date('d.m.Y', strtotime($employee->work_permit_expired)) : '';
+        $dateTo = $docData['date_to'] or $workPermitExpired;
+        $salary = $docData['salary'];
+        $contractNumber = $docData['contract_number'];
+        $employerId = $docData['employer_id'];
+        $employer = Employer::find($employerId);
+        $employerAddress = Address::find($employer->address_id)->name_ru;
+        $address = static::parseAddress($employerAddress);
         $title = array_filter([$address['region'], $address['city'], $address['locality']]);
-        $title[] = implode(' ', self::parseDate($date_from, true)) . __('YEAR_SUFFIX');
+        $title[] =
+            implode(' ', static::parseDate($dateFrom, true)) . __('YEAR_SUFFIX');
         $title = implode(', ', $title);
 
-        $director1 = [];
-        $director1[] = self::declension($employer->director_last_name_ru, 2, $employer->director_gender, 'name');
-        $director1[] = self::declension($employer->director_first_name_ru, 2, $employer->director_gender, 'name');
-        $director1[] = self::declension($employer->director_middle_name_ru, 2, $employer->director_gender, 'name');
-        $director1 = implode(' ', $director1);
+        $director = Employee::find($employer->director_id);
+        $directorName = array_filter([
+            $director->last_name_ru,
+            $director->first_name_ru,
+            $director->middle_name_ru,
+        ]);
+        $director1 = static::declension(
+            implode(' ', $directorName),
+            2,
+            $director->gender,
+            'name'
+        );
+        $director2 = static::shortenName($director);
 
-        $director2 = $employer->director_last_name_ru;
+        $employeeName = implode(' ',
+            array_filter([
+                $employee->last_name_ru,
+                $employee->first_name_ru,
+                $employee->middle_name_ru,
+            ]));
+        $citizenship = static::declension(
+            Country::find($employee->citizenship_id)->name_ru,
+            2,
+            '',
+            'name'
+        );
+        $employerInfo = implode(', ', [
+            $employer->full_name_ru,
+            $employerAddress,
+            __('TAXPAYER_ID') . ' ' . $employer->taxpayer_id,
+            __('TAXPAYER_CODE') . ' ' . $employer->taxpayer_code,
+            __('PRIME_REG_NUMBER') . ' ' . $employer->prime_reg_number,
+        ]);
 
-        $initials = $employer->director_first_name_ru ?
-            ' ' . mb_substr($employer->director_first_name_ru, 0, 1) . '.' : '';
-        $initials .= $employer->director_middle_name_ru ?
-            ' ' . mb_substr($employer->director_middle_name_ru, 0, 1) . '.' : '';
+        $employeeInfo = [];
+        $employeeInfo[] = $employeeName;
+        $employeeInfo[] = date('d/m/Y', strtotime($employee->birth_date)) . __('BIRTH_DATE_SUFFIX');
+        $employeeInfo[] = __('PASSPORT_LC') .
+                          ' ' .
+                          $employee->passport_number .
+                          ' ' .
+                          __('ISSUED_BY_1_LC') .
+                          ' ' .
+                          date('d/m/Y', strtotime($employee->passport_issued_date)) .
+                          ' ' .
+                          $employee->passport_issuer;
+        $employeeInfo[] = __('REG_ADDR_LC') . ': ' . Address::find($employee->reg_address_id)->name_ru;
+        $employeeInfo = implode(', ', $employeeInfo);
 
-        $director2 .= $initials;
+        $occupation = static::declension(
+            Occupation::find($employee->occupation_id)->name_ru,
+            2,
+            '',
+            '',
+            1
+        );
 
-        $employee_name = $item->last_name_ru .
-                         ' ' .
-                         $item->first_name_ru .
-                         ($item->middle_name_ru ? ' ' . $item->middle_name_ru : '');
-        $employee = $employee_name;
-        $citizenship = self::declension($item->citizenship_name, 2, '', 'name');
-
-        $employer_info = [];
-        $employer_info[] = $employer->full_name_ru;
-        $employer_info[] = $employer->address_name;
-        $employer_info[] = __('TAXPAYER_ID') . ' ' . $employer->taxpayer_id;
-        $employer_info[] = __('TAXPAYER_CODE') . ' ' . $employer->taxpayer_code;
-        $employer_info[] = __('PRIME_REG_NUMBER') . ' ' . $employer->prime_reg_number;
-        $employer_info = implode(', ', $employer_info);
-
-        $employee_info = [];
-        $employee_info[] = $employee_name;
-        $employee_info[] = __('BIRTH_DATE') . ' ' . date('d/m/Y', strtotime($item->birth_date));
-        $employee_info[] = __('PASSPORT_LC') .
-                           ' ' .
-                           $item->passport_number .
-                           ' ' .
-                           __('ISSUED_BY_1_LC') .
-                           ' ' .
-                           date('d/m/Y', strtotime($item->passport_issued_date)) .
-                           ' ' .
-                           $item->passport_issuer;
-        $employee_info[] = __('REG_ADDR_LC') . ': ' . $item->reg_address_name;
-        $employee_info = implode(', ', $employee_info);
-
-        $fields =
+        $data =
             [
-                'file_name'   => $file_name,
-                'title'       => $title,
-                'director1'   => $director1,
-                'employee'    => $employee,
-                'citizenship' => $citizenship,
-                'address'     => $item->work_address_name,
-                'date_from'   => date('d/m/Y', strtotime($date_from)),
-                'date_to'     => date('d/m/Y', strtotime($date_to)),
-                'salary'      => $salary,
-                'director2'   => $director2
+                'title'           => $title,
+                'director1'       => $director1,
+                'employee'        => $employeeName,
+                'citizenship'     => $citizenship,
+                'address'         => $employee->work_address_name,
+                'date_from'       => date('d/m/Y', strtotime($dateFrom)),
+                'date_to'         => date('d/m/Y', strtotime($dateTo)),
+                'salary'          => $salary,
+                'director2'       => $director2,
+                'contract_number' => $contractNumber,
+                'employer'        => $employer->full_name_ru,
+                'occupation1'     => $occupation,
+                'occupation2'     => $occupation,
+                'employer_info'   => $employerInfo,
+                'employee_info'   => $employeeInfo,
             ];
 
-        if ($contract_number) {
-            $fields['contract_number'] = $contract_number;
+        if ($employee->work_permit_number) {
+            $workPermitName =
+                in_array($employee->citizenship_id, static::$CIS) ? __('WORK_PATENT') : __('WORK_PERMIT');
+            $data['occation'] = mb_strtolower($workPermitName);
+            $data['occation'] .=
+                sprintf(__('SERIE_NUMBER_SPRINTF'), $employee->work_permit_serie, $employee->work_permit_number);
+            $data['occation'] .= __('SINCE') . date('d/m/Y', strtotime($employee->work_permit_issued_date));
         }
 
-        if ($item->work_permit_number) {
-            $work_permit_name = in_array($item->citizenship, self::$CIS) ? __('WORK_PATENT') :
-                __('WORK_PERMIT');
-            $fields['occation'] = mb_strtolower($work_permit_name);
-            $fields['occation'] .=
-                Text::sprintf('SERIE_NUMBER_SPRINTF', $item->work_permit_serie, $item->work_permit_number);
-            $fields['occation'] .= __('SINCE') . date('d/m/Y', strtotime($item->work_permit_issued));
-        }
-
-        $occupation = self::declension($item->occupation_name, 2, '', '', 1);
-
-        self::splitText($employer->full_name_ru, 'employer', $fields, true, false, false, 2, 66, 46);
-        self::splitText($occupation, 'occupation1', $fields, true, false, false, 2, 34, 66);
-        self::splitText($occupation, 'occupation2', $fields, true, false, false, 2, 41, 66);
-        self::splitText($employer_info, 'employer_info', $fields, true, false, false, 7, 32);
-        self::splitText($employee_info, 'employee_info', $fields, true, false, false, 9, 32);
-
-        self::output($template, $fields);
+        return static::prepareData($doc, $docData, $data);
     }
 
     public static function printWorkPermit($docData, $doc, $id)
@@ -2009,7 +1854,7 @@ class PdfFormFillingService
         return implode(' ', $name);
     }
 
-    public static function splitDate($dates, &$data, $fullMonthFormat = false, $shortYear = false)
+    public static function splitDate($dates, &$data, $fullMonthFormat = false, $fullYear = true)
     {
         foreach ($dates as $key => $date) {
             if (!$date) {
@@ -2017,13 +1862,12 @@ class PdfFormFillingService
                 continue;
             }
 
-            $date = Carbon::parse($date);
+            $date = static::parseDate($date, $fullMonthFormat, $fullYear);
             $key = ($key == 'date') ? '' : ($key . '_');
 
-            $data[$key . 'day'] = $date->isoFormat('DD');
-            $data[$key . 'month'] =
-                $fullMonthFormat ? $date->getTranslatedMonthName('MMMM', '_full') : $date->isoFormat('MM');
-            $data[$key . 'year'] = $shortYear ? $date->isoFormat('YY') : $date->isoFormat('YYYY');
+            $data[$key . 'day'] = $date['d'];
+            $data[$key . 'month'] = $date['m'];
+            $data[$key . 'year'] = $date['y'];
         }
     }
 
