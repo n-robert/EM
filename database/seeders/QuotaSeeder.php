@@ -73,12 +73,14 @@ class QuotaSeeder extends Seeder
                     $newValue = [];
                     $value = json_decode($value);
 
-                    foreach ($value->country as $key => $country) {
-                        $tmpObj = new \stdClass();
-                        $tmpObj->country_id = $country;
-                        $tmpObj->occupation_id = $value->occupation[$key];
-                        $tmpObj->quantity = $value->quantity[$key];
-                        $newValue[] = $tmpObj;
+                    if ($value) {
+                        foreach ($value->country as $key => $country) {
+                            $tmpObj = new \stdClass();
+                            $tmpObj->country_id = $country;
+                            $tmpObj->occupation_id = $value->occupation[$key];
+                            $tmpObj->quantity = $value->quantity[$key];
+                            $newValue[] = $tmpObj;
+                        }
                     }
 
                     $value = json_encode($newValue);

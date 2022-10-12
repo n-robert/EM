@@ -49,7 +49,7 @@ class EmployerSeeder extends Seeder
         ];
         $columns = array_merge($columns, $changedColumns);
         $oldData = DB::connection('mysqlx')->table('fmsdocs_employers')->get();
-        $types = DB::connection('mysql')->table('types')->pluck('id', 'code');
+        $types = DB::connection('pgsql')->table('types')->pluck('id', 'code');
         Employer::truncate();
 
         foreach ($oldData as $oldDatum) {

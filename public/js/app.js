@@ -4199,7 +4199,7 @@ __webpack_require__.r(__webpack_exports__);
       return 'inline-flex hover:text-white' + (this.hasFilters ? ' bg-indigo-400 text-white hover:bg-indigo-500' : ' bg-white text-gray-500 hover:bg-indigo-500');
     },
     pageInfo: function pageInfo() {
-      return [this.pagination.firstItem + '-' + this.pagination.lastItem, this.__('from'), this.pagination.total].join(' ');
+      return this.pagination.total ? [this.pagination.firstItem + '-' + this.pagination.lastItem, this.__('from'), this.pagination.total].join(' ') : '';
     }
   },
   methods: {

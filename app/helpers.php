@@ -50,14 +50,15 @@ if (!function_exists('get_translations')) {
 }
 
 if (!function_exists('to_lower_case_array')) {
-    function to_lower_case_array($str)
+    function to_lower_case_array($str, $smart=false)
     {
-        preg_match_all('/[A-Z]+(?=[A-Z][a-z]+[0-9]*|\b)|[A-Z]?[a-z]+[0-9]*|[A-Z]|[0-9]+/', $str, $matches);
+        $pattern = '/(\(?)([A-ZА-Я]+(?=[A-ZА-Я][a-zа-я]+[0-9]*|\b)|[A-ZА-Я]?[a-zа-я]+[0-9]*|[A-ZА-Я]+|[0-9]+)(\)?)/';
+        preg_match_all($pattern, $str, $matches);
 
         return
             array_map(
-                function ($value) {
-                    return strtolower($value);
+                function ($value) use($smart) {
+                    return $smart && preg_match('/(\(?)([A-ZА-Я]+)(\)?)/', $value) ? $value : strtolower($value);
                 },
                 $matches[0]
             );
@@ -65,28 +66,28 @@ if (!function_exists('to_lower_case_array')) {
 }
 
 if (!function_exists('to_phrase')) {
-    function to_phrase($str)
+    function to_phrase($str, $smart=false)
     {
-        return ucfirst(implode(' ', to_lower_case_array($str)));
+        return ucfirst(implode(' ', to_lower_case_array($str, $smart)));
     }
 }
 
 if (!function_exists('to_snake_case')) {
-    function to_snake_case($str)
+    function to_snake_case($str, $smart=false)
     {
-        return implode('_', to_lower_case_array($str));
+        return implode('_', to_lower_case_array($str, $smart));
     }
 }
 
 if (!function_exists('to_kebab_case')) {
-    function to_kebab_case($str)
+    function to_kebab_case($str, $smart=false)
     {
-        return implode('-', to_lower_case_array($str));
+        return implode('-', to_lower_case_array($str, $smart));
     }
 }
 
 if (!function_exists('to_pascal_case')) {
-    function to_pascal_case($str)
+    function to_pascal_case($str, $smart=false)
     {
         return
             implode(
@@ -95,16 +96,16 @@ if (!function_exists('to_pascal_case')) {
                     function ($value) {
                         return ucfirst($value);
                     },
-                    to_lower_case_array($str)
+                    to_lower_case_array($str, $smart)
                 )
             );
     }
 }
 
 if (!function_exists('to_camel_case')) {
-    function to_camel_case($str)
+    function to_camel_case($str, $smart=false)
     {
-        $lowerCaseArray = to_lower_case_array($str);
+        $lowerCaseArray = to_lower_case_array($str, $smart);
 
         return
             implode(

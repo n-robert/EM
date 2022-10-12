@@ -69,40 +69,43 @@ class Address extends BaseModel
         $attributes = app(AddressRequestValidation::class)->except('type');
         $existing = $this->usagePermits->all();
 
-        if (empty($attributes['usage_permits']) && !empty($existing)) {
-            array_map(
-                function ($usagePermit) {
-                    UsagePermit
-                        ::find($usagePermit->id)
-                        ->delete();
-                },
-                $existing
-            );
+        if (empty($attributes['usage_permits'])) {
+            if (!empty($existing)) {
+                array_map(
+                    function ($usagePermit) {
+                        UsagePermit
+                            ::find($usagePermit->id)
+                            ->delete();
+                    },
+                    $existing
+                );
+            }
 
             return true;
         }
 
-        $coming = $attributes['usage_permits'];
         $new = [];
         $abandoned = [];
 
-        array_map(
-            function ($actual) use (&$new) {
-                $usagePermitsModel =
-                    $actual['id'] ?
-                        UsagePermit::find($actual['id']) : new UsagePermit();
+        if ($coming = $attributes['usage_permits']) {
+            array_map(
+                function ($actual) use (&$new) {
+                    $usagePermitsModel =
+                        $actual['id'] ?
+                            UsagePermit::find($actual['id']) : new UsagePermit();
 
-                $usagePermitsModel->setAttribute('address_id', $this->id);
-                $usagePermitsModel->setAttribute('user_ids', session($this->name . '.user_ids'));
+                    $usagePermitsModel->setAttribute('address_id', $this->id);
+                    $usagePermitsModel->setAttribute('user_ids', session($this->name . '.user_ids'));
 
-                $usagePermitsModel
-                    ->fill($actual)
-                    ->save();
+                    $usagePermitsModel
+                        ->fill($actual)
+                        ->save();
 
-                $new[] = $actual['id'];
-            },
-            $coming
-        );
+                    $new[] = $actual['id'];
+                },
+                $coming
+            );
+        }
 
         if (!empty($existing)) {
             array_map(

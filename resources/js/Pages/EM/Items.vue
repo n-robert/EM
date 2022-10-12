@@ -196,7 +196,12 @@ export default {
         },
 
         pageInfo: function () {
-            return [this.pagination.firstItem + '-' + this.pagination.lastItem, this.__('from'), this.pagination.total].join(' ');
+            return this.pagination.total ?
+                [
+                    this.pagination.firstItem + '-' + this.pagination.lastItem,
+                    this.__('from'),
+                    this.pagination.total
+                ].join(' ') : '';
         },
     },
 

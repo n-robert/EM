@@ -3,11 +3,14 @@
 namespace App\Models;
 
 use App\Contracts\ModelInterface;
+use App\Scopes\AuthUserMyScope;
 use App\Services\XmlFormHandlingService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 use App\Scopes\AuthUserScope;
