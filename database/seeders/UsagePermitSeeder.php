@@ -47,7 +47,7 @@ class UsagePermitSeeder extends Seeder
 //                $newData[$column] = $value;
 //            }
 //
-//            UsagePermit::insert($newData);
+//            UsagePermit::withoutGlobalScopes()->insert($newData);
 //        }
     }
 }

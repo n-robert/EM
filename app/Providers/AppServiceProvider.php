@@ -62,6 +62,10 @@ class AppServiceProvider extends ServiceProvider
                             Session::get('errors')->getBag('default')->getMessages() : (object)[];
                 },
 
+                'isAdmin' => function () {
+                    return Gate::allows('is-admin');
+                },
+
                 'canEdit' => function () {
                     return Gate::allows('can-edit');
                 },

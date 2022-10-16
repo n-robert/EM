@@ -56,7 +56,7 @@ class OccupationSeeder extends Seeder
                 $newData['updated_at'] = Carbon::now()->format('Y-m-d H:i:s');
             }
 
-            Occupation::insert($newData);
+            Occupation::withoutGlobalScopes()->insert($newData);
         }
     }
 }

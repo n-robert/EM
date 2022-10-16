@@ -97,7 +97,7 @@ class QuotaSeeder extends Seeder
                     }
                 );
 
-            Quota::insert($newData);
+            Quota::withoutGlobalScopes()->insert($newData);
         }
     }
 }

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 
 class AuthUserScope implements Scope
@@ -23,7 +24,7 @@ class AuthUserScope implements Scope
         $user = Auth::user();
         $connection = DB::connection()->getName();
 
-        if (($user->is_admin) || $connection == 'mysqlx') {
+        if (Gate::allows('is-admin') || $connection == 'mysqlx') {
             return;
         }
 

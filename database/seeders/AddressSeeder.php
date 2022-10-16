@@ -54,7 +54,7 @@ class AddressSeeder extends Seeder
                 $newData[$column] = $value;
             }
 
-            Address::insert($newData);
+            Address::withoutGlobalScopes()->insert($newData);
         }
     }
 }

@@ -156,7 +156,7 @@ class EmployeeSeeder extends Seeder
                 $newData[$column] = $value;
             }
 
-            Employee::insert($newData);
+            Employee::withoutGlobalScopes()->insert($newData);
         }
     }
 }

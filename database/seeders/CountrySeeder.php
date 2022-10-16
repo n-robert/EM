@@ -37,7 +37,7 @@ class CountrySeeder extends Seeder
                 $newData['created_at'] = Carbon::now();
             }
 
-            Country::insert($newData);
+            Country::withoutGlobalScopes()->insert($newData);
         }
     }
 }

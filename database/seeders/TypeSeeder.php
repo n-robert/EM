@@ -33,7 +33,7 @@ class TypeSeeder extends Seeder
         Type::truncate();
 
         foreach ($types as $type) {
-            Type::insert(['code' => $type, 'user_ids' => '{2, 3}', 'created_at' => Carbon::now()]);
+            Type::withoutGlobalScopes()->insert(['code' => $type, 'user_ids' => '{2, 3}', 'created_at' => Carbon::now()]);
         }
     }
 }

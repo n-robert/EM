@@ -4,7 +4,6 @@ namespace App\Http\Requests;
 
 use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
-use phpDocumentor\Reflection\Types\Parent_;
 
 class BaseRequestValidation extends FormRequest
 {
@@ -27,7 +26,7 @@ class BaseRequestValidation extends FormRequest
      */
     public function authorize()
     {
-//        return $this->user()->is_admin;
+//        return !empty($this->user()->id);
         return true;
     }
 

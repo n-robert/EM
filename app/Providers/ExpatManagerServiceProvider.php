@@ -3,12 +3,14 @@
 namespace App\Providers;
 
 use App\Contracts\RepositoryInterface;
+use App\Models\Team;
 use App\Repositories\Eloquent\BaseRepository;
 use Carbon\Carbon;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Schema\Grammars\PostgresGrammar;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
@@ -44,6 +46,16 @@ class ExpatManagerServiceProvider extends ServiceProvider
 //                $models[] = strtolower($baseName);
 //            }
 //        }
+        Gate::define('is-admin', function ($user) {
+            $adminTeam = Team::query()->where(['name' => 'admin'])->first();
+            return $adminTeam && $user->ownsTeam($adminTeam);
+        });
+
+        Gate::define('can-edit', function ($user) {
+            return $user->teams->contains(function ($team, $key) use ($user) {
+                return $user->hasTeamRole($team, 'admin');
+            });
+        });
 
         $models = ['employee', 'employer', 'permit', 'quota', 'occupation', 'address'];
         session(['views' => $models]);
@@ -118,8 +130,7 @@ class ExpatManagerServiceProvider extends ServiceProvider
         );
 
         if (DB::connection()->getName() == 'pgsql') {
-            DB::connection()->setSchemaGrammar(new class extends PostgresGrammar
-            {
+            DB::connection()->setSchemaGrammar(new class extends PostgresGrammar {
                 protected function typeInt_array(\Illuminate\Support\Fluent $column)
                 {
                     return 'int[]';

@@ -16,18 +16,18 @@
         "@inertiajs/progress": "^0.2.7",
         "@tailwindcss/forms": "^0.2.1",
         "@tailwindcss/typography": "^0.3.0",
-        "@vue/compiler-sfc": "^3.0.5",
-        "autoprefixer": "^10.4.11",
+        "@vue/compiler-sfc": "^3.2.41",
+        "autoprefixer": "^10.4.12",
         "axios": "^0.21",
         "laravel-mix": "^6.0.49",
         "lodash": "^4.17.19",
         "portal-vue": "^2.1.7",
-        "postcss": "^8.1.14",
+        "postcss": "^8.4.18",
         "postcss-import": "^12.0.1",
         "tailwindcss": "^2.0.1",
-        "vue": "^2.5.17",
+        "vue": "^2.7.13",
         "vue-loader": "^15.9.6",
-        "vue-template-compiler": "^2.6.10"
+        "vue-template-compiler": "^2.7.13"
     },
     "dependencies": {
         "qs": "^6.11.0",
