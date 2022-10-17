@@ -7,15 +7,12 @@ use App\Scopes\AuthUserMyScope;
 use App\Services\XmlFormHandlingService;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 use App\Scopes\AuthUserScope;
 use LogicException;
@@ -419,7 +416,7 @@ class BaseModel extends Model implements ModelInterface
      *
      * @param string $field
      * @param array $options
-     * @return mixed
+     * @return Collection
      * @throws BindingResolutionException
      */
     public function getFilterFieldItems(string $field, array $options)
@@ -432,13 +429,14 @@ class BaseModel extends Model implements ModelInterface
 
         static::applyQueryOptions($options, $query, $nameField);
 
-        $items =
-            $query
-                ->distinct($valueField)
-                ->select([$valueField . ' AS value', $nameField . ' AS name'])
-                ->get();
+        if ($query instanceof QueryBuilder) {
+            $query = $this->newQuery()->setQuery($query);
+        }
 
-        return $items;
+        return $query
+            ->distinct($valueField)
+            ->select([$valueField . ' AS value', $nameField . ' AS name'])
+            ->get();
     }
 
     /**

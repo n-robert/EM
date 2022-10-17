@@ -299,7 +299,7 @@ export default {
     },
 
     provide: {
-        filterFieldDefaultClass: 'm-1 p-1 rounded cursor-pointer bg-indigo-100 hover:bg-indigo-500 hover:text-white text-sm',
+        filterFieldDefaultClass: 'm-1 p-1 rounded cursor-pointer bg-indigo-50 hover:bg-indigo-500 hover:text-white text-sm',
         filterFieldIsChecked: 'bg-indigo-400 text-white',
         paginationActive: 'bg-indigo-400 text-white rounded-md',
         paginationNull: 'bg-white text-gray-500',
