@@ -5,15 +5,20 @@ namespace App\Models;
 use App\Contracts\ModelInterface;
 use App\Scopes\AuthUserMyScope;
 use App\Services\XmlFormHandlingService;
+use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 use App\Scopes\AuthUserScope;
+use LogicException;
 
 class BaseModel extends Model implements ModelInterface
 {
@@ -35,6 +40,11 @@ class BaseModel extends Model implements ModelInterface
      * @var array
      */
     static $baseAppends = ['default_name'];
+
+    /**
+     * @var bool
+     */
+    static $skipAuthUserScope = false;
 
     /**
      * @var array
@@ -126,7 +136,7 @@ class BaseModel extends Model implements ModelInterface
      * @param boolean $distinct
      * @return Collection
      */
-    public static function getSingleSelectOptions($model, $distinct = true)
+    public static function getSingleSelectOptions($model, bool $distinct = true): Collection
     {
         if (!is_array($model)) {
             $model = explode(':', $model);
@@ -159,7 +169,7 @@ class BaseModel extends Model implements ModelInterface
      * @param int $id
      * @return string
      */
-    public static function getSingleValue($model, $id)
+    public static function getSingleValue($model, int $id): string
     {
         if (!is_array($model)) {
             $model = explode(':', $model, 2);
@@ -179,9 +189,10 @@ class BaseModel extends Model implements ModelInterface
 
     /**
      * Get options for form select.
-     * @return array
+     * @return Collection
+     * @throws BindingResolutionException
      */
-    protected static function getOwnSelectOptions()
+    protected static function getOwnSelectOptions(): Collection
     {
         $model = app()->make(static::class);
 
@@ -199,16 +210,18 @@ class BaseModel extends Model implements ModelInterface
      */
     protected static function booted()
     {
-        static::addGlobalScope(new AuthUserScope());
+        if (!Gate::allows('is-admin') && !static::$skipAuthUserScope) {
+            static::addGlobalScope(new AuthUserScope());
+        }
     }
 
     /**
      * Scope a query to applied filters.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $builder
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param Builder $builder
+     * @return Builder
      */
-    public function scopeApplyFilters($builder)
+    public function scopeApplyFilters(Builder $builder): Builder
     {
 //        Session::remove($this->names . '.filters');
         $filters = session($this->names . '.filters');
@@ -249,11 +262,11 @@ class BaseModel extends Model implements ModelInterface
      * Apply additional options to query
      *
      * @param array $options
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param mixed $query
      * @param string $field
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws BindingResolutionException
      */
-    public static function applyQueryOptions($options, &$query, &$field = '')
+    public static function applyQueryOptions(array $options, &$query, string &$field = '')
     {
         if (isset($options['model'])) {
             $model = app()->make(__NAMESPACE__ . '\\' . $options['model']);
@@ -276,10 +289,10 @@ class BaseModel extends Model implements ModelInterface
     /**
      * Scope a query to default order by.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $builder
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param Builder $builder
+     * @return Builder
      */
-    public function scopeApplyDefaultOrder($builder)
+    public function scopeApplyDefaultOrder(Builder $builder): Builder
     {
         if ($this->defaultOrderBy) {
             array_walk(
@@ -299,10 +312,10 @@ class BaseModel extends Model implements ModelInterface
     /**
      * Scope a query to model's custom clauses.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $builder
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param Builder $builder
+     * @return Builder
      */
-    public function scopeApplyCustomClauses($builder)
+    public function scopeApplyCustomClauses(Builder $builder): Builder
     {
         return $builder;
     }
@@ -312,7 +325,7 @@ class BaseModel extends Model implements ModelInterface
      *
      * @return string
      */
-    public function getDefaultNameAttribute()
+    public function getDefaultNameAttribute(): string
     {
         return
             array_key_exists(static::$defaultName, $this->getAttributes()) ?
@@ -323,10 +336,10 @@ class BaseModel extends Model implements ModelInterface
     /**
      * Get pagination data for items
      *
-     * @param \Illuminate\Pagination\LengthAwarePaginator $items
+     * @param LengthAwarePaginator $items
      * @return array
      */
-    public function getPagination($items)
+    public function getPagination(LengthAwarePaginator $items): array
     {
         $pagination = [];
         $pagination['links'] = $items->toArray()['links'];
@@ -353,9 +366,9 @@ class BaseModel extends Model implements ModelInterface
      * Get filters parameters.
      *
      * @return array
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws BindingResolutionException
      */
-    public function getFilters()
+    public function getFilters(): array
     {
         $filters = [];
 
@@ -407,9 +420,9 @@ class BaseModel extends Model implements ModelInterface
      * @param string $field
      * @param array $options
      * @return mixed
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws BindingResolutionException
      */
-    public function getFilterFieldItems($field, $options)
+    public function getFilterFieldItems(string $field, array $options)
     {
         $valueField = $nameField = $this->names . '.' . $field;
         $query =
@@ -469,7 +482,7 @@ class BaseModel extends Model implements ModelInterface
      *
      * @return bool|null|int
      *
-     * @throws \LogicException
+     * @throws LogicException
      */
     public function delete()
     {
@@ -488,7 +501,7 @@ class BaseModel extends Model implements ModelInterface
      * @param array $options
      * @return bool
      */
-    public function save(array $options = [])
+    public function save(array $options = []): bool
     {
         $key = $this->getKeyName();
 

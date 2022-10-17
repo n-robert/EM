@@ -47,7 +47,7 @@
                     <div class="p-4 table w-full">
                         <div class="even:bg-indigo-100 text-indigo-600 table-row-group font-bold">
                             <div class="table-row">
-                                <div v-for="field in formFields" class="p-2 align-middle table-cell">
+                                <div v-for="field in formFields" class="p-2 align-top table-cell">
                                     <div v-if="field.name === 'default_name'" class="pl-6 text-left">
                                         {{ field.label && __(field.label).ucFirst() }}
                                     </div>
@@ -55,8 +55,8 @@
                                     <div v-else>{{ field.label && __(field.label).ucFirst() }}</div>
                                 </div>
 
-                                <div class="p-2 align-middle table-cell"></div>
-                                <div v-if="Object.keys(docList).length" class="p-2 align-middle table-cell"></div>
+                                <div class="p-2 align-middletop table-cell"></div>
+                                <div v-if="Object.keys(docList).length" class="p-2 align-top table-cell"></div>
                             </div>
                         </div>
 

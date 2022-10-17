@@ -1,10 +1,13 @@
 <?xml version="1.0"?>
 <root>
     <field
-            name="default_name"
-            label="Person full name"/>
+        name="default_name"
+        label="Person full name"/>
     <field
-            name="status"/>
+        name="status"/>
     <field
-            name="occupation"/>
+        name="occupation"/>
+    <field
+        name="work_permit_expired_date"
+        label="Permit expired"/>
 </root>

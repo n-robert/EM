@@ -30,13 +30,17 @@
                             :format="$page.props.defaultDateFormat"
                             :clear-button="clearButton"
                             :highlighted="highlighted"
-                            :input-class="isRequired && (!modelValue || $page.props.errors[name]) ? fieldWarningClass : inputDefaultClass"></datepicker>
+                            :input-class=
+                                "isRequired && (!modelValue || $page.props.errors[name]) ?
+                                fieldWarningClass : inputDefaultClass"></datepicker>
 
                 <textarea v-else-if="type === 'textarea'"
                           :name="name"
                           :id="id"
                           v-model="modelValue"
-                          :class="isRequired && (!modelValue || $page.props.errors[name]) ? fieldWarningClass : inputDefaultClass"></textarea>
+                          :class="[
+                              isRequired && (!modelValue || $page.props.errors[name]) ? fieldWarningClass : inputDefaultClass,
+                              textareaDefaultClass]"></textarea>
 
                 <e-m-button v-else-if="type === 'button' || type === 'submit'"
                             :type="type"
@@ -54,7 +58,9 @@
                        :id="id"
                        :disabled="! $page.props.canEdit"
                        :onclick="onclick"
-                       :class="isRequired && (!modelValue || $page.props.errors[name]) ? fieldWarningClass : inputDefaultClass"/>
+                       :class=
+                           "isRequired && (!modelValue || $page.props.errors[name]) ?
+                           fieldWarningClass : inputDefaultClass"/>
 
                 <input v-else
                        :name="name"
@@ -63,7 +69,9 @@
                        :disabled="! $page.props.canEdit"
                        v-model="modelValue"
                        :onclick="onclick"
-                       :class="isRequired && (!modelValue || $page.props.errors[name]) ? fieldWarningClass : inputDefaultClass"/>
+                       :class=
+                           "isRequired && (!modelValue || $page.props.errors[name]) ?
+                           fieldWarningClass : inputDefaultClass"/>
 
                 <p v-if="isRequired && (!modelValue || $page.props.errors[name])"
                    :class="[warningClass, pDefaultClass]">
@@ -93,6 +101,7 @@ export default {
         'warningClass',
         'labelDefaultClass',
         'inputDefaultClass',
+        'textareaDefaultClass',
         'fieldWarningClass',
         'pDefaultClass',
     ],

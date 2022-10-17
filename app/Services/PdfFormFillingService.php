@@ -307,10 +307,10 @@ class PdfFormFillingService
         $recipient_emails = [];
 
         if ($user->authorise('core.admin')) {
-            $recipient_ids = self::getAllUsers();
+            $recipient_ids = static::getAllUsers();
         } else {
-            $related_groups = self::getRelatedGroups();
-            $limited_users = self::getLimitedUsers();
+            $related_groups = static::getRelatedGroups();
+            $limited_users = static::getLimitedUsers();
             $tmp = [];
 
             if (!empty($limited_users)) {
@@ -425,7 +425,8 @@ class PdfFormFillingService
             'city'        => __('REGEXP_CITY'),
             'district'    => __('REGEXP_DISTRICT'),
             'street'      => __('REGEXP_STREET'),
-            'house'       => __('REGEXP_HOUSE_1') . '|' . __('REGEXP_HOUSE_2') . '|' . __('REGEXP_HOUSE_3'),
+            'house'       => __('REGEXP_HOUSE_1') . '|' . __('REGEXP_HOUSE_2') . '|' . __('REGEXP_HOUSE_3') . '|' .
+                             __('REGEXP_HOUSE_4'),
             'building'    => __('REGEXP_BUILDING'),
             'subBuilding' => __('REGEXP_SUB_BUILDING'),
             'room'        => __('REGEXP_ROOM_1') . '|' . __('REGEXP_ROOM_2') . '|' . __('REGEXP_ROOM_3'),
@@ -435,6 +436,7 @@ class PdfFormFillingService
             'HOUSE_1' => 'REGEXP_HOUSE_1',
             'HOUSE_2' => 'REGEXP_HOUSE_2',
             'HOUSE_3' => 'REGEXP_HOUSE_3',
+            'HOUSE_4' => 'REGEXP_HOUSE_4',
         ];
 
         $roomVariants = [
@@ -572,7 +574,7 @@ class PdfFormFillingService
         return $data;
     }
 
-    public static function printArrivalNotice($docData, $doc, $id)
+    public static function printArrivalNotice($docData, $doc, $id): array
     {
         $employee = Employee::find($id);
         $citizenship = Country::find($employee->citizenship_id);
@@ -583,7 +585,7 @@ class PdfFormFillingService
         $employer = Employer::find($employee->employer_id);
         $employerType = Type::find($employer->type_id)->code;
 
-        if (in_array($employerType, self::$individualHosts)) {
+        if (in_array($employerType, static::$individualHosts)) {
             $employerType = 'INDIVIDUAL';
         }
 
@@ -591,19 +593,20 @@ class PdfFormFillingService
         $director = Employee::find($employer->director_id);
 
         $regAddress = Address::find($employee->reg_address_id);
-        $usage_permit = '';
-        $ownershipCertificates = json_decode($regAddress->ownership_certificate, true);
 
-        if ($ownershipCertificates && $ownershipCertificates['employer_id'] && $ownershipCertificates['certificate']) {
-            $ownershipCertificates =
-                array_combine($ownershipCertificates['employer_id'], $ownershipCertificates['certificate']);
-            $usage_permit = $ownershipCertificates[$employer->id];
+        if (!empty($regAddress->usage_permits[$employer->id])) {
+            $obj = $regAddress->usage_permits[$employer->id];
+            $signing_date = static::parseDate($obj->signing_date);
+            $usage_permit = $obj->name_ru . __('SINCE') .
+                            $signing_date['d'] . '-' . $signing_date['m'] . '-' . $signing_date['y'];
+        } else {
+            $usage_permit = '';
         }
 
-        $regAddress = self::parseAddress($regAddress->name_ru);
+        $regAddress = static::parseAddress($regAddress->name_ru);
         $destinationCity = implode(', ', array_filter([$regAddress['city'], $regAddress['locality']]));
 
-        $directorAddress = self::parseAddress($director->address);
+        $directorAddress = static::parseAddress($director->address);
         $directorCity = array_filter([$directorAddress['city'], $directorAddress['locality']]);
 
         $passport = __('PASSPORT');
@@ -645,7 +648,7 @@ class PdfFormFillingService
                 'guest_passport_serie'                   => $employee->passport_serie,
                 'passport_number'                        => $employee->passport_number,
                 'guest_passport_number'                  => $employee->passport_number,
-                'phone'                                  => self::handlePhones($employee->phone),
+                'phone'                                  => static::handlePhones($employee->phone),
                 'occupation'                             => $occupation,
                 'migr_card_serie'                        => $employee->migr_card_serie,
                 'migr_card_number'                       => $employee->migr_card_number,
@@ -686,7 +689,7 @@ class PdfFormFillingService
                 'director_building'                      => $directorAddress['building'],
                 'director_sub_building'                  => $directorAddress['subBuilding'],
                 'director_room'                          => $directorAddress['room'],
-                'director_phone'                         => self::handlePhones($director->phone),
+                'director_phone'                         => static::handlePhones($director->phone),
                 'employer_taxpayer_id'                   => $employer->taxpayer_id,
                 'birth_place'                            => $birthPlace,
                 'guest_birth_place'                      => $birthPlace,
@@ -752,7 +755,7 @@ class PdfFormFillingService
             implode(' ', array_filter([$director->first_name_ru, $director->middle_name_ru]));
         $repId = $docData['rep_id'] ?: $employee->director;
         $rep = Employee::find($repId);
-        $regAddress = self::parseAddress(
+        $regAddress = static::parseAddress(
             Address::find($employee->reg_address_id)->name_ru
         );
         $city = array_filter([$regAddress['city'], $regAddress['locality']]);
@@ -823,12 +826,12 @@ class PdfFormFillingService
 
     public static function printFiringNotice($docData, $doc, $id)
     {
-        return self::printHiringOrFiringNotice($docData, $doc, $id);
+        return static::printHiringOrFiringNotice($docData, $doc, $id);
     }
 
     public static function printHiringNotice($docData, $doc, $id)
     {
-        return self::printHiringOrFiringNotice($docData, $doc, $id);
+        return static::printHiringOrFiringNotice($docData, $doc, $id);
     }
 
     public static function printHiringOrFiringNotice($docData, $doc, $id)
@@ -840,7 +843,7 @@ class PdfFormFillingService
 
         $employerType = Type::find($employer->type_id)->code;
 
-        if (in_array($employerType, self::$legalEmployers)) {
+        if (in_array($employerType, static::$legalEmployers)) {
             $employerType = 'LEGAL';
         }
 
@@ -853,13 +856,13 @@ class PdfFormFillingService
         );
         $accRegInfo = implode(',', $accRegInfo);
 
-        $employerPhone = self::handlePhones($employer->phone, '8');
+        $employerPhone = static::handlePhones($employer->phone, '8');
 
         $citizenship = Country::find($employee->citizenship_id);
         $birthPlace = implode(', ', [$citizenship->name_ru, $employee->birth_place]);
 
         $director = Employee::find($employer->director_id);
-        $director_name = self::shortenName($director);
+        $director_name = static::shortenName($director);
 
         $regInfo = array_filter(
             [$employer->uni_reg_number, $employer->prime_reg_number]
@@ -1022,6 +1025,16 @@ class PdfFormFillingService
         $director = Employee::find($employer->director_id);
         $uniRegDate = Carbon::parse($employer->uni_reg_date)->isoFormat('DD.MM.YYYY');
 
+        $address = Address::find($employer->address_id)->name_ru;
+        $parsedAddress = static::parseAddress($address);
+        $tripStops = array_filter([
+            $parsedAddress['region'],
+            $parsedAddress['city'],
+            $parsedAddress['locality']
+        ]);
+        array_unshift($tripStops, __('RUSSIA'));
+        $tripStops = implode(', ', $tripStops);
+
 
         $data =
             [
@@ -1030,10 +1043,14 @@ class PdfFormFillingService
                 'taxpayer_id'                 => $employer->taxpayer_id,
                 'prime_reg_number'            => $employer->prime_reg_number,
                 'uni_reg_date'                => $uniRegDate,
-                'phone'                       => self::handlePhones($employer->phone, '8', 0),
+                'full_name'                   => $employer->full_name_ru,
+                'address_name'                => $address,
+                'real_address_name'                => $address,
+                'phone'                       => static::handlePhones($employer->phone, '8', 0),
                 'desired_date'                => $desiredDate,
-                'director'                    => self::shortenName($director),
+                'director'                    => static::shortenName($director),
                 'trip_purpose'                => __($tripPurpose),
+                'trip_stops'                  => $tripStops,
                 'duration'                    => __('DURATION'),
                 'supposed_entry_date'         => $supposedEntryDate,
                 'up_to'                       => $upToDate,
@@ -1062,7 +1079,7 @@ class PdfFormFillingService
                 'passport_number'             => $employee->passport_number,
                 'passport_issued'             => $passportIssued,
                 'passport_expired'            => $passportExpired,
-                'host_phone'                  => self::handlePhones($employer->phone, '8', 0),
+                'host_phone'                  => static::handlePhones($employer->phone, '8', 0),
             ];
 
         return static::prepareData($doc, $docData, $data);
@@ -1086,7 +1103,7 @@ class PdfFormFillingService
         $occupation = Occupation::find($employee->occupation_id)->name_ru;
         $reason = static::getReason($docData);
         $inviter = Employer::find($inviterId);
-        $inviterPhone = self::handlePhones($inviter->phone, '8');
+        $inviterPhone = static::handlePhones($inviter->phone, '8');
         $inviterAddress = Address::find($inviter->address_id)->name_ru;
         $inviterTaxpayerId = __('TAXPAYER_ID') . ' ' . $inviter->taxpayer_id;
         $inviterInfo = array_filter([
@@ -1098,7 +1115,7 @@ class PdfFormFillingService
         $inviterInfo = implode(', ', $inviterInfo);
 
         $employer = Employer::find($employee->employer_id);
-        $employerPhone = self::handlePhones($employer->phone, '8');
+        $employerPhone = static::handlePhones($employer->phone, '8');
         $employerTaxpayerId = __('TAXPAYER_ID') . ' ' . $employer->taxpayer_id;
         $employerAddress = Address::find($employer->address_id)->name_ru;
 
@@ -1121,7 +1138,7 @@ class PdfFormFillingService
         $destination = Address::find($destinationId)->name_ru;
         $relatives = __('NO');
 
-        $inviterAddress = self::parseAddress($inviterAddress);
+        $inviterAddress = static::parseAddress($inviterAddress);
         $tripStops = array_filter([
             $inviterAddress['region'],
             $inviterAddress['city'],
@@ -1258,7 +1275,7 @@ class PdfFormFillingService
         $taxpayerId = __('TAXPAYER_ID') . ' ' . $employer->taxpayer_id;
         $primeRegNumber = __('PRIME_REG_NUMBER') . ' ' . $employer->prime_reg_number;
         $taxpayerCode = __('TAXPAYER_CODE') . ' ' . $employer->taxpayer_code;
-        $employerPhone = self::handlePhones($employer->phone, '8');
+        $employerPhone = static::handlePhones($employer->phone, '8');
         $phone = __('PHONE_LC') . ': ' . $employerPhone;
 
         $hostInfo = [
@@ -1276,7 +1293,7 @@ class PdfFormFillingService
 
         if (!empty($employee->citizenship_id)) {
             $country = Country::find($employee->citizenship_id);
-            $citizenship = self::declension($country->name_ru, 2, '', 'name');
+            $citizenship = static::declension($country->name_ru, 2, '', 'name');
         } else {
             $citizenship = '';
         }
@@ -1308,7 +1325,7 @@ class PdfFormFillingService
         $address = Address::find($destinationAddress)->name_ru;
 
         $data = [
-            'recipient'          => self::declension($recipient->name_ru, 2, '', '', 1),
+            'recipient'          => static::declension($recipient->name_ru, 2, '', '', 1),
             'recipient_director' => $recipientPersonName,
             'date'               => date('d/m/Y', $date ? strtotime($date) : time()),
             'host_name'          => $employer->name_ru,
@@ -1459,7 +1476,7 @@ class PdfFormFillingService
         $passport = __('PASSPORT');
 
         $employer = Employer::find($employee->employer_id);
-        $employerPhone = self::handlePhones($employer->phone, '8', 0);
+        $employerPhone = static::handlePhones($employer->phone, '8', 0);
         $employerAddress = Address::find($employer->address_id)->name_ru;
         $employerInfo = $employer->uni_reg_number . ', ' . $permitInfo;
 
@@ -1501,7 +1518,7 @@ class PdfFormFillingService
                 'taxpayer_id_issued' => $employee->taxpayer_id_issued_date
             ];
 
-        self::splitDate($dates, $data);
+        static::splitDate($dates, $data);
 
         return static::prepareData($doc, $docData, $data);
     }
@@ -1514,7 +1531,7 @@ class PdfFormFillingService
         $recipientDirector = Employee::find($recipientDirectorId);
         $recipientDirector =
             [
-                self::declension($recipientDirector->last_name_ru, 3, $recipientDirector->gender, 'name'),
+                static::declension($recipientDirector->last_name_ru, 3, $recipientDirector->gender, 'name'),
                 mb_substr($recipientDirector->first_name_ru, 0, 1) . '.',
                 mb_substr($recipientDirector->middle_name_ru, 0, 1) . '.'
             ];
@@ -1523,7 +1540,7 @@ class PdfFormFillingService
         $employer = Employer::find($employee->employer_id);
 
         $address = Address::find($employer->address_id);
-        $address = self::parseAddress($address->name_ru);
+        $address = static::parseAddress($address->name_ru);
         $title = array_filter([$address['region'], $address['city']]);
         $title[] = Carbon::parse($docData['date'])->isoFormat('DD MMMM YYYY') . __('YEAR_SUFFIX');
         $title = implode(', ', $title);
@@ -1536,7 +1553,7 @@ class PdfFormFillingService
         $guestName = implode(' ', $guestName);
 
         $guestCitizenship = Country::find($employee->citizenship_id)->name_ru;
-        $guestInfo[] = self::declension($guestCitizenship, 2, '', 'name') . ': ' . $guestName;
+        $guestInfo[] = static::declension($guestCitizenship, 2, '', 'name') . ': ' . $guestName;
 
         if ($employee->birth_date) {
             $guestInfo[] =
@@ -1569,7 +1586,7 @@ class PdfFormFillingService
 
         $data =
             [
-                'recipient'          => self::declension($recipient->name_ru, 2, '', '', 1),
+                'recipient'          => static::declension($recipient->name_ru, 2, '', '', 1),
                 'recipient_director' => $recipientDirector,
                 'title'              => $title,
                 'employer'           => $employer->name_ru,
@@ -1758,13 +1775,13 @@ class PdfFormFillingService
         $shipment_model = BaseDatabaseModel::getInstance('Shipment', 'FMSDocsModel', ['ignore_request' => true]);
         $method = 'apply' . ucfirst($host[0]) . ucfirst($host[1]);
 
-        self::$method($url, $input, $id, $model, $shipment_model, $app);
+        static::$method($url, $input, $id, $model, $shipment_model, $app);
     }
 
     public static function shortenAddresses($addresses, $type_required = true)
     {
         foreach ($addresses as &$address) {
-            $parts = self::parseAddress($address, $type_required);
+            $parts = static::parseAddress($address, $type_required);
 
             if (isset($parts['region'])) {
                 unset($parts['region']);
@@ -2060,7 +2077,7 @@ class PdfFormFillingService
     {
         $submit = $input->post->get('submit', '', 'string');
 
-        self::checkRequiredValues(
+        static::checkRequiredValues(
             $app,
             $view,
             $id,
@@ -2080,7 +2097,7 @@ class PdfFormFillingService
         $rep_document_date = '';
 
         $item = $model->getItem($id, true);
-        $file_name = self::getFileName($item, $template);
+        $file_name = static::getFileName($item, $template);
 
         $no_middle_name = !empty($item->middle_name_ru) ? '' : '1';
         $status = '5';
@@ -2115,7 +2132,7 @@ class PdfFormFillingService
         $country_code = $item->country_code;
         $country_code_2 = $country_code;
         $is_resident = ($item->citizenship == '177' || $item->resident_document) ? '1' : '2';
-        $reg_adrress = self::parseAddress($item->reg_address_name, false);
+        $reg_adrress = static::parseAddress($item->reg_address_name, false);
 
         if ($item->citizenship == '177') {
             $document_code = '21';
@@ -2197,12 +2214,12 @@ class PdfFormFillingService
                 'registration_expired' => $item->visa_expired
             ];
 
-        self::splitDate($dates, $fields);
+        static::splitDate($dates, $fields);
 
-        self::splitText($rep_document, 'rep_document', $fields, false, false, true, 2, 20);
-        self::splitText($birth_place, 'birth_place', $fields, false, false, true, 2, 40);
+        static::splitText($rep_document, 'rep_document', $fields, false, false, true, 2, 20);
+        static::splitText($birth_place, 'birth_place', $fields, false, false, true, 2, 40);
 
-        self::output($template, $fields, true);
+        static::output($template, $fields, true);
     }
 
     public static function updateRelatedUsers($user, &$data, $table_name)
@@ -2215,8 +2232,8 @@ class PdfFormFillingService
         $data['user_ids'][] = $user->id;
         $table_name .= 's';
 
-        $related_groups = self::getRelatedGroups();
-        $limited_users = self::getLimitedUsers();
+        $related_groups = static::getRelatedGroups();
+        $limited_users = static::getLimitedUsers();
 
         $addrress_column =
             [
@@ -2446,7 +2463,7 @@ class PdfFormFillingService
                 $post->theme = Text::sprintf('NEW_INVITE', $employee_name);
                 $post->text = Text::sprintf('DOWNLOAD_INVITE', $link, $new_invite);
 //				echo '<pre>', print_r($post), '</pre>'; exit;
-                self::sendMessage($post);
+                static::sendMessage($post);
             } catch (Exception $e) {
                 $app->enqueueMessage($e->getMessage(), 'error');
             }

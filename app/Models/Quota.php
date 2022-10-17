@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -69,10 +70,10 @@ class Quota extends BaseModel
     /**
      * Scope a query to model's custom clauses.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder $builder
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param Builder $builder
+     * @return Builder
      */
-    public function scopeApplyCustomClauses($builder)
+    public function scopeApplyCustomClauses(Builder $builder): Builder
     {
         $builder
             ->join('employers as er', 'er.id', '=', 'employer_id', 'left');

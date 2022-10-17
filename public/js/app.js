@@ -2766,6 +2766,7 @@ __webpack_require__.r(__webpack_exports__);
     warningClass: 'text-red-600',
     labelDefaultClass: 'text-sm',
     inputDefaultClass: 'rounded-md shadow-sm max-w-xs',
+    textareaDefaultClass: 'w-96 h-20',
     fieldWarningClass: 'rounded-md shadow-sm max-w-xs border border-red-600',
     pDefaultClass: 'text-xs'
   },
@@ -3806,7 +3807,7 @@ __webpack_require__.r(__webpack_exports__);
     EMButton: _Button__WEBPACK_IMPORTED_MODULE_1__["default"],
     Datepicker: vuejs_datepicker__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
-  inject: ['leftColumn', 'rightColumn', 'warningClass', 'labelDefaultClass', 'inputDefaultClass', 'fieldWarningClass', 'pDefaultClass'],
+  inject: ['leftColumn', 'rightColumn', 'warningClass', 'labelDefaultClass', 'inputDefaultClass', 'textareaDefaultClass', 'fieldWarningClass', 'pDefaultClass'],
   props: {
     name: {
       "default": null
@@ -8752,7 +8753,7 @@ var render = function render() {
       value: _vm.modelValue,
       expression: "modelValue"
     }],
-    "class": _vm.isRequired && (!_vm.modelValue || _vm.$page.props.errors[_vm.name]) ? _vm.fieldWarningClass : _vm.inputDefaultClass,
+    "class": [_vm.isRequired && (!_vm.modelValue || _vm.$page.props.errors[_vm.name]) ? _vm.fieldWarningClass : _vm.inputDefaultClass, _vm.textareaDefaultClass],
     attrs: {
       name: _vm.name,
       id: _vm.id
@@ -9321,14 +9322,14 @@ var render = function render() {
     staticClass: "table-row"
   }, [_vm._l(_vm.formFields, function (field) {
     return _c("div", {
-      staticClass: "p-2 align-middle table-cell"
+      staticClass: "p-2 align-top table-cell"
     }, [field.name === "default_name" ? _c("div", {
       staticClass: "pl-6 text-left"
     }, [_vm._v("\n                                    " + _vm._s(field.label && _vm.__(field.label).ucFirst()) + "\n                                ")]) : _c("div", [_vm._v(_vm._s(field.label && _vm.__(field.label).ucFirst()))])]);
   }), _vm._v(" "), _c("div", {
-    staticClass: "p-2 align-middle table-cell"
+    staticClass: "p-2 align-middletop table-cell"
   }), _vm._v(" "), Object.keys(_vm.docList).length ? _c("div", {
-    staticClass: "p-2 align-middle table-cell"
+    staticClass: "p-2 align-top table-cell"
   }) : _vm._e()], 2)]), _vm._v(" "), _vm._l(_vm.items, function (item) {
     return _c("div", {
       staticClass: "even:bg-indigo-100 text-sm table-row-group"
@@ -11818,7 +11819,7 @@ module.exports = {
       var delimiters = ['-', '.', '/'],
           currentDelimiter = this.getDelimiter(this.$page.props.defaultDateFormat, delimiters);
 
-      if (currentDelimiter) {
+      if (date && currentDelimiter) {
         var defaultOrder = this.getYearMonthDayOrder(this.$page.props.defaultDateFormat, currentDelimiter);
         var currentDateArray = date.split(currentDelimiter);
 

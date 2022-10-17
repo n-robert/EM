@@ -3,6 +3,12 @@
 namespace App\Models;
 
 
+use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
+
 class Employer extends BaseModel
 {
     /**
@@ -42,9 +48,10 @@ class Employer extends BaseModel
     /**
      * Get options for form select.
      * @param array $args
-     * @return array
+     * @return Collection
+     * @throws BindingResolutionException
      */
-    public static function getOwnSelectOptions(...$args)
+    public static function getOwnSelectOptions(...$args): Collection
     {
         $args = $args ?: ['LEGAL'];
         $options = ['employers.id AS value', 'name_ru AS text'];
@@ -60,7 +67,7 @@ class Employer extends BaseModel
     /**
      * Get all addresses employer has usage permits to.
      */
-    public function addresses()
+    public function addresses(): BelongsToMany
     {
         return $this->belongsToMany(Address::class, 'usage_permits');
     }
@@ -68,7 +75,7 @@ class Employer extends BaseModel
     /**
      * Get all employer's usage permits.
      */
-    public function usagePermits()
+    public function usagePermits(): HasMany
     {
         return $this->hasMany(UsagePermit::class);
     }
@@ -76,10 +83,10 @@ class Employer extends BaseModel
     /**
      * Scope a query to model's custom clauses.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder $builder
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param Builder $builder
+     * @return Builder
      */
-    public function scopeApplyCustomClauses($builder)
+    public function scopeApplyCustomClauses(Builder $builder): Builder
     {
         $builder
             ->join('types as t', 't.id', '=', 'type_id', 'left');

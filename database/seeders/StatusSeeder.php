@@ -34,10 +34,9 @@ class StatusSeeder extends Seeder
 
         foreach ($statuses as $name_en => $name_ru) {
             Status::withoutGlobalScopes()->insert([
-//                'id' => $status->id,
                 'name_en' => $name_en,
                 'name_ru' => $name_ru,
-                'user_ids' => '{2}',
+                'user_ids' => '{}',
                 'created_at' => Carbon::now()
             ]);
         }

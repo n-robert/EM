@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class Employee extends BaseModel
@@ -41,6 +44,7 @@ class Employee extends BaseModel
         'last_name_ru',
         'middle_name_ru',
         'first_name_ru',
+        'work_permit_expired_date',
         'o.name_ru as occupation',
         's.name_ru as status',
     ];
@@ -96,7 +100,7 @@ class Employee extends BaseModel
      *
      * @return string
      */
-    public function getFullNameRuAttribute()
+    public function getFullNameRuAttribute(): string
     {
         return implode(' ', array_filter([$this->last_name_ru, $this->first_name_ru, $this->middle_name_ru]));
     }
@@ -104,14 +108,15 @@ class Employee extends BaseModel
     /**
      * Get options for form select.
      * @param array $args
-     * @return array
+     * @return Collection
+     * @throws BindingResolutionException
      */
-    public static function getOwnSelectOptions(...$args)
+    public static function getOwnSelectOptions(...$args): Collection
     {
         $options = [
             'employees.id AS value',
             DB::raw('
-                CONCAT(COALESCE(last_name_ru, \'\'), \' \', COALESCE(first_name_ru, \'\'), \' \', COALESCE(middle_name_ru, \'\')) 
+                CONCAT(COALESCE(last_name_ru, \'\'), \' \', COALESCE(first_name_ru, \'\'), \' \', COALESCE(middle_name_ru, \'\'))
                 AS text'
             )
         ];
@@ -127,10 +132,10 @@ class Employee extends BaseModel
     /**
      * Scope a query to model's custom clauses.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder $builder
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param Builder $builder
+     * @return Builder
      */
-    public function scopeApplyCustomClauses($builder)
+    public function scopeApplyCustomClauses(Builder $builder): Builder
     {
         $builder
             ->join('occupations as o', 'o.id', '=', 'occupation_id', 'left')

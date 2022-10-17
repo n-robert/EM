@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
 class Permit extends BaseModel
@@ -113,10 +115,10 @@ class Permit extends BaseModel
     /**
      * Scope a query to model's custom clauses.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder $builder
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param Builder $builder
+     * @return Builder
      */
-    public function scopeApplyCustomClauses($builder)
+    public function scopeApplyCustomClauses(Builder $builder): Builder
     {
         $builder
             ->join('employers as er', 'er.id', '=', 'employer_id', 'left');
@@ -127,9 +129,10 @@ class Permit extends BaseModel
     /**
      * Get own options for form select.
      * @param array $args
-     * @return array
+     * @return Collection
+     * @throws BindingResolutionException
      */
-    public static function getOwnSelectOptions(...$args)
+    public static function getOwnSelectOptions(...$args): Collection
     {
         $options = ['id AS value', 'number AS text'];
         $query = static::query()->whereNotEmpty('number');

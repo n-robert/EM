@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Gate;
 
 
 class AuthUserScope implements Scope
@@ -15,8 +14,8 @@ class AuthUserScope implements Scope
     /**
      * Apply the scope to a given Eloquent query builder.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $builder
-     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param Builder $builder
+     * @param Model $model
      * @return void
      */
     public function apply(Builder $builder, Model $model)
@@ -24,7 +23,7 @@ class AuthUserScope implements Scope
         $user = Auth::user();
         $connection = DB::connection()->getName();
 
-        if (Gate::allows('is-admin') || $connection == 'mysqlx') {
+        if ($connection == 'mysqlx') {
             return;
         }
 

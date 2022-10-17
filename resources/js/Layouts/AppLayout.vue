@@ -308,6 +308,7 @@ export default {
         warningClass: 'text-red-600',
         labelDefaultClass: 'text-sm',
         inputDefaultClass: 'rounded-md shadow-sm max-w-xs',
+        textareaDefaultClass: 'w-96 h-20',
         fieldWarningClass: 'rounded-md shadow-sm max-w-xs border border-red-600',
         pDefaultClass: 'text-xs',
     },

@@ -3,6 +3,9 @@
 namespace App\Models;
 
 use App\Http\Requests\AddressRequestValidation;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class Address extends BaseModel
@@ -36,22 +39,25 @@ class Address extends BaseModel
     /**
      * Get the model's usage permits.
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
-    public function getUsagePermitsAttribute()
+    public function getUsagePermitsAttribute(): Collection
     {
         return
             DB::table('usage_permits')
               ->where('address_id', '=', $this->id)
-              ->get(['id', 'name_ru', 'employer_id', 'signing_date']);
+              ->get(['id', 'name_ru', 'employer_id', 'signing_date'])
+              ->mapWithKeys(function ($item) {
+                  return [$item->employer_id => $item];
+              });
     }
 
     /**
      * Get all employers that has usage permits to address.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
-    public function employers()
+    public function employers(): BelongsToMany
     {
         return $this->belongsToMany(Employer::class, 'usage_permits');
     }
@@ -59,10 +65,10 @@ class Address extends BaseModel
     /**
      * Save the model to the database.
      *
-     * @param  array $options
+     * @param array $options
      * @return bool
      */
-    public function save(array $options = [])
+    public function save(array $options = []): bool
     {
         parent::save($options);
 
@@ -135,9 +141,9 @@ class Address extends BaseModel
     /**
      * Get all usage permits of address.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
-    public function usagePermits()
+    public function usagePermits(): HasMany
     {
         return $this->hasMany(UsagePermit::class);
     }

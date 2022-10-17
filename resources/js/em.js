@@ -33,7 +33,7 @@ module.exports = {
                 delimiters = ['-', '.', '/'],
                 currentDelimiter = this.getDelimiter(this.$page.props.defaultDateFormat, delimiters);
 
-            if (currentDelimiter) {
+            if (date && currentDelimiter) {
                 const defaultOrder = this.getYearMonthDayOrder(this.$page.props.defaultDateFormat, currentDelimiter);
                 let currentDateArray = date.split(currentDelimiter);
 
