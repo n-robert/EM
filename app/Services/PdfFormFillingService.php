@@ -11,7 +11,6 @@ use App\Models\Permit;
 use App\Models\Type;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use mikehaertl\pdftk\Pdf;
 
 class PdfFormFillingService
@@ -340,31 +339,33 @@ class PdfFormFillingService
         return $recipients;
     }
 
-    public static function getFileName($item, $template, $lowercase = false)
+    /**
+     * Get the file name for PDF output
+     *
+     * @param int $id
+     * @param string $doc
+     * @param bool $lowercase
+     * @return string
+     */
+    public static function getFileName(int $id, string $doc, bool $lowercase = false): string
     {
-        $file_name = $item->last_name_ru . ' ' . $item->first_name_ru;
-        $file_name .= '_' . __('APPLY_' . strtoupper($template));
-        $file_name .= '_' . date('dmy_His', time());
+        $employee = Employee::find($id);
+        $fileName = implode('-', [
+            str_replace(' ', '-', $employee->full_name_en),
+            __($doc),
+            date('dmy-His', time()),
+        ]);
 
-        return ($lowercase ? str_replace(' ', '_', mb_strtolower($file_name)) : $file_name) . '.pdf';
+        return ($lowercase ? str_replace(' ', '_', mb_strtolower($fileName)) : $fileName) . '.pdf';
     }
 
-    public static function getOccupations()
-    {
-        $db = Factory::getDbo();
-        $query = $db->getQuery(true);
-        $query
-            ->select($db->QuoteName('id'))
-            ->select($db->QuoteName('name'))
-            ->from($db->QuoteName('#__fmsdocs_occupations'));
-        $occupations = $db
-            ->setQuery($query)
-            ->loadAssocList('id', 'name');
-
-        return $occupations;
-    }
-
-    public static function getTemplate($doc)
+    /**
+     * Get the PDF-form template
+     *
+     * @param string $doc
+     * @return string
+     */
+    public static function getTemplate(string $doc): string
     {
         return config('app.pdf_template_path') . $doc . '.pdf';
     }
@@ -511,6 +512,7 @@ class PdfFormFillingService
 
     /**
      * Prepare data for PDF-form
+     *
      * @param $doc
      * @param array $docData
      * @param array $data
@@ -796,8 +798,9 @@ class PdfFormFillingService
         );
         $pdf = new Pdf(static::getTemplate($doc));
         $pdf->fillForm($data)->needAppearances();
+        $fileName = static::getFileName($id, $doc, true);
 
-        if (!$pdf->send()) {
+        if (!$pdf->send($fileName, true)) {
             abort(
                 implode(
                     "\r\n",

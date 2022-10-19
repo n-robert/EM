@@ -96,7 +96,17 @@ class Employee extends BaseModel
     ];
 
     /**
-     * Get the employee's russian full name.
+     * Get the employee's full name in English
+     *
+     * @return string
+     */
+    public function getFullNameEnAttribute(): string
+    {
+        return implode(' ', array_filter([$this->last_name_en, $this->first_name_en, $this->middle_name_en]));
+    }
+
+    /**
+     * Get the employee's full name in Russian
      *
      * @return string
      */
