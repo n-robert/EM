@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Contracts\ModelInterface;
-use App\Scopes\AuthUserMyScope;
 use App\Services\XmlFormHandlingService;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Eloquent\Builder;
@@ -361,6 +360,8 @@ class BaseModel extends Model implements ModelInterface
     }
 
     /**
+     * Get the filters for showAll()
+     *
      * @param bool $skip
      * @param string $fieldName
      * @return array
@@ -411,9 +412,12 @@ class BaseModel extends Model implements ModelInterface
     }
 
     /**
+     * Get items for each filter field
+     *
      * @param string $field
      * @param array $options
-     * @param string $skip
+     * @param bool $skip
+     * @param string $fieldName
      * @return Collection
      * @throws BindingResolutionException
      */
@@ -423,13 +427,11 @@ class BaseModel extends Model implements ModelInterface
                                         string $fieldName = ''): Collection
     {
         $valueField = $nameField = $this->names . '.' . $field;
+        // Determine whether to skip dynamic applying other fields filters when getting this field items
         $query = ($skip || $field == $fieldName) ? new static() : static::applyFilters();
-
-        if (str_ends_with($field, '_date')) {
-            $query = $query->whereNotNull($valueField);
-        } else {
-            $query = $query->whereNotEmpty($valueField);
-        }
+        $query =
+            str_ends_with($field, '_date') ?
+                $query->whereNotNull($valueField) : $query->whereNotEmpty($valueField);
 
         static::applyQueryOptions($options, $query, $nameField);
 
