@@ -237,6 +237,7 @@ class BaseModel extends Model implements ModelInterface
      * @param $filters
      * @param $builder
      * @param null $defaultKey
+     * @throws BindingResolutionException
      */
     protected function applyFiltersRecursive($filters, $builder, $defaultKey = null)
     {
@@ -250,7 +251,7 @@ class BaseModel extends Model implements ModelInterface
                 static::applyQueryOptions($options, $builder);
             } else {
                 $key = $defaultKey ?: $key;
-                $builder->whereIn($key, $value);
+                $builder->whereIn($this->names . '.' . $key, $value);
             }
         });
     }
@@ -360,12 +361,12 @@ class BaseModel extends Model implements ModelInterface
     }
 
     /**
-     * Get filters parameters.
-     *
+     * @param bool $skip
+     * @param string $fieldName
      * @return array
      * @throws BindingResolutionException
      */
-    public function getFilters(): array
+    public function getFilters(bool $skip = false, string $fieldName = ''): array
     {
         $filters = [];
 
@@ -390,9 +391,7 @@ class BaseModel extends Model implements ModelInterface
                 continue;
             }
 
-            $items = $this->getFilterFieldItems($field, $options);
-
-            if (!$items) {
+            if (!$items = $this->getFilterFieldItems($field, $options, $skip, $fieldName)) {
                 continue;
             }
 
@@ -407,28 +406,34 @@ class BaseModel extends Model implements ModelInterface
                 $filters[$field][$value]['action'] = session($key) ? 'remove' : 'put';
             }
         }
-//        dd($filters);
+
         return $filters;
     }
 
     /**
-     * Get items for filter field
-     *
      * @param string $field
      * @param array $options
+     * @param string $skip
      * @return Collection
      * @throws BindingResolutionException
      */
-    public function getFilterFieldItems(string $field, array $options)
+    public function getFilterFieldItems(string $field,
+                                        array  $options,
+                                        bool   $skip = false,
+                                        string $fieldName = ''): Collection
     {
         $valueField = $nameField = $this->names . '.' . $field;
-        $query =
-            str_ends_with($field, '_date') ?
-                static::whereNotNull($valueField) :
-                static::whereNotEmpty($valueField);
+        $query = (!$skip || $field == $fieldName) ? new static() : static::applyFilters();
+
+        if (str_ends_with($field, '_date')) {
+            $query->whereNotNull($valueField);
+        } else {
+            $query->whereNotEmpty($valueField);
+        }
 
         static::applyQueryOptions($options, $query, $nameField);
 
+        // Switch to Illuminate\Database\Eloquent\Builder to use global scopes
         if ($query instanceof QueryBuilder) {
             $query = $this->newQuery()->setQuery($query);
         }

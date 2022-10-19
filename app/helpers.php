@@ -144,8 +144,7 @@ if (!function_exists('validate_boolean')) {
         if ($bool_only) {
             return filter_var($var, FILTER_VALIDATE_BOOLEAN);
         } else {
-            $result = filter_var($var, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? $var;
-            return $result;
+            return filter_var($var, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? $var;
         }
     }
 }

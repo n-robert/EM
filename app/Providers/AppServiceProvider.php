@@ -67,7 +67,7 @@ class AppServiceProvider extends ServiceProvider
                 },
 
                 'canEdit' => function () {
-                    return Gate::allows('can-edit');
+                    return Gate::allows('is-admin') || Gate::allows('can-edit');
                 },
 
                 'locale' => function () {

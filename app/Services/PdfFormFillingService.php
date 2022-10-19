@@ -11,6 +11,7 @@ use App\Models\Permit;
 use App\Models\Type;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use mikehaertl\pdftk\Pdf;
 
 class PdfFormFillingService
@@ -35,13 +36,13 @@ class PdfFormFillingService
 
     /**
      * Method to decline word suffix
-     * @param String $string
+     * @param string $string
      * @param Integer $case (2, 3, 4, 5, 6)
-     * @param String $gender (MALE, FEMALE)
-     * @param String $type (empty, name)
+     * @param string $gender (MALE, FEMALE)
+     * @param string $type (empty, name)
      * @param Integer $affected - how many words will be declined
      * @param Boolean $uc - whether to decline uppercase words
-     * @return String
+     * @return string
      */
     public static function declension($string, $case, $gender = '', $type = '', $affected = 0, $uc = false)
     {
@@ -528,12 +529,12 @@ class PdfFormFillingService
 
     /**
      * Prepare data for PDF-form
-     * @param string $doc
-     * @param $docData
+     * @param $doc
+     * @param array $docData
      * @param array $data
-     * @return array $data
+     * @return array|array[]|false|false[]|string|string[]|string[][]|null
      */
-    public static function prepareData($doc, $docData, $data)
+    public static function prepareData($doc, array $docData, array $data)
     {
         if (isset($docData['upper_case']) && validate_boolean($docData['upper_case'], true)) {
             $data = to_upper_case($data);
@@ -1045,7 +1046,7 @@ class PdfFormFillingService
                 'uni_reg_date'                => $uniRegDate,
                 'full_name'                   => $employer->full_name_ru,
                 'address_name'                => $address,
-                'real_address_name'                => $address,
+                'real_address_name'           => $address,
                 'phone'                       => static::handlePhones($employer->phone, '8', 0),
                 'desired_date'                => $desiredDate,
                 'director'                    => static::shortenName($director),
@@ -1258,7 +1259,13 @@ class PdfFormFillingService
         return static::prepareData($doc, $docData, $data);
     }
 
-    public static function printInviteWarranty($docData, $doc, $id)
+    /**
+     * @param array $docData
+     * @param string $doc
+     * @param int $id
+     * @return array
+     */
+    public static function printInviteWarranty(array $docData, string $doc, int $id): array
     {
         $recipientId = $docData['recipient_id'];
         $recipientPersonId = $docData['recipient_person_id'];
@@ -1348,7 +1355,7 @@ class PdfFormFillingService
         return static::prepareData($doc, $docData, $data);
     }
 
-    public static function printWorkContract($docData, $doc, $id)
+    public static function printWorkContract($docData, $doc, $id): array
     {
         $employee = Employee::find($id);
         $dateFrom = $docData['date_from'];
@@ -1850,9 +1857,17 @@ class PdfFormFillingService
         $middle_name = '',
         $case = 1,
         $gender = ''
-    )
+    ): string
     {
         $last_name = $last_name ?: $person ? $person->last_name_ru : '';
+
+        if (str_contains(
+            mb_strtolower($last_name),
+            mb_strtolower(__('CHIEF'))
+        )) {
+            return '';
+        }
+
         $first_name = $first_name ?: $person ? $person->first_name_ru : '';
         $middle_name = $middle_name ?: $person ? $person->middle_name_ru : '';
         $gender = $gender ?: $person ? $person->genrder : '';

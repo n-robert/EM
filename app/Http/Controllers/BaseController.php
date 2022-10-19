@@ -108,23 +108,22 @@ class BaseController extends Controller implements ControllerInterface
 
     /**
      * Apply a filter from request.
-     *
-     * @return mixed
+     * @return bool|InertiaResponse
      */
     public function applyFilter()
     {
 //        dd($this->request->input());
-        $name = $this->request->get('name', '');
-        $field = $this->request->get('field', '');
-        $value = $this->request->get('value', '');
-        $action = $this->request->get('action', '');
+        $name = $this->request->input('name', '');
+        $field = $this->request->input('field', '');
+        $value = $this->request->input('value', '');
+        $action = $this->request->input('action', '');
 
         if (!$field) {
             return true;
         }
 
         try {
-            if (!($value && $action)) {
+            if (!$value || !$action) {
                 throw new \Exception(__('Not enough parameters.'));
             }
 
@@ -135,9 +134,17 @@ class BaseController extends Controller implements ControllerInterface
             $key = $this->names . '.filters.';
             $key .= is_array($value) ? $field . '.' . $name : $field . '.' . $value;
 
-            $args =
-                $action == 'remove' ? [$key] :
-                    ($action == 'put' ? [$key, $value] : []);
+            switch ($action) {
+                case 'remove':
+                    $args = [$key];
+                    break;
+                case 'put':
+                    $args = [$key, $value];
+                    break;
+                default:
+                    $args = [];
+            }
+
             Session::$action(...$args);
         } catch (\Exception $e) {
             abort(404, $e->getMessage());
@@ -145,7 +152,7 @@ class BaseController extends Controller implements ControllerInterface
 
         session(['filtersModal' => true]);
 
-        return redirect()->route('gets.' . $this->names);
+        return $this->showAll($field);
     }
 
     /**
@@ -167,12 +174,13 @@ class BaseController extends Controller implements ControllerInterface
 
     /**
      * Get form fields from XML-file.
-     * @param $dir
-     * @param $name
-     * @param $id
+     *
+     * @param string $dir
+     * @param string $name
+     * @param int $id
      * @return array
      */
-    public function getFormFields($dir, $name, $id)
+    public function getFormFields(string $dir, string $name, int $id): array
     {
         return call_user_func_array(
             [$this->formHandlingService, 'getFormFields'],
@@ -223,7 +231,7 @@ class BaseController extends Controller implements ControllerInterface
         $userIds = $item->user_ids ?: Auth::id();
         session([$this->name . '.user_ids' => $userIds]);
 
-        $canEdit = Gate::allows('can-edit');
+        $canEdit = Gate::allows('is-admin') || Gate::allows('can-edit');
         $page = 'EM/Item';
         $page .= $canEdit ? 'Edit' : 'View';
         $action = $id > 0 ? 'update' : 'store';
@@ -249,10 +257,11 @@ class BaseController extends Controller implements ControllerInterface
 
     /**
      * Show items list.
-     *
+     * @param string $fieldName
+     * @param bool $skip
      * @return InertiaResponse
      */
-    public function showAll(): InertiaResponse
+    public function showAll(string $fieldName = '', bool $skip = false): InertiaResponse
     {
         $query =
             $this->model
@@ -264,7 +273,7 @@ class BaseController extends Controller implements ControllerInterface
         $items = $query->paginate(request('perPage'));
 
         $page = 'EM/Items';
-        $filters = $this->model->getFilters();
+        $filters = $this->model->getFilters($skip, $fieldName);
         $hasFilters = session($this->names . '.filters') && !!array_filter(session($this->names . '.filters'));
         $pagination = $this->model->getPagination($items);
         $modal = [];

@@ -3,7 +3,10 @@
 namespace App\Services;
 
 use App\Models\BaseModel;
+use Exception;
 use Illuminate\Support\Collection;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 class XmlFormHandlingService
 {
@@ -66,12 +69,14 @@ class XmlFormHandlingService
 
     /**
      * Get form fields from XML-file.
-     * @param $dir
-     * @param $name
-     * @param $id
-     * @return array
+     * @param string $dir
+     * @param string $name
+     * @param int $id
+     * @return array[]
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
-    public static function getFormFields($dir, $name, $id = 0)
+    public static function getFormFields(string $dir, string $name, int $id = 0): array
     {
         $dir = explode('.', $dir);
         $path = array_reduce(
@@ -88,12 +93,14 @@ class XmlFormHandlingService
 
     /**
      * Parse XML-form file to get array of form fields
-     *
      * @param string $xmlFile
      * @param int $id
-     * @return array
+     * @return array[]
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws Exception
      */
-    public static function parseFormFields($xmlFile, $id = 0)
+    public static function parseFormFields(string $xmlFile, int $id = 0): array
     {
         $formFields = [
             'requiredFields' => [],
@@ -109,6 +116,7 @@ class XmlFormHandlingService
             }
 
             foreach ($root->attributes() as $key => $value) {
+                $formFields[(string)$key]['name'] = $key;
                 $formFields[(string)$key]['value'] = validate_boolean((string)$value);
                 $formFields[(string)$key]['type'] = 'hidden';
             }

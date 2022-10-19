@@ -48,7 +48,7 @@ class ExpatManagerServiceProvider extends ServiceProvider
 //        }
         Gate::define('is-admin', function ($user) {
             $adminTeam = Team::query()->where(['name' => 'admin'])->first();
-            return $adminTeam && $user->ownsTeam($adminTeam);
+            return $user->ownsTeam($adminTeam);
         });
 
         Gate::define('can-edit', function ($user) {
@@ -103,6 +103,19 @@ class ExpatManagerServiceProvider extends ServiceProvider
         $translator = Carbon::getTranslator();
         $translator->addResource('array', require base_path('resources/lang/ru/customCarbonRu.php'), 'ru');
 
+        // Custom whereNotEmpty for Illuminate\Database\Eloquent\Builder
+        // Will return Illuminate\Database\Query\Builder::whereNotEmpty()
+        Builder::macro(
+            'whereNotEmpty',
+            function (string $column, bool $distinct = true) {
+                return
+                    $this
+                        ->getQuery()
+                        ->whereNotEmpty($column, $distinct);
+            }
+        );
+
+        // Custom whereNotEmpty for Illuminate\Database\Query\Builder
         QueryBuilder::macro(
             'whereNotEmpty',
             function (string $column, bool $distinct = true) {
@@ -116,16 +129,6 @@ class ExpatManagerServiceProvider extends ServiceProvider
                 }
 
                 return $this;
-            }
-        );
-
-        Builder::macro(
-            'whereNotEmpty',
-            function (string $column, bool $distinct = true) {
-                return
-                    $this
-                        ->getQuery()
-                        ->whereNotEmpty($column, $distinct);
             }
         );
 
