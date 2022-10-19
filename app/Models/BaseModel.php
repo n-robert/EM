@@ -216,6 +216,7 @@ class BaseModel extends Model implements ModelInterface
      *
      * @param Builder $builder
      * @return Builder
+     * @throws BindingResolutionException
      */
     public function scopeApplyFilters(Builder $builder): Builder
     {
@@ -447,9 +448,9 @@ class BaseModel extends Model implements ModelInterface
     }
 
     /**
-     * Transform details field to JSON
+     * Access the transformed item's user_ids
      *
-     * @return mixed
+     * @return array|string|string[]
      */
     public function getUserIdsAttribute()
     {
@@ -457,7 +458,7 @@ class BaseModel extends Model implements ModelInterface
     }
 
     /**
-     * Transform details field to JSON
+     * Transform and set the item's user_ids
      *
      * @param $value
      * @return void

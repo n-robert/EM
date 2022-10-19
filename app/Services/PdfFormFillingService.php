@@ -198,25 +198,6 @@ class PdfFormFillingService
         curl_close($ch);
     }
 
-    /**
-     * Get available actions for current user
-     * @return CMSObject
-     */
-    public static function getActions()
-    {
-        $user = Factory::getUser();
-        $result = new CMSObject;
-        $assetName = 'com_fmsdocs';
-        $file = JPATH_ADMINISTRATOR . '/components/' . $assetName . '/access.xml';
-        $actions = Access::getActionsFromFile($file);
-
-        foreach ($actions as $action) {
-            $result->set($action->name, $user->authorise($action->name, $assetName));
-        }
-
-        return $result;
-    }
-
     public static function getAllUsers()
     {
         $db = Factory::getDbo();
@@ -232,12 +213,13 @@ class PdfFormFillingService
 
     /**
      * Get data fields
-     * @param $doc
-     * @param $data
-     * @param $docData
+     *
+     * @param string $doc
+     * @param array $data
+     * @param array|null $docData
      * @return array
      */
-    public static function getDataFields($doc, $data, $docData = null)
+    public static function getDataFields(string $doc, array $data, array $docData = null): array
     {
         $pdf = new Pdf(static::getTemplate($doc));
         $allFields = $pdf->getDataFields()->__toArray();
