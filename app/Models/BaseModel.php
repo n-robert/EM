@@ -366,7 +366,7 @@ class BaseModel extends Model implements ModelInterface
      * @return array
      * @throws BindingResolutionException
      */
-    public function getFilters(bool $skip = false, string $fieldName = ''): array
+    public function getFilters(bool $skip = true, string $fieldName = ''): array
     {
         $filters = [];
 
@@ -419,16 +419,16 @@ class BaseModel extends Model implements ModelInterface
      */
     public function getFilterFieldItems(string $field,
                                         array  $options,
-                                        bool   $skip = false,
+                                        bool   $skip = true,
                                         string $fieldName = ''): Collection
     {
         $valueField = $nameField = $this->names . '.' . $field;
-        $query = (!$skip || $field == $fieldName) ? new static() : static::applyFilters();
+        $query = ($skip || $field == $fieldName) ? new static() : static::applyFilters();
 
         if (str_ends_with($field, '_date')) {
-            $query->whereNotNull($valueField);
+            $query = $query->whereNotNull($valueField);
         } else {
-            $query->whereNotEmpty($valueField);
+            $query = $query->whereNotEmpty($valueField);
         }
 
         static::applyQueryOptions($options, $query, $nameField);

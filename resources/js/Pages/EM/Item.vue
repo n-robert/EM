@@ -150,7 +150,7 @@ export default {
             backLayer,
             frontLayer,
             tabLayer,
-            isNotFields: ['type', 'show', 'repeatable', 'justify', 'split_word', 'cells', 'has_tabs'],
+            isNotFields: ['type', 'show', 'repeatable', 'has_tabs'],
             fieldSetKey: 0,
             tabActive,
             tabInActive,

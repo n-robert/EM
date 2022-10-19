@@ -261,7 +261,7 @@ class BaseController extends Controller implements ControllerInterface
      * @param bool $skip
      * @return InertiaResponse
      */
-    public function showAll(string $fieldName = '', bool $skip = false): InertiaResponse
+    public function showAll(string $fieldName = '', bool $skip = true): InertiaResponse
     {
         $query =
             $this->model

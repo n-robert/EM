@@ -1915,7 +1915,14 @@ class PdfFormFillingService
      * @param mixed $rows
      * @return boolean
      */
-    public static function splitText($value, $key, &$data, $justify, $splitWord, $cells, $total, $rows)
+    public static function splitText(string $value,
+                                     string $key,
+                                     array  &$data,
+                                     bool   $justify,
+                                     bool   $splitWord,
+                                     bool   $cells,
+                                     int    $total,
+                                            $rows): bool
     {
         if (isset($data[$key])) {
             unset($data[$key]);
@@ -1984,7 +1991,7 @@ class PdfFormFillingService
                         $separators = count($tmpWords) - 1;
 
                         while ($extra > 0) {
-                            $min = ($separators - $extra) > 0 ? ($separators - $extra) : 0;
+                            $min = max(($separators - $extra), 0);
 
                             for ($j = $separators; $j > $min; $j--) {
                                 $tmpWords[$j] = ' ' . $tmpWords[$j];
