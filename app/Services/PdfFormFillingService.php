@@ -35,15 +35,21 @@ class PdfFormFillingService
 
     /**
      * Method to decline word suffix
+     *
      * @param string $string
-     * @param Integer $case (2, 3, 4, 5, 6)
-     * @param string $gender (MALE, FEMALE)
-     * @param string $type (empty, name)
-     * @param Integer $affected - how many words will be declined
-     * @param Boolean $uc - whether to decline uppercase words
+     * @param int $case
+     * @param string $gender
+     * @param string $type
+     * @param int $affected
+     * @param bool $uc
      * @return string
      */
-    public static function declension($string, $case, $gender = '', $type = '', $affected = 0, $uc = false)
+    public static function declension(string $string,
+                                      int    $case,
+                                      string $gender = '',
+                                      string $type = '',
+                                      int    $affected = 0,
+                                      bool   $uc = false): string
     {
         if ($case < 2 || $case > 6) {
             return $string;

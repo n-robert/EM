@@ -47,8 +47,11 @@ class ExpatManagerServiceProvider extends ServiceProvider
 //            }
 //        }
         Gate::define('is-admin', function ($user) {
-            $adminTeam = Team::query()->where(['name' => 'admin'])->first();
-            return $user->ownsTeam($adminTeam);
+            if ($adminTeam = Team::query()->where(['name' => 'admin'])->first()) {
+                return $user->ownsTeam($adminTeam);
+            }
+
+            return false;
         });
 
         Gate::define('can-edit', function ($user) {
