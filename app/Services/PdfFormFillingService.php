@@ -1861,7 +1861,7 @@ class PdfFormFillingService
 
         $first_name = $first_name ?: $person ? $person->first_name_ru : '';
         $middle_name = $middle_name ?: $person ? $person->middle_name_ru : '';
-        $gender = $gender ?: $person ? $person->genrder : '';
+        $gender = $gender ?: $person ? $person->gender : '';
         $name = [static::declension($last_name, $case, $gender, 'name')];
 
         $first_name = explode(' ', $first_name);
