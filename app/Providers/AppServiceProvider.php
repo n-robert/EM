@@ -42,6 +42,10 @@ class AppServiceProvider extends ServiceProvider
 //            return $emRedirector;
 //        });
 
+        if (!$this->app->environment('local')) {
+            URL::forceScheme('https');
+        }
+
         if ($this->app->environment('local')) {
             $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
             $this->app->register(TelescopeServiceProvider::class);
@@ -55,10 +59,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        if (!app()->environment('local')) {
-            URL::forceScheme('https');
-        }
-
         Inertia::share(
             [
                 'errors' => function () {
