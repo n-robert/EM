@@ -19,7 +19,7 @@ class ForceSSL
     public function handle(Request $request, Closure $next)
     {
         if (!$request->secure() && !app()->environment('local')) {
-            dd('https://' . $request->getHost() . $request->getRequestUri());
+            dd($request->getScheme());
             return redirect()->to('https://' . $request->getHost() . $request->getRequestUri(), 302);
         }
         return $next($request);
