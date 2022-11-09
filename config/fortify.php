@@ -61,7 +61,7 @@ return [
     |
     */
 
-    'home' => config('app.url') . RouteServiceProvider::HOME,
+    'home' => RouteServiceProvider::HOME,
 
     /*
     |--------------------------------------------------------------------------
@@ -89,7 +89,7 @@ return [
     |
     */
 
-    'middleware' => ['web'],
+    'middleware' => ['web', 'ssl'],
 
     /*
     |--------------------------------------------------------------------------
