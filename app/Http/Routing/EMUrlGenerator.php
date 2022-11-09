@@ -17,7 +17,7 @@ class EMUrlGenerator extends UrlGenerator
      */
     public function to($path, $extra = [], $secure = null)
     {
-        $secure = Str::startsWith(config('app.url'), 'https');dd(parent::to($path, $extra, $secure));
+        $secure = Str::startsWith(config('app.url'), 'https');
 
         return parent::to($path, $extra, $secure);
     }
