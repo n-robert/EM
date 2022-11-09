@@ -16,7 +16,7 @@ class EMUrlGenerator extends UrlGenerator
      */
     public function to($path, $extra = [], $secure = null)
     {
-        $path = parent::to($path, $extra, $secure);
+        $path = parent::to($path, $extra, true);
         dd($path);
 
         // We'll explicitly assign secure scheme
