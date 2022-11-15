@@ -93,7 +93,7 @@ class EmployeeSeeder extends Seeder
 
         Employee::truncate();
 
-        DB::connection('mysqlx')->table('fmsdocs_employees')->chunk(100,
+        DB::connection('mysqlx')->table('fmsdocs_employees')->orderBy('id')->chunk(100,
             function ($oldData) use ($columns, $changedColumns, $statuses) {
                 foreach ($oldData as $oldDatum) {
                     $newData = [];
