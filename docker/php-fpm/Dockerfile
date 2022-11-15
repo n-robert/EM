@@ -2,7 +2,11 @@ FROM php:7.4-fpm
 
 RUN apt-get update \
     && apt-get install -y wget git unzip libpq-dev libicu-dev libpng-dev libzip-dev libjpeg-dev libfreetype6-dev\
+    && apt-get install -y libz-dev libmemcached-dev \
+    && apt-get install -y memcached libmemcached-tools \
+    && pecl install memcached \
     && pecl install xdebug-2.9.1 \
+    && docker-php-ext-enable memcached \
     && docker-php-ext-enable xdebug \
     && docker-php-ext-install zip \
     && docker-php-ext-install gd \
