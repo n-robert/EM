@@ -118,10 +118,14 @@ class EmployerSeeder extends Seeder
                             $prevValue = [];
                             $tmp = explode(chr(10), $oldValue->prev_value[$k]);
                             array_walk($tmp, function ($item) use (&$prevValue) {
-                                list($k, $v) = explode(': ', $item);
+                                $item = explode(': ', $item);
 
-                                if ($k != 'user_ids') {
-                                    $prevValue[$k] = $v;
+                                if (count($item) == 2) {
+                                    list($k, $v) = explode(': ', $item);
+
+                                    if ($k != 'user_ids') {
+                                        $prevValue[$k] = $v;
+                                    }
                                 }
                             });
                             $user = preg_replace('~^#(\d+)\s.+~', '$1', $oldValue->user[$k]);
