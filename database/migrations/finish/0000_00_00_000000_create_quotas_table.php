@@ -40,7 +40,7 @@ class CreateQuotasTable extends Migration
                 'total',
             ],
 
-            'text' => [
+            'jsonb' => [
                 'history',
                 'details',
             ],

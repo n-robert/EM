@@ -49,7 +49,7 @@ class CreatePermitsTable extends Migration
                 'expired_date',
             ],
 
-            'text' => [
+            'jsonb' => [
                 'history',
                 'details',
             ],

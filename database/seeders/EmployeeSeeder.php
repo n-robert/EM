@@ -89,74 +89,102 @@ class EmployeeSeeder extends Seeder
         ];
 
         $columns = array_merge($columns, $changedColumns);
-        $oldData = DB::connection('mysqlx')->table('fmsdocs_employees')->get();
         $statuses = DB::connection('pgsql')->table('statuses')->pluck('id', 'name_en');
+
         Employee::truncate();
 
-        foreach ($oldData as $oldDatum) {
-            $newData = [];
+        DB::connection('mysqlx')->table('fmsdocs_employees')->chunk(100,
+            function ($oldData) use ($columns, $changedColumns, $statuses) {
+                foreach ($oldData as $oldDatum) {
+                    $newData = [];
 
-            foreach ($columns as $column) {
-                switch ($column) {
-                    case 'created_at':
-                        $key = 'created';
-                        break;
-                    case 'updated_at':
-                        $key = 'last_modified';
-                        break;
-                    default:
-                        $key = $column;
+                    foreach ($columns as $column) {
+                        switch ($column) {
+                            case 'created_at':
+                                $key = 'created';
+                                break;
+                            case 'updated_at':
+                                $key = 'last_modified';
+                                break;
+                            default:
+                                $key = $column;
+                        }
+
+                        if (in_array($column, $changedColumns)) {
+                            $key = preg_replace('~^(.+)(_id|_date)$~', '$1', $key);
+                        }
+
+                        $value = str_replace('COM_FMSDOCS_', '', $oldDatum->{$key});
+
+                        $dateFields = [
+                            'birth_date',
+                            'passport_issued_date',
+                            'passport_expired_date',
+                            'resident_document_issued_date',
+                            'resident_document_expired_date',
+                            'work_permit_issued_date',
+                            'work_permit_started_date',
+                            'work_permit_expired_date',
+                            'work_permit_paid_till_date',
+                            'hired_date',
+                            'fired_date',
+                            'taxpayer_id_issued_date',
+                            'cert_issued_date',
+                            'visa_issued_date',
+                            'visa_started_date',
+                            'visa_expired_date',
+                            'entry_date',
+                            'migr_card_issued_date',
+                            'reg_date',
+                            'departure_date',
+                        ];
+
+                        if (in_array($column, $dateFields)) {
+                            $value = $value == '0000-00-00' ? null : $value;
+                        }
+
+                        if ($column == 'status_id') {
+                            $value = str_replace(
+                                ['family', 'furlough', 'worker'],
+                                ['family member', 'on leave', 'hired'],
+                                strtolower($value)
+                            );
+                            $value = $statuses[ucfirst($value)];
+                        }
+
+                        if ($column == 'user_ids') {
+                            $value =
+                                '{' . str_replace(['208', '209', '211', '214', '215'], [2, 3, 2, 4, 5], $value) . '}';
+                        }
+
+                        if (str_ends_with($column, '_id')) {
+                            $value = intval($value);
+                        }
+
+                        if ($column == 'history') {
+                            $oldValue = json_decode($value);
+
+                            if (!empty($oldValue['date'])) {
+                                $newValue = [];
+
+                                foreach ($oldValue['date'] as $k => $date) {
+                                    $newValue[] = [
+                                        'date' => $date,
+                                        'prev_value' => $oldValue['prev_value'][$k],
+                                        'user' => $oldValue['user'][$k],
+                                    ];
+                                }
+
+                                $value = json_encode($newValue);
+                            }
+                        }
+
+                        $newData[$column] = $value;
+                    }
+
+                    Employee::withoutGlobalScopes()->insert($newData);
                 }
-
-                if (in_array($column, $changedColumns)) {
-                    $key = preg_replace('~^(.+)(_id|_date)$~', '$1', $key);
-                }
-
-                $value =  str_replace('COM_FMSDOCS_', '', $oldDatum->{$key});
-
-                $dateFields = [
-                    'birth_date',
-                    'passport_issued_date',
-                    'passport_expired_date',
-                    'resident_document_issued_date',
-                    'resident_document_expired_date',
-                    'work_permit_issued_date',
-                    'work_permit_started_date',
-                    'work_permit_expired_date',
-                    'work_permit_paid_till_date',
-                    'hired_date',
-                    'fired_date',
-                    'taxpayer_id_issued_date',
-                    'cert_issued_date',
-                    'visa_issued_date',
-                    'visa_started_date',
-                    'visa_expired_date',
-                    'entry_date',
-                    'migr_card_issued_date',
-                    'reg_date',
-                    'departure_date',
-                ];
-
-                if (in_array($column, $dateFields)) {
-                    $value = $value == '0000-00-00' ? null : $value;
-                }
-
-                if ($column == 'status_id') {
-                    $value = $statuses[ucfirst(strtolower($value))];
-                }
-
-                if ($column == 'user_ids') {
-                    $value = '{' . str_replace(['208', '209', '211', '214', '215'], [2, 3, 2, 4, 5], $value) . '}';
-                }
-
-                if (str_ends_with($column, '_id')) {
-                    $value = intval($value);
-                }
-
-                $newData[$column] = $value;
             }
-
-            Employee::withoutGlobalScopes()->insert($newData);
-        }
+        );
     }
 }

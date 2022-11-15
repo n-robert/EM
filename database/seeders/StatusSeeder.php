@@ -22,13 +22,13 @@ class StatusSeeder extends Seeder
             'Cancelled' => 'Аннулирован',
             'Client' => 'Контрагент',
             'Denied' => 'Отказан',
-            'Family' => 'Член семьи',
+            'Family member' => 'Член семьи',
             'Fired' => 'Уволен',
-            'Furlough' => 'В отпуске',
+            'On leave' => 'В отпуске',
             'Left' => 'Убыл',
             'Official' => 'Чиновник',
             'Seeker' => 'Соискатель',
-            'Worker' => 'Работающий',
+            'Hired' => 'Принят на работу',
         ];
         Status::truncate();
 

@@ -44,7 +44,7 @@ class CreateOccupationsTable extends Migration
                     'description',
                 ],
             ],
-            'text' => [
+            'jsonb' => [
                 'history',
             ],
         ];

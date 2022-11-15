@@ -38,7 +38,7 @@ class CreateAddressesTable extends Migration
                     'description',
                 ],
             ],
-            'text' => [
+            'jsonb' => [
                 'history',
             ],
         ];

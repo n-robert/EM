@@ -49,7 +49,7 @@ class ExpatManagerServiceProvider extends ServiceProvider
         Gate::define('is-admin', function ($user) {
             // An admin owns a team named "admin"
             if ($adminTeam = Team::query()->where(['name' => 'admin'])->first()) {
-                return $user->ownsTeam($adminTeam);
+                return $user->hasTeamRole($adminTeam, 'admin');
             }
 
             // or is the first user

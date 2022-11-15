@@ -26,7 +26,8 @@ if (!function_exists('add_columns_from_array')) {
                                     $table->addColumn($type, $value, compact('length'))->$func($arg);
                             } else {
                                 ($hasDefaultValue == 'none') ?
-                                    $table->$type($value, $length) : $table->$type($value, $length)->$func($arg);
+                                    $table->$type($value, $length) :
+                                    $table->$type($value, $length)->$func($arg);
                             }
                         }
                     );
@@ -50,14 +51,14 @@ if (!function_exists('get_translations')) {
 }
 
 if (!function_exists('to_lower_case_array')) {
-    function to_lower_case_array($str, $smart=false)
+    function to_lower_case_array($str, $smart = false)
     {
         $pattern = '/(\(?)([A-ZА-Я]+(?=[A-ZА-Я][a-zа-я]+[0-9]*|\b)|[A-ZА-Я]?[a-zа-я]+[0-9]*|[A-ZА-Я]+|[0-9]+)(\)?)/';
         preg_match_all($pattern, $str, $matches);
 
         return
             array_map(
-                function ($value) use($smart) {
+                function ($value) use ($smart) {
                     return $smart && preg_match('/(\(?)([A-ZА-Я]+)(\)?)/', $value) ? $value : strtolower($value);
                 },
                 $matches[0]
@@ -66,28 +67,28 @@ if (!function_exists('to_lower_case_array')) {
 }
 
 if (!function_exists('to_phrase')) {
-    function to_phrase($str, $smart=false)
+    function to_phrase($str, $smart = false)
     {
         return ucfirst(implode(' ', to_lower_case_array($str, $smart)));
     }
 }
 
 if (!function_exists('to_snake_case')) {
-    function to_snake_case($str, $smart=false)
+    function to_snake_case($str, $smart = false)
     {
         return implode('_', to_lower_case_array($str, $smart));
     }
 }
 
 if (!function_exists('to_kebab_case')) {
-    function to_kebab_case($str, $smart=false)
+    function to_kebab_case($str, $smart = false)
     {
         return implode('-', to_lower_case_array($str, $smart));
     }
 }
 
 if (!function_exists('to_pascal_case')) {
-    function to_pascal_case($str, $smart=false)
+    function to_pascal_case($str, $smart = false)
     {
         return
             implode(
@@ -103,7 +104,7 @@ if (!function_exists('to_pascal_case')) {
 }
 
 if (!function_exists('to_camel_case')) {
-    function to_camel_case($str, $smart=false)
+    function to_camel_case($str, $smart = false)
     {
         $lowerCaseArray = to_lower_case_array($str, $smart);
 

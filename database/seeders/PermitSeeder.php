@@ -87,6 +87,24 @@ class PermitSeeder extends Seeder
                     $value = json_encode($newValue);
                 }
 
+                if ($column == 'history') {
+                    $oldValue = json_decode($value);
+
+                    if (!empty($oldValue['date'])) {
+                        $newValue = [];
+
+                        foreach ($oldValue['date'] as $k => $date) {
+                            $newValue[] = [
+                                'date' => $date,
+                                'prev_value' => $oldValue['prev_value'][$k],
+                                'user' => $oldValue['user'][$k],
+                            ];
+                        }
+
+                        $value = json_encode($newValue);
+                    }
+                }
+
                 $newData[$column] = $value;
             }
 

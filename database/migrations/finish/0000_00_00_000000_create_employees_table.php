@@ -78,7 +78,7 @@ class CreateEmployeesTable extends Migration
                 'birth_place',
                 'address',
             ],
-            'text' => [
+            'jsonb' => [
                 'history',
             ],
             'date' => [

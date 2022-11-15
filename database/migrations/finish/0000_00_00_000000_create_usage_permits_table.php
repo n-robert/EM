@@ -32,7 +32,7 @@ class CreateUsagePermitsTable extends Migration
             'date'   => [
                 'signing_date',
             ],
-            'text'   => [
+            'jsonb'   => [
                 'history',
             ],
             'unsignedBigInteger' => [
