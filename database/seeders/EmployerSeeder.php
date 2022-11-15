@@ -111,14 +111,14 @@ class EmployerSeeder extends Seeder
                 if ($column == 'history') {
                     $oldValue = json_decode($value);
 
-                    if (!empty($oldValue['date'])) {
+                    if (!empty($oldValue->date)) {
                         $newValue = [];
 
-                        foreach ($oldValue['date'] as $k => $date) {
+                        foreach ($oldValue->date as $k => $date) {
                             $newValue[] = [
                                 'date' => $date,
-                                'prev_value' => $oldValue['prev_value'][$k],
-                                'user' => $oldValue['user'][$k],
+                                'prev_value' => $oldValue->prev_value[$k],
+                                'user' => $oldValue->user[$k],
                             ];
                         }
 
