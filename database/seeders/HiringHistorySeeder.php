@@ -20,7 +20,6 @@ class HiringHistorySeeder extends Seeder
             'id',
         ];
         $dateColumns = [
-            'id',
             'entry_date',
             'hired_date',
             'fired_date',
@@ -30,7 +29,7 @@ class HiringHistorySeeder extends Seeder
 
         HiringHistory::truncate();
 
-        DB::connection('pgsql')->table('employees')->select($dateColumns)->orderBy('id')->chunk(100,
+        DB::connection('pgsql')->table('employees')->select($columns)->orderBy('id')->chunk(100,
             function ($oldData) use ($dateColumns) {
                 foreach ($oldData as $oldDatum) {
                     foreach ($dateColumns as $column) {
