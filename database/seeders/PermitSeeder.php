@@ -94,10 +94,20 @@ class PermitSeeder extends Seeder
                         $newValue = [];
 
                         foreach ($oldValue->date as $k => $date) {
+                            $prevValue = [];
+                            $tmp = explode(chr(10), $oldValue->prev_value[$k]);
+                            array_walk($tmp, function ($item) use (&$prevValue) {
+                                list($k, $v) = explode(': ', $item);
+
+                                if ($k != 'user_ids') {
+                                    $prevValue[$k] = $v;
+                                }
+                            });
+                            $user = preg_replace('~^#(\d+)\s.+~', '$1', $oldValue->user[$k]);
                             $newValue[] = [
                                 'date' => $date,
-                                'prev_value' => $oldValue->prev_value[$k],
-                                'user' => $oldValue->user[$k],
+                                'prev_value' => $prevValue,
+                                'user' => $user,
                             ];
                         }
 
