@@ -174,7 +174,7 @@ class EmployeeSeeder extends Seeder
                                         $item = explode(': ', $item);
 
                                         if (count($item) == 2) {
-                                            list($k, $v) = explode(': ', $item);
+                                            list($k, $v) = $item;
 
                                             if ($k != 'user_ids') {
                                                 $prevValue[$k] = $v;
