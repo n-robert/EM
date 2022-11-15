@@ -37,7 +37,7 @@ class HiringHistorySeeder extends Seeder
                             $newData = [
                                 'employee_id' => $oldDatum->id,
                                 $column => $oldDatum->{$column},
-                                'user_ids' => '',
+                                'user_ids' => '{}',
                             ];
 
                             HiringHistory::withoutGlobalScopes()->insert($newData);
