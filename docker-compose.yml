@@ -39,7 +39,7 @@ services:
       - "5434:5432"           # "3308:3306"
     volumes:
 #      - ./docker/pgsql/init:/docker-entrypoint-initdb.d                                       # ./docker/mysql/init
-      - ./backup/last/em_pg-latest.sql.gz:/docker-entrypoint-initdb.d/em_pg-latest.sql.gz   # ./backup/latest/em_my-latest.sql.gz
+#      - ./backup/last/em_pg-latest.sql.gz:/docker-entrypoint-initdb.d/em_pg-latest.sql.gz   # ./backup/latest/em_my-latest.sql.gz
       - ./docker/pgsql/pgdata:/var/lib/postgresql
     environment:
       - POSTGRES_DB=${DB_DATABASE_PG}       # MYSQL_DB
