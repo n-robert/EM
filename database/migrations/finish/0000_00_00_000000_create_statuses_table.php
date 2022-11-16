@@ -18,7 +18,6 @@ class CreateStatusesTable extends Migration
             $table->string('name_en', 32)->unique();
             $table->string('name_ru', 32)->unique();
             $table->addColumn('int_array', 'user_ids');
-            $table->timestamps();
         });
     }
 

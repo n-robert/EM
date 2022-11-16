@@ -29,6 +29,7 @@ class StatusSeeder extends Seeder
             'Official' => 'Чиновник',
             'Seeker' => 'Соискатель',
             'Hired' => 'Принят на работу',
+            'Arrived' => 'Прибыл',
         ];
         Status::truncate();
 
@@ -37,7 +38,6 @@ class StatusSeeder extends Seeder
                 'name_en' => $name_en,
                 'name_ru' => $name_ru,
                 'user_ids' => '{}',
-                'created_at' => Carbon::now()
             ]);
         }
     }

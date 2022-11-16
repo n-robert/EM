@@ -20,10 +20,10 @@ class HiringHistorySeeder extends Seeder
             'id',
         ];
         $dateColumns = [
-            'entry_date',
-            'hired_date',
-            'fired_date',
-            'departure_date',
+            13 => 'entry_date',
+            12 => 'hired_date',
+            7  => 'fired_date',
+            9  => 'departure_date',
         ];
         $columns = array_merge($columns, $dateColumns);
 
@@ -32,12 +32,13 @@ class HiringHistorySeeder extends Seeder
         DB::connection('pgsql')->table('employees')->select($columns)->orderBy('id')->chunk(100,
             function ($oldData) use ($dateColumns) {
                 foreach ($oldData as $oldDatum) {
-                    foreach ($dateColumns as $column) {
-                        if ($oldDatum->{$column}) {
+                    foreach ($dateColumns as $status => $dateColumn) {
+                        if ($oldDatum->{$dateColumn}) {
                             $newData = [
                                 'employee_id' => $oldDatum->id,
-                                $column => $oldDatum->{$column},
-                                'user_ids' => '{}',
+                                'date'        => $oldDatum->{$dateColumn},
+                                'status_id'   => $status,
+                                'user_ids'    => '{}',
                             ];
 
                             HiringHistory::withoutGlobalScopes()->insert($newData);

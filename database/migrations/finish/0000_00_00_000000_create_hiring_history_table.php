@@ -16,12 +16,9 @@ class CreateHiringHistoryTable extends Migration
         Schema::create('hiring_history', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('employee_id', null);
-            $table->date('entry_date', null)->nullable(true);
-            $table->date('hired_date', null)->nullable(true);
-            $table->date('fired_date', null)->nullable(true);
-            $table->date('departure_date', null)->nullable(true);
+            $table->date('date', null)->nullable(true);
+            $table->unsignedBigInteger('status', null);
             $table->addColumn('int_array', 'user_ids');
-            $table->timestamps();
         });
     }
 
