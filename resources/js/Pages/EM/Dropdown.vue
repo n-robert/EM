@@ -49,7 +49,7 @@ export default {
             default: '48',
         },
         contentClasses: {
-            default: () => ['py-2', 'px-6', 'mb-4', 'bg-white'],
+            default: () => ['py-2', 'px-6', 'bg-white'],
         },
         buttonCustomClass: {
             default: '',
