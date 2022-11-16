@@ -9,7 +9,7 @@
         <centered-item :width="centeredItemWidth">
             <div class="max-w-7xl mx-auto">
                 <dropdown
-                    v-if="filters.keys().length > 0"
+                    v-if="Object.keys(filters).length !== 0"
                     align="left" width="9/12"
                     :buttonCustomClass="customClass"
                     :buttonOpenText="__('Open filters')"
@@ -18,7 +18,7 @@
 
                     <template #content>
                         <div v-for="(elements, field) in filters" class="p-2 my-4 border rounded-lg w-full">
-                            <div v-if="elements.keys().length > 0" class="font-bold text-indigo-600">
+                            <div v-if="Object.keys(elements).length > 0" class="font-bold text-indigo-600">
                                 {{ field && __(field).ucFirst() }}
                             </div>
 
