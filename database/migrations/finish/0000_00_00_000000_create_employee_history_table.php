@@ -17,7 +17,7 @@ class CreateEmployeeHistoryTable extends Migration
             $table->id();
             $table->unsignedBigInteger('employee_id', null);
             $table->date('date', null)->nullable(true);
-            $table->unsignedBigInteger('status', null);
+            $table->unsignedBigInteger('status_id', null);
             $table->addColumn('int_array', 'user_ids');
         });
     }
