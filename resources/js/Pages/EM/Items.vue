@@ -18,7 +18,7 @@
 
                     <template #content>
                         <div v-for="(elements, field) in filters" class="p-2 my-4 border rounded-lg w-full">
-                            <div v-if="Object.keys(elements).length > 1 && !elements[field]" class="font-bold text-indigo-600">
+                            <div v-if="!elements[field]" class="font-bold text-indigo-600">
                                 {{ field && __(field).ucFirst() }}
                             </div>
 
