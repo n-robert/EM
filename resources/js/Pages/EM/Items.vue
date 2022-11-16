@@ -18,9 +18,7 @@
 
                     <template #content>
                         <div v-for="(elements, field) in filters" class="p-2 my-4 border rounded-lg w-full">
-                            <div v-if="elements.length > 1" class="font-bold text-indigo-600">
-                                {{ field && __(field).ucFirst() }}
-                            </div>
+                            <div class="font-bold text-indigo-600">{{ elements.length }}</div>
 
                             <div v-for="element in elements" class="inline-flex">
                                 <filter-by-field :element="element"></filter-by-field>
