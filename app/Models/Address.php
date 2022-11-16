@@ -77,14 +77,9 @@ class Address extends BaseModel
 
         if (empty($attributes['usage_permits'])) {
             if (!empty($existing)) {
-                array_map(
-                    function ($usagePermit) {
-                        UsagePermit
-                            ::find($usagePermit->id)
-                            ->delete();
-                    },
-                    $existing
-                );
+                array_map(function ($usagePermit) {
+                    UsagePermit::find($usagePermit->id)->delete();
+                }, $existing);
             }
 
             return true;
@@ -94,45 +89,27 @@ class Address extends BaseModel
         $abandoned = [];
 
         if ($coming = $attributes['usage_permits']) {
-            array_map(
-                function ($actual) use (&$new) {
-                    $usagePermitsModel =
-                        $actual['id'] ?
-                            UsagePermit::find($actual['id']) : new UsagePermit();
-
-                    $usagePermitsModel->setAttribute('address_id', $this->id);
-                    $usagePermitsModel->setAttribute('user_ids', session($this->name . '.user_ids'));
-
-                    $usagePermitsModel
-                        ->fill($actual)
-                        ->save();
-
-                    $new[] = $actual['id'];
-                },
-                $coming
-            );
+            array_map(function ($actual) use (&$new) {
+                $usagePermitsModel = $actual['id'] ? UsagePermit::find($actual['id']) : new UsagePermit();
+                $usagePermitsModel->setAttribute('address_id', $this->id);
+                $usagePermitsModel->setAttribute('user_ids', session($this->name . '.user_ids'));
+                $usagePermitsModel->fill($actual)->save();
+                $new[] = $actual['id'];
+            }, $coming);
         }
 
         if (!empty($existing)) {
-            array_map(
-                function ($old) use ($new, &$abandoned) {
-                    if (!in_array($old->id, $new)) {
-                        $abandoned[] = $old->id;
-                    }
-                },
-                $existing
-            );
+            array_map(function ($old) use ($new, &$abandoned) {
+                if (!in_array($old->id, $new)) {
+                    $abandoned[] = $old->id;
+                }
+            }, $existing);
         }
 
         if (!empty($abandoned)) {
-            array_map(
-                function ($id) {
-                    UsagePermit
-                        ::find($id)
-                        ->delete();
-                },
-                $abandoned
-            );
+            array_map(function ($id) {
+                UsagePermit::find($id)->delete();
+            }, $abandoned);
         }
 
         return true;
