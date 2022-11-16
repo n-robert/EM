@@ -9,7 +9,7 @@
         <centered-item :width="centeredItemWidth">
             <div class="max-w-7xl mx-auto">
                 <dropdown
-                    v-if="filters.keys().length !== 0"
+                    v-if="filters.keys().length > 0"
                     align="left" width="9/12"
                     :buttonCustomClass="customClass"
                     :buttonOpenText="__('Open filters')"
