@@ -2,12 +2,12 @@
 
 namespace Database\Seeders;
 
-use App\Models\HiringHistory;
+use App\Models\EmployeeHistory;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use App\Models\Employee;
 
-class HiringHistorySeeder extends Seeder
+class EmployeeHistorySeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -27,7 +27,7 @@ class HiringHistorySeeder extends Seeder
         ];
         $columns = array_merge($columns, $dateColumns);
 
-        HiringHistory::truncate();
+        EmployeeHistory::truncate();
 
         DB::connection('pgsql')->table('employees')->select($columns)->orderBy('id')->chunk(100,
             function ($oldData) use ($dateColumns) {
@@ -41,7 +41,7 @@ class HiringHistorySeeder extends Seeder
                                 'user_ids'    => '{}',
                             ];
 
-                            HiringHistory::withoutGlobalScopes()->insert($newData);
+                            EmployeeHistory::withoutGlobalScopes()->insert($newData);
                         }
                     }
                 }
