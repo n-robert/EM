@@ -264,15 +264,8 @@ class BaseModel extends Model implements ModelInterface
      * @param string $field
      * @throws BindingResolutionException
      */
-    public static function applyQueryOptions(array $options, &$query, string &$field = '')
+    public static function applyQueryOptions(array $options, &$query)
     {
-        if (isset($options['model'])) {
-            $model = app()->make(__NAMESPACE__ . '\\' . $options['model']);
-            $table = $model->getTable();
-            $field = $table . '.' . $model::$defaultName;
-            unset($options['model']);
-        }
-
         if (!empty($options)) {
             array_walk_recursive($options, function ($args, $method) use (&$query) {
                 $args =
@@ -428,13 +421,22 @@ class BaseModel extends Model implements ModelInterface
                                         string $fieldName = ''): Collection
     {
         $valueField = $nameField = $this->names . '.' . $field;
+
+        if (isset($options['model'])) {
+            $model = app()->make(__NAMESPACE__ . '\\' . $options['model']);
+            $table = $model->getTable();
+            // This variable is used in getFilterFieldItems()
+            $nameField = $table . '.' . $model::$defaultName;
+            unset($options['model']);
+        }
+
         // Determine whether to skip dynamic applying other fields filters when getting this field items
         $query = ($skip || $field == $fieldName) ? new static() : static::applyFilters();
         $query =
             str_ends_with($field, '_date') ?
                 $query->whereNotNull($valueField) : $query->whereNotEmpty($valueField);
 
-        static::applyQueryOptions($options, $query, $nameField);
+        static::applyQueryOptions($options, $query);
 
         // Switch to Illuminate\Database\Eloquent\Builder to use global scopes
         if ($query instanceof QueryBuilder) {

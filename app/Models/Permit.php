@@ -51,7 +51,7 @@ class Permit extends BaseModel
      * @var array
      */
     protected $filterFields = [
-        'employer_id'                => [
+        'employer_id'   => [
             'model' => 'Employer',
             ['leftJoin' => 'employers|employers.id|permits.employer_id'],
             ['leftJoin' => 'types|types.id|employers.type_id'],
