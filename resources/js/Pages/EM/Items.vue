@@ -179,7 +179,7 @@ export default {
                 md: 'full',
                 xl: '3/4',
             },
-            needAdditionalButton: this.items.length > 7,
+            needAdditionalButton: this.items.length > 5,
             createNewItem: this.__('New ' + this.controllerName),
             itemCount: [
                 this.pagination.firstItem + '-' + this.pagination.lastItem,
