@@ -158,7 +158,7 @@ class XmlFormHandlingService
 
             $formFields['has_tabs'] = $hasTabs;
         }
-//        dd($formFields);
+        dd($formFields);
         return $formFields;
     }
 
