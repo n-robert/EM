@@ -146,7 +146,7 @@ class BaseModel extends Model implements ModelInterface
             $model = explode(':', $model);
         }
 
-        $class = __NAMESPACE__ . '\\' . array_shift($model);
+        $class = app(__NAMESPACE__ . '\\' . array_shift($model));
         $args = $model;
         $method = array_shift($model);
 
@@ -180,7 +180,7 @@ class BaseModel extends Model implements ModelInterface
         }
 
         list($class, $properties) = $model;
-        $item = call_user_func([__NAMESPACE__ . '\\' . $class, 'find'], $id);
+        $item = call_user_func([app(__NAMESPACE__ . '\\' . $class), 'find'], $id);
 
         return array_reduce(
             explode(':', $properties),

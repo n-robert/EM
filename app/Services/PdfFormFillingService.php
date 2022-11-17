@@ -1261,8 +1261,9 @@ class PdfFormFillingService
 
         $recipient = Employer::find($recipientId);
         $recipientPerson = Employee::find($recipientPersonId);
-        $recipientPersonName = $recipientPerson->first_name_ru == __('CHIEF') ? ''
-            : static::shortenName($recipientPerson, '', '', '', 3);
+        $recipientPersonName =
+            $recipientPerson->first_name_ru == __('CHIEF') ? ''
+                : static::shortenName($recipientPerson, '', '', '', 3);
 
         $employer = Employer::find($employerId);
         $taxpayerId = __('TAXPAYER_ID') . ' ' . $employer->taxpayer_id;
