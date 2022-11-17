@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<root upper_case="true" justify="false" split_word="false" cells="true">
+<root upper_case="false" justify="false" split_word="false" cells="true">
     <field
         name="date_from"
         required="true"

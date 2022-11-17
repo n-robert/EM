@@ -1174,7 +1174,9 @@ class PdfFormFillingService
             ];
 
         array_walk($dates, function ($value, $key) use (&$data) {
-            $data[$key] = Carbon::parse($value)->isoFormat('DD/MM/YYYY');
+            if ($value) {
+                $data[$key] = Carbon::parse($value)->isoFormat('DD/MM/YYYY');
+            }
         });
 
         return static::prepareData($doc, $docData, $data);
@@ -1583,7 +1585,8 @@ class PdfFormFillingService
                 'recipient'          => static::declension($recipient->name_ru, 2, '', '', 1),
                 'recipient_director' => $recipientDirector,
                 'title'              => $title,
-                'employer'           => $employer->name_ru,
+                'employer1'           => $employer->name_ru,
+                'employer2'           => $employer->name_ru,
                 'guest_name'         => $guestName,
                 'guest_info'         => $guestInfo,
                 'director'           => $director
