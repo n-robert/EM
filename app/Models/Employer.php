@@ -55,9 +55,9 @@ class Employer extends BaseModel
     {
         $args = $args ?: ['LEGAL'];
         $options = ['employers.id AS value', 'name_ru AS text'];
-        $query = static::query()->whereNotEmpty('name_ru');
+        $query = static::query();
 
-        if ($conditions = static::$ownSelectOptionsCondtitions[$args[0]]) {
+        if ($args && $conditions = static::$ownSelectOptionsCondtitions[$args[0]]) {
             static::applyQueryOptions($conditions, $query);
         }
 
