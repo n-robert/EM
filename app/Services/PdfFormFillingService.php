@@ -605,19 +605,13 @@ class PdfFormFillingService
         $representatives = '';
         $existingAddress = '';
 
-        $history = json_decode($employee->history, true);
-        $prevValues = $history['prev_value'];
+        if ($employee->history) {
+            foreach (array_reverse($employee->history) as $item) {
+                $existingAddress = $item['prev_value']['reg_address_name'] ?? $existingAddress;
 
-        for ($n = count($prevValues) - 1; $n > -1; $n--) {
-            foreach (explode(PHP_EOL, $prevValues[$n]) as $prevValue) {
-                if (strpos($prevValue, 'reg_address_name') === 0) {
-                    $existingAddress = explode(':', $prevValue)[1];
+                if ($existingAddress) {
                     break;
                 }
-            }
-
-            if (!empty($existingAddress)) {
-                break;
             }
         }
 

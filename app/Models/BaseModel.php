@@ -6,6 +6,7 @@ use App\Contracts\ModelInterface;
 use App\Services\XmlFormHandlingService;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -100,6 +101,13 @@ class BaseModel extends Model implements ModelInterface
      * @var array
      */
     protected $filterFields = [];
+
+    /**
+     * @var array
+     */
+    protected $casts = [
+        'history' => AsArrayObject::class,
+    ];
 
     /**
      * BaseModel constructor.
