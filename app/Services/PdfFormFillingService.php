@@ -1165,12 +1165,12 @@ class PdfFormFillingService
 
         $dates =
             [
-                'date'                  => $date,
-                'birth_date'            => $employee->birth_date,
-                'passport_issued_date'  => $employee->passport_issued_date,
-                'passport_expired_date' => $employee->passport_expired_date,
-                'visa_started_date'     => $employee->visa_started_date,
-                'visa_expired_date'     => $employee->visa_expired_date,
+                'date'                       => $date,
+                'birth_date'                 => $employee->birth_date,
+                'passport_issued_date'       => $employee->passport_issued_date,
+                'passport_expired_date'      => $employee->passport_expired_date,
+                'existing_visa_started_date' => $employee->visa_started_date,
+                'existing_visa_expired_date' => $employee->visa_expired_date,
             ];
 
         array_walk($dates, function ($value, $key) use (&$data) {
