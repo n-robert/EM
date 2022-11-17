@@ -105,7 +105,7 @@ module.exports = {
 };
 
 String.prototype.toLowerCaseArray = function (smart = false) {
-    let pattern = /(\(?)([A-ZА-Я]+(?=[A-ZА-Я][a-zа-я]+[0-9]*|\b)|[A-ZА-Я]?[a-zа-я\/]+[0-9]*|[A-ZА-Я]+|[0-9]+)(\)?)/g;
+    let pattern = /(\(?)([A-ZА-Я]+(?=[A-ZА-Я][a-zа-я]+[0-9]*|\b)|[A-ZА-Я]?[a-zа-я]+[0-9]*|[A-ZА-Я]+|[0-9]+|\/)(\)?)/g;
     return this
         .match(pattern)
         .map(word => smart && (/(\(?)([A-ZА-Я]+)(\)?)/).test(word) ? word : word.toLowerCase());
