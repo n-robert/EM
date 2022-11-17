@@ -98,9 +98,6 @@ class BaseController extends Controller implements ControllerInterface
             case 'requestValidation':
                 $class = 'App\\Http\\Requests\\' . $class . 'RequestValidation';
                 break;
-            case 'repository':
-                $class = 'App\\Repositories\\Eloquent\\' . $class . 'Repository';
-                break;
         }
 
         return app($class);

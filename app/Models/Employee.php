@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class Employee extends BaseModel
@@ -12,12 +13,12 @@ class Employee extends BaseModel
     /**
      * @var string
      */
-    static $defaultName = 'full_name_ru';
+    public static $defaultName = 'full_name_ru';
 
     /**
      * @var array
      */
-    static $ownSelectOptionsCondtitions = [
+    public static $ownSelectOptionsCondtitions = [
         'Officer'  => [
             ['leftJoin' => 'statuses|statuses.id|status_id'],
             ['where' => 'statuses.name_en|Official'],
@@ -121,7 +122,7 @@ class Employee extends BaseModel
      * @return Collection
      * @throws BindingResolutionException
      */
-    public static function getOwnSelectOptions(...$args): Collection
+    public function getOwnSelectOptions(...$args): Collection
     {
         $options = [
             'employees.id AS value',
@@ -130,7 +131,7 @@ class Employee extends BaseModel
                 AS text'
             )
         ];
-        $query = static::query();
+        $query = $this->applyDefaultOrder()->applyAuthUser()->getQuery();
 
         if ($args && $conditions = static::$ownSelectOptionsCondtitions[$args[0]]) {
             static::applyQueryOptions($conditions, $query);

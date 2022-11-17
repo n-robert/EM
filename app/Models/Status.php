@@ -7,5 +7,5 @@ class Status extends BaseModel
     /**
      * @var bool
      */
-    static $skipAuthUserScope = true;
+    public static $skipAuthUserScope = true;
 }

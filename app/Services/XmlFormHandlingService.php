@@ -174,11 +174,69 @@ class XmlFormHandlingService
     {
         if ($fieldAttributes['model']) {
             if ($fieldAttributes['type'] == 'select') {
-                $tmp['options'] = BaseModel::getSingleSelectOptions($fieldAttributes['model']);
+                $tmp['options'] = static::getSingleSelectOptions($fieldAttributes['model']);
             } else {
-                $tmp['value'] = BaseModel::getSingleValue($fieldAttributes['model'], $id);
+                $tmp['value'] = static::getSingleValue($fieldAttributes['model'], $id);
             }
         }
+    }
+
+    /**
+     * Get options for a single select.
+     *
+     * @param string|array $params
+     * @param boolean $distinct
+     * @return Collection
+     */
+    public static function getSingleSelectOptions($params, bool $distinct = true): Collection
+    {
+        if (!is_array($params)) {
+            $params = explode(':', $params);
+        }
+
+        $model = app('App\\Models\\' . array_shift($params));
+        $args = $params;
+        $method = array_shift($params);
+
+        if ($method && str_starts_with($method, '__')) {
+            $method = str_replace('__', '', $method);
+            $column = array_shift($params);
+
+            if ($column) {
+                $model->whereNotEmpty($column, $distinct);
+            }
+
+            $options = $model->$method($column);
+        } else {
+            $options = $model->getOwnSelectOptions(...$args);
+        }
+
+        return XmlFormHandlingService::buildSelectOptions($options);
+    }
+
+    /**
+     * Get an item property value
+     *
+     * @param string|array $params
+     * @param int $id
+     * @return string
+     */
+    public static function getSingleValue($params, int $id): string
+    {
+        if (!is_array($params)) {
+            $params = explode(':', $params, 2);
+        }
+
+        list($model, $properties) = $params;
+        $item = app('App\\Models\\' . $model)->find($id);
+
+        return array_reduce(
+            explode(':', $properties),
+            function ($result, $property) use ($item) {
+                $result .= ' ' . $item->{$property};
+                return $result;
+            }
+        );
     }
 
     /**

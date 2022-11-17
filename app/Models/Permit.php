@@ -6,18 +6,20 @@ use Carbon\Carbon;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class Permit extends BaseModel
 {
     /**
      * @var string
      */
-    static $defaultName = 'number';
+    public static $defaultName = 'number';
 
     /**
      * @var array
      */
-    static $ownSelectOptionsCondtitions = [
+    public static $ownSelectOptionsCondtitions = [
         'Valid' => [
             ['whereRaw' => 'expired_date >= NOW()'],
         ],
@@ -132,10 +134,10 @@ class Permit extends BaseModel
      * @return Collection
      * @throws BindingResolutionException
      */
-    public static function getOwnSelectOptions(...$args): Collection
+    public function getOwnSelectOptions(...$args): Collection
     {
         $options = ['id AS value', 'number AS text'];
-        $query = static::query()->whereNotEmpty('number');
+        $query = $this->applyDefaultOrder()->applyAuthUser()->getQuery();
 
         if ($args && $conditions = static::$ownSelectOptionsCondtitions[$args[0]]) {
             static::applyQueryOptions($conditions, $query);

@@ -8,13 +8,15 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class Employer extends BaseModel
 {
     /**
      * @var array
      */
-    static $ownSelectOptionsCondtitions = [
+    public static $ownSelectOptionsCondtitions = [
         'LEGAL' => [
             ['leftJoin' => 'types|types.id|type_id'],
             ['whereRaw' => 'types.code LIKE \'%LEGAL%\''],
@@ -51,11 +53,11 @@ class Employer extends BaseModel
      * @return Collection
      * @throws BindingResolutionException
      */
-    public static function getOwnSelectOptions(...$args): Collection
+    public function getOwnSelectOptions(...$args): Collection
     {
         $args = $args ?: ['LEGAL'];
         $options = ['employers.id AS value', 'name_ru AS text'];
-        $query = static::query();
+        $query = $this->applyDefaultOrder()->applyAuthUser()->getQuery();
 
         if ($args && $conditions = static::$ownSelectOptionsCondtitions[$args[0]]) {
             static::applyQueryOptions($conditions, $query);

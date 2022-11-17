@@ -11,7 +11,7 @@ class Quota extends BaseModel
     /**
      * @var string
      */
-    static $defaultName = 'year';
+    public static $defaultName = 'year';
 
     /**
      * @var array

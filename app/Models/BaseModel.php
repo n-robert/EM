@@ -3,15 +3,15 @@
 namespace App\Models;
 
 use App\Contracts\ModelInterface;
-use App\Services\XmlFormHandlingService;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use App\Scopes\AuthUserScope;
@@ -24,24 +24,56 @@ class BaseModel extends Model implements ModelInterface
     /**
      * @var string
      */
-    static $defaultName = 'name_ru';
+    public static $defaultName = 'name_ru';
 
     /**
      * @var array
      */
-    static $ownSelectOptionsCondtitions = [];
+    public static $ownSelectOptionsCondtitions = [];
 
     /**
      * The base accessors to append to the model's array form.
      *
      * @var array
      */
-    static $baseAppends = ['default_name'];
+    public static $baseAppends = ['default_name'];
 
     /**
      * @var bool
      */
-    static $skipAuthUserScope = false;
+    public static $skipAuthUserScope = false;
+
+    /**
+     * Apply additional options to query
+     *
+     * @param array $options
+     * @param mixed $query
+     * @throws BindingResolutionException
+     */
+    public static function applyQueryOptions(array $options, &$query)
+    {
+        if (!empty($options)) {
+            array_walk_recursive($options, function ($args, $method) use (&$query) {
+                $args =
+                    $query->getConnection()->getName() == 'mysql' ?
+                        str_replace(['INTEGER', 'INT'], 'UNSIGNED', $args) : $args;
+                $args = preg_split('~\s*\|\s*~', $args);
+                $query = $query->$method(...$args);
+            });
+        }
+    }
+
+    /**
+     * The "booted" method of the model.
+     *
+     * @return void
+     */
+    protected static function booted()
+    {
+        if (!Gate::allows('is-admin') && !static::$skipAuthUserScope) {
+            static::addGlobalScope(new AuthUserScope());
+        }
+    }
 
     /**
      * @var array
@@ -134,155 +166,49 @@ class BaseModel extends Model implements ModelInterface
     }
 
     /**
-     * Get options for a single select.
+     * Handle dynamic method calls into the model.
      *
-     * @param string|array $model
-     * @param boolean $distinct
-     * @return Collection
+     * @param string $method
+     * @param array $parameters
+     * @return mixed
      */
-    public static function getSingleSelectOptions($model, bool $distinct = true): Collection
+    public function __call($method, $parameters)
     {
-        if (!is_array($model)) {
-            $model = explode(':', $model);
-        }
-
-        $class = __NAMESPACE__ . '\\' . array_shift($model);
-        $args = $model;
-        $method = array_shift($model);
-
-        if ($method && str_starts_with($method, '__')) {
-            $method = str_replace('__', '', $method);
-            $column = array_shift($model);
-
-            if ($column) {
-                $class = call_user_func_array([$class, 'whereNotEmpty'], [$column, $distinct]);
-            }
-
-            $options = call_user_func_array([$class, $method], [$column]);
-        } else {
-            $options = call_user_func_array([$class, 'getOwnSelectOptions'], $args);
-        }
-
-        return XmlFormHandlingService::buildSelectOptions($options);
-    }
-
-    /**
-     * Get an item property value
-     *
-     * @param string|array $model
-     * @param int $id
-     * @return string
-     */
-    public static function getSingleValue($model, int $id): string
-    {
-        if (!is_array($model)) {
-            $model = explode(':', $model, 2);
-        }
-
-        list($class, $properties) = $model;
-        $item = call_user_func([__NAMESPACE__ . '\\' . $class, 'find'], $id);
-
-        return array_reduce(
-            explode(':', $properties),
-            function ($result, $property) use ($item) {
-                $result .= ' ' . $item->{$property};
-                return $result;
-            }
-        );
-    }
-
-    /**
-     * Get options for form select.
-     * @return Collection
-     * @throws BindingResolutionException
-     */
-    protected static function getOwnSelectOptions(): Collection
-    {
-        $model = app()->make(static::class);
-
         return
-            $model
-                ->applyDefaultOrder()
-                ->whereNotEmpty(static::$defaultName)
-                ->get([$model->getKeyName() . ' AS value', static::$defaultName . ' AS text']);
+            method_exists($this, $method) ?
+                $this->$method(...$parameters) :
+                parent::__call($method, $parameters);
     }
 
     /**
-     * The "booted" method of the model.
-     *
-     * @return void
-     */
-    protected static function booted()
-    {
-        if (!Gate::allows('is-admin') && !static::$skipAuthUserScope) {
-            static::addGlobalScope(new AuthUserScope());
-        }
-    }
-
-    /**
-     * Scope a query to applied filters.
-     *
      * @param Builder $builder
      * @return Builder
-     * @throws BindingResolutionException
      */
-    public function scopeApplyFilters(Builder $builder): Builder
+    public function scopeApplyAuthUser(Builder $builder): Builder
     {
-//        Session::remove($this->names . '.filters');
-        $filters = session($this->names . '.filters');
-//        dd(array_filter($filters));
+        if (!Gate::allows('is-admin') && !static::$skipAuthUserScope) {
+            $user = Auth::user();
+            $connection = DB::connection()->getName();
 
-        if ($filters && $filters = array_filter($filters)) {
-            $this->applyFiltersRecursive($filters, $builder);
+            if ($connection == 'pgsql') {
+                $builder->whereRaw($user->id . ' = ANY(' . $this->getTable() . '.user_ids)');
+            } else {
+                $builder->whereRaw('FIND_IN_SET(' . $user->id . ', ' . $this->getTable() . '.user_ids)');
+            }
         }
 
         return $builder;
     }
 
     /**
-     * Traverse filters array recursively to apply them
+     * Scope a query to model's custom clauses.
      *
-     * @param $filters
-     * @param $builder
-     * @param null $defaultKey
-     * @throws BindingResolutionException
+     * @param Builder $builder
+     * @return Builder
      */
-    protected function applyFiltersRecursive($filters, $builder, $defaultKey = null)
+    public function scopeApplyCustomClauses(Builder $builder): Builder
     {
-        array_walk($filters, function ($value, $key) use ($builder, $defaultKey) {
-            if (count($value) != count($value, COUNT_RECURSIVE)) {
-                $this->applyFiltersRecursive($value, $builder, $key);
-            }
-            // If there is a simplified filter, then we just apply its original options to query
-            // Otherwise we will apply the "where... IN" clause to query
-            if ($options = session($this->names . '.queries.' . $key)) {
-                static::applyQueryOptions($options, $builder);
-            } else {
-                $key = $defaultKey ?: $key;
-                $builder->whereIn($this->names . '.' . $key, $value);
-            }
-        });
-    }
-
-    /**
-     * Apply additional options to query
-     *
-     * @param array $options
-     * @param mixed $query
-     * @param string $field
-     * @throws BindingResolutionException
-     */
-    public static function applyQueryOptions(array $options, &$query)
-    {
-        if (!empty($options)) {
-            array_walk_recursive($options, function ($args, $method) use (&$query) {
-                $args =
-                    $query->getConnection()->getName() == 'mysql' ?
-                        str_replace(['INTEGER', 'INT'], 'UNSIGNED', $args) : $args;
-                $args = preg_split('~\s*\|\s*~', $args);
-                $query = $query->$method(...$args);
-            });
-        }
+        return $builder;
     }
 
     /**
@@ -309,13 +235,20 @@ class BaseModel extends Model implements ModelInterface
     }
 
     /**
-     * Scope a query to model's custom clauses.
+     * Scope a query to applied filters.
      *
      * @param Builder $builder
      * @return Builder
+     * @throws BindingResolutionException
      */
-    public function scopeApplyCustomClauses(Builder $builder): Builder
+    public function scopeApplyFilters(Builder $builder): Builder
     {
+        $filters = session($this->names . '.filters');
+
+        if ($filters && $filters = array_filter($filters)) {
+            $this->applyFiltersRecursive($filters, $builder);
+        }
+
         return $builder;
     }
 
@@ -479,21 +412,6 @@ class BaseModel extends Model implements ModelInterface
     }
 
     /**
-     * Handle dynamic method calls into the model.
-     *
-     * @param string $method
-     * @param array $parameters
-     * @return mixed
-     */
-    public function __call($method, $parameters)
-    {
-        return
-            method_exists($this, $method) ?
-                $this->$method(...$parameters) :
-                parent::__call($method, $parameters);
-    }
-
-    /**
      * Delete the model from the database.
      *
      * @return bool|null|int
@@ -534,5 +452,45 @@ class BaseModel extends Model implements ModelInterface
         }
 
         return $result;
+    }
+
+    /**
+     * Get options for form select.
+     * @return Collection
+     * @throws BindingResolutionException
+     */
+    protected function getOwnSelectOptions(): Collection
+    {
+        return
+            $this->applyDefaultOrder()
+                 ->applyAuthUser()
+                 ->getQuery()
+                 ->whereNotEmpty(static::$defaultName)
+                 ->get([$this->getKeyName() . ' AS value', static::$defaultName . ' AS text']);
+    }
+
+    /**
+     * Traverse filters array recursively to apply them
+     *
+     * @param $filters
+     * @param $builder
+     * @param null $defaultKey
+     * @throws BindingResolutionException
+     */
+    protected function applyFiltersRecursive($filters, $builder, $defaultKey = null)
+    {
+        array_walk($filters, function ($value, $key) use ($builder, $defaultKey) {
+            if (count($value) != count($value, COUNT_RECURSIVE)) {
+                $this->applyFiltersRecursive($value, $builder, $key);
+            }
+            // If there is a simplified filter, then we just apply its original options to query
+            // Otherwise we will apply the "where... IN" clause to query
+            if ($options = session($this->names . '.queries.' . $key)) {
+                static::applyQueryOptions($options, $builder);
+            } else {
+                $key = $defaultKey ?: $key;
+                $builder->whereIn($this->names . '.' . $key, $value);
+            }
+        });
     }
 }
