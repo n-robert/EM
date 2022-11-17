@@ -106,7 +106,7 @@ class BaseModel extends Model implements ModelInterface
      * @var array
      */
     protected $casts = [
-        'history' => AsArrayObject::class,
+        'history' => 'array',
     ];
 
     /**
