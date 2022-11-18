@@ -376,20 +376,29 @@ class PdfFormFillingService
         return config('app.pdf_template_path') . $doc . '.pdf';
     }
 
-    public static function handlePhones($phones, $code = '', $key = null, $no_spaces = true, $delimiter = ',')
+    public static function handlePhones($phones, $code = '', $keys = [], $no_spaces = true, $delimiter = ',')
     {
         if (!is_array($phones)) {
             $phones = explode($delimiter, $phones);
         }
 
-        foreach ($phones as &$phone) {
-            $phone = $no_spaces ? str_replace(' ', '', $phone) : trim($phone);
-            $phone = preg_replace('#^\s*(\+7|8)\s*(.*)$#', $code . '$2', $phone);
+        $patterns = ['#^\s*(\+7|8)(.*)$#'];
+        $patterns[] = $no_spaces ? '#\D#' : '#[^\d\s]#';
+        $result = [];
+
+        foreach ($phones as $key => $phone) {
+            if (in_array(-($key + 1), $keys)) {
+                unset($phones[$key]);
+                unset($keys[array_search(-($key + 1), $keys)]);
+                continue;
+            }
+
+            if (in_array($key + 1, $keys) || !$keys) {
+                $result[] = preg_replace($patterns, [$code . '$2', ''], trim($phone));
+            }
         }
 
-        $result = !is_null($key) ? $phones[$key] : implode($delimiter . ' ', $phones);
-
-        return $result;
+        return implode($delimiter . ' ', $result);
     }
 
     public static function loadModalTemplate($layout, $view = null, $input = null)
@@ -633,7 +642,7 @@ class PdfFormFillingService
                 'guest_passport_serie'                   => $employee->passport_serie,
                 'passport_number'                        => $employee->passport_number,
                 'guest_passport_number'                  => $employee->passport_number,
-                'phone'                                  => static::handlePhones($employee->phone),
+                'phone'                                  => static::handlePhones($employee->phone, '8', [1]),
                 'occupation'                             => $occupation,
                 'migr_card_serie'                        => $employee->migr_card_serie,
                 'migr_card_number'                       => $employee->migr_card_number,
@@ -842,7 +851,7 @@ class PdfFormFillingService
         );
         $accRegInfo = implode(',', $accRegInfo);
 
-        $employerPhone = static::handlePhones($employer->phone, '8');
+        $employerPhone = static::handlePhones($employer->phone, '8', [1]);
 
         $citizenship = Country::find($employee->citizenship_id);
         $birthPlace = implode(', ', [$citizenship->name_ru, $employee->birth_place]);
@@ -1032,7 +1041,7 @@ class PdfFormFillingService
                 'full_name'                   => $employer->full_name_ru,
                 'address_name'                => $address,
                 'real_address_name'           => $address,
-                'phone'                       => static::handlePhones($employer->phone, '8', 0),
+                'phone'                       => static::handlePhones($employer->phone, '8', [1], false),
                 'desired_date'                => $desiredDate,
                 'director'                    => static::shortenName($director),
                 'trip_purpose'                => __($tripPurpose),
@@ -1065,7 +1074,7 @@ class PdfFormFillingService
                 'passport_number'             => $employee->passport_number,
                 'passport_issued'             => $passportIssued,
                 'passport_expired'            => $passportExpired,
-                'host_phone'                  => static::handlePhones($employer->phone, '8', 0),
+                'host_phone'                  => static::handlePhones($employer->phone, '8', [1], false),
             ];
 
         return static::prepareData($doc, $docData, $data);
@@ -1089,7 +1098,7 @@ class PdfFormFillingService
         $occupation = Occupation::find($employee->occupation_id)->name_ru;
         $reason = static::getReason($docData);
         $inviter = Employer::find($inviterId);
-        $inviterPhone = static::handlePhones($inviter->phone, '8');
+        $inviterPhone = static::handlePhones($inviter->phone, '8', [1], false);
         $inviterAddress = Address::find($inviter->address_id)->name_ru;
         $inviterTaxpayerId = __('TAXPAYER_ID') . ' ' . $inviter->taxpayer_id;
         $inviterInfo = array_filter([
@@ -1101,7 +1110,7 @@ class PdfFormFillingService
         $inviterInfo = implode(', ', $inviterInfo);
 
         $employer = Employer::find($employee->employer_id);
-        $employerPhone = static::handlePhones($employer->phone, '8');
+        $employerPhone = static::handlePhones($employer->phone, '8', [1], false);
         $employerTaxpayerId = __('TAXPAYER_ID') . ' ' . $employer->taxpayer_id;
         $employerAddress = Address::find($employer->address_id)->name_ru;
 
@@ -1195,7 +1204,7 @@ class PdfFormFillingService
             $employer->name_ru,
             __('TAXPAYER_ID') . ' ' . $employer->taxpayer_id,
             Address::find($employer->address_id)->name_ru,
-            $employer->phone
+            static::handlePhones($employer->phone, '8', [1], false)
         ]);
         $birth_date =
             is_null($employee->birth_date) ? '' : date('d/m/Y', strtotime($employee->birth_date));
@@ -1268,15 +1277,16 @@ class PdfFormFillingService
                 : static::shortenName($recipientPerson, '', '', '', 3);
 
         $employer = Employer::find($employerId);
+        $employer_address = Address::find($employer->address_id)->name_ru;
         $taxpayerId = __('TAXPAYER_ID') . ' ' . $employer->taxpayer_id;
         $primeRegNumber = __('PRIME_REG_NUMBER') . ' ' . $employer->prime_reg_number;
         $taxpayerCode = __('TAXPAYER_CODE') . ' ' . $employer->taxpayer_code;
-        $employerPhone = static::handlePhones($employer->phone, '8');
+        $employerPhone = static::handlePhones($employer->phone, '8', [-1], false);
         $phone = __('PHONE_LC') . ': ' . $employerPhone;
 
         $hostInfo = [
             $employer->full_name_ru,
-            $employer->address_name,
+            $employer_address,
             $taxpayerId . '/' . $primeRegNumber . '/' . $taxpayerCode,
             $phone
         ];
@@ -1472,7 +1482,7 @@ class PdfFormFillingService
         $passport = __('PASSPORT');
 
         $employer = Employer::find($employee->employer_id);
-        $employerPhone = static::handlePhones($employer->phone, '8', 0);
+        $employerPhone = static::handlePhones($employer->phone, '8', [1]);
         $employerAddress = Address::find($employer->address_id)->name_ru;
         $employerInfo = $employer->uni_reg_number . ', ' . $permitInfo;
 
@@ -1482,8 +1492,8 @@ class PdfFormFillingService
                 strtolower($employee->gender) => 'Х',
                 'passport'                    => $passport,
                 'passport_number'             => $employee->passport_number,
-                'taxpayer_id'                 => $employee->taxpayer_id,
-                'employer_taxpayer_id'        => $employee->employer_taxpayer_id,
+                'taxpayer_id'                 => $employee->taxpayer_id ?: '',
+                'employer_taxpayer_id'        => $employer->taxpayer_id ?: '',
                 'employer_info'               => $employerInfo,
                 'permit_info'                 => $permitInfo,
                 'employer_phone'              => $employerPhone,
@@ -1585,8 +1595,8 @@ class PdfFormFillingService
                 'recipient'          => static::declension($recipient->name_ru, 2, '', '', 1),
                 'recipient_director' => $recipientDirector,
                 'title'              => $title,
-                'employer1'           => $employer->name_ru,
-                'employer2'           => $employer->name_ru,
+                'employer1'          => $employer->name_ru,
+                'employer2'          => $employer->name_ru,
                 'guest_name'         => $guestName,
                 'guest_info'         => $guestInfo,
                 'director'           => $director
