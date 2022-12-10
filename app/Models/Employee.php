@@ -314,8 +314,8 @@ class Employee extends BaseModel
                     $test = $datum;
                     unset($test['user_ids']);
 
-                    if (!MonthlyStaff::query()->where($test)->first()) {
-                        (new MonthlyStaff())->fill($datum)->save();
+                    if (!EmployeeTurnover::query()->where($test)->first()) {
+                        (new EmployeeTurnover())->fill($datum)->save();
                     }
                 }
             }
