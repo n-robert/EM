@@ -9,12 +9,12 @@ class BaseRequestValidation extends FormRequest
 {
 
     /**
-     * Get all of the input and files for the request.
+     * Get all the input and files for the request.
      *
      * @param  array|mixed|null  $keys
      * @return array
      */
-    public function all($keys = null)
+    public function all($keys = null): array
     {
         return $this->sanitize(parent::all($keys));
     }
@@ -24,7 +24,7 @@ class BaseRequestValidation extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
 //        return !empty($this->user()->id);
         return true;
@@ -35,7 +35,7 @@ class BaseRequestValidation extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [];
     }
@@ -43,10 +43,10 @@ class BaseRequestValidation extends FormRequest
     /**
      * Sanitize all of the input and files for the request.
      *
-     * @param  array  $input
+     * @param array $input
      * @return array
      */
-    public function sanitize($input)
+    public function sanitize(array $input): array
     {
         array_walk_recursive($input, function (&$value, $key) {
             if (str_ends_with($key, '_date') && $value) {

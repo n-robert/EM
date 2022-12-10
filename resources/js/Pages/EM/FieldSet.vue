@@ -19,7 +19,7 @@
 
     <div v-else class="space-y-3" :id="name">
         <div v-for="(subItem, subKey) in item[name]"
-             class="p-2 mt-2 rounded-md bg-gradient-to-b from-indigo-100 to-white">
+             class="py-2 pr-2 mt-2 rounded-md bg-gradient-to-b from-indigo-100 to-white">
             <e-m-input
                 v-for="(subField, subName) in field"
                 v-if="!isNotFields.includes(subName)"
@@ -39,6 +39,7 @@
             <span :class="leftColumn"></span>
             <span :class="rightColumn">
                 <e-m-button
+                    v-if="field.deletable"
                     type="button"
                     :originalText="__('Remove ' + name)"
                     customClass="hover:text-white hover:bg-indigo-500"
@@ -81,7 +82,7 @@ export default {
 
     data() {
         return {
-            isNotFields: ['type', 'show', 'repeatable'],
+            isNotFields: ['type', 'show', 'repeatable', 'deletable'],
         };
     },
 

@@ -19,7 +19,7 @@ class Quota extends BaseModel
     public $listable = [
         'quotas.id',
         'year',
-        'er.name_ru as employer',
+        'employers.name_ru as employer',
         'total',
     ];
 
@@ -45,8 +45,8 @@ class Quota extends BaseModel
      * @var array
      */
     protected $filterFields = [
-        'employer_id'       => [
-            'model' => 'Employer',
+        'quotas.employer_id'       => [
+            'nameModel' => 'Employer',
             ['leftJoin' => 'employers|employers.id|quotas.employer_id'],
             ['leftJoin' => 'types|types.id|employers.type_id'],
             ['whereRaw' => 'types.code LIKE \'%LEGAL%\''],
@@ -73,10 +73,10 @@ class Quota extends BaseModel
      * @param Builder $builder
      * @return Builder
      */
-    public function scopeApplyCustomClauses(Builder $builder): Builder
+    public function scopeApplyOwnQueryClauses(Builder $builder): Builder
     {
         $builder
-            ->join('employers as er', 'er.id', '=', 'employer_id', 'left');
+            ->join('employers', 'employers.id', '=', 'employer_id', 'left');
 
         return $builder;
     }

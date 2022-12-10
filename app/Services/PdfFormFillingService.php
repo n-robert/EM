@@ -579,10 +579,10 @@ class PdfFormFillingService
         $employee = Employee::find($id);
         $citizenship = Country::find($employee->citizenship_id);
         $birthPlace = implode(' ', array_filter([$citizenship->name_ru, $employee->birth_place]));
-        $occupation = Occupation::find($employee->occupation_id);
+        $occupation = Occupation::find($employee->last_job->occupation_id);
         $occupation = $occupation ? $occupation->nam_ru : '';
 
-        $employer = Employer::find($employee->employer_id);
+        $employer = Employer::find($employee->last_job->employer_id);
         $employerType = Type::find($employer->type_id)->code;
 
         if (in_array($employerType, static::$individualHosts)) {
@@ -743,7 +743,7 @@ class PdfFormFillingService
         $employee = Employee::find($id);
         $firstMiddleName =
             implode(' ', array_filter([$employee->first_name_ru, $employee->middle_name_ru]));
-        $employer = Employer::find($employee->employer_id);
+        $employer = Employer::find($employee->last_job->employer_id);
         $director = Employee::find($employer->director_id);
         $directorFirstMiddleName =
             implode(' ', array_filter([$director->first_name_ru, $director->middle_name_ru]));
@@ -832,9 +832,9 @@ class PdfFormFillingService
     public static function printHiringOrFiringNotice($docData, $doc, $id)
     {
         $recipient = Employer::find($docData['authority_id']);
-        $employee = Employee::find($id);
         $agent = (isset($docData['agent_id']) && $docData['agent_id']) ? Employee::find($docData['agent_id']) : null;
-        $employer = Employer::find($employee->employer_id);
+        $employee = Employee::find($id);
+        $employer = Employer::find($employee->last_job->employer_id);
 
         $employerType = Type::find($employer->type_id)->code;
 
@@ -889,7 +889,7 @@ class PdfFormFillingService
                 'employer_address'        => Address::find($employer->address_id)->name_ru,
                 'birth_place'             => $birthPlace,
                 'issuer'                  => $employee->passport_issuer,
-                'occupation'              => Occupation::find($employee->occupation_id)->name_ru,
+                'occupation'              => Occupation::find($employee->last_job->occupation_id)->name_ru,
             ];
 
 //		$data[strtolower($item->gender)] = 'Х';
@@ -1095,7 +1095,7 @@ class PdfFormFillingService
         $citizenship = Country::find($employee->citizenship_id)->name_ru;
         $birthPlace = $employee->birth_place;
         $homeAddress = implode(', ', [$citizenship, $birthPlace]);
-        $occupation = Occupation::find($employee->occupation_id)->name_ru;
+        $occupation = Occupation::find($employee->last_job->occupation_id)->name_ru;
         $reason = static::getReason($docData);
         $inviter = Employer::find($inviterId);
         $inviterPhone = static::handlePhones($inviter->phone, '8', [1], false);
@@ -1109,7 +1109,7 @@ class PdfFormFillingService
         ]);
         $inviterInfo = implode(', ', $inviterInfo);
 
-        $employer = Employer::find($employee->employer_id);
+        $employer = Employer::find($employee->last_job->employer_id);
         $employerPhone = static::handlePhones($employer->phone, '8', [1], false);
         $employerTaxpayerId = __('TAXPAYER_ID') . ' ' . $employer->taxpayer_id;
         $employerAddress = Address::find($employer->address_id)->name_ru;
@@ -1199,7 +1199,7 @@ class PdfFormFillingService
         $recipientDirector = Employee::find($recipientDirectorId);
         $recipientDirector = static::shortenName($recipientDirector, '', '', '', 3);
         $employee = Employee::find($id);
-        $employer = Employer::find($employee->employer_id);
+        $employer = Employer::find($employee->last_job->employer_id);
         $hostInfo = implode(', ', [
             $employer->name_ru,
             __('TAXPAYER_ID') . ' ' . $employer->taxpayer_id,
@@ -1360,7 +1360,7 @@ class PdfFormFillingService
         $dateFrom = $docData['date_from'];
         $workPermitExpired = $employee->work_permit_expired ?
             date('d.m.Y', strtotime($employee->work_permit_expired)) : '';
-        $dateTo = $docData['date_to'] or $workPermitExpired;
+        $dateTo = $docData['date_to'] ?: $workPermitExpired;
         $salary = $docData['salary'];
         $contractNumber = $docData['contract_number'];
         $employerId = $docData['employer_id'];
@@ -1422,7 +1422,7 @@ class PdfFormFillingService
         $employeeInfo = implode(', ', $employeeInfo);
 
         $occupation = static::declension(
-            Occupation::find($employee->occupation_id)->name_ru,
+            Occupation::find($employee->last_job->occupation_id)->name_ru,
             2,
             '',
             '',
@@ -1478,10 +1478,10 @@ class PdfFormFillingService
             !empty($citizenship) ? ($citizenship . ', ' . $employee->birth_place) : $employee->birth_place;
         $address = $employee->address ?: $birthPlace;
         $regAddress = Address::find($employee->reg_address_id)->name_ru;
-        $occupation = Occupation::find($employee->occupation_id)->name_ru;
+        $occupation = Occupation::find($employee->last_job->occupation_id)->name_ru;
         $passport = __('PASSPORT');
 
-        $employer = Employer::find($employee->employer_id);
+        $employer = Employer::find($employee->last_job->employer_id);
         $employerPhone = static::handlePhones($employer->phone, '8', [1]);
         $employerAddress = Address::find($employer->address_id)->name_ru;
         $employerInfo = $employer->uni_reg_number . ', ' . $permitInfo;
@@ -1543,7 +1543,7 @@ class PdfFormFillingService
             ];
         $recipientDirector = implode(' ', $recipientDirector);
 
-        $employer = Employer::find($employee->employer_id);
+        $employer = Employer::find($employee->last_job->employer_id);
 
         $address = Address::find($employer->address_id);
         $address = static::parseAddress($address->name_ru);
@@ -1576,19 +1576,8 @@ class PdfFormFillingService
                 $employee->passport_issuer
             ]
         );
-
         $guestInfo = implode(', ', $guestInfo);
-
-        $director = Employee::find($employer->director_id);
-        $director =
-            implode(
-                ' ',
-                [
-                    $director->last_name_ru,
-                    mb_substr($director->first_name_ru, 0, 1) . '.',
-                    $director->middle_name_ru ? mb_substr($director->middle_name_ru, 0, 1) . '.' : ''
-                ]
-            );
+        $director = static::shortenName(Employee::find($employer->director_id));
 
         $data =
             [
@@ -1597,6 +1586,7 @@ class PdfFormFillingService
                 'title'              => $title,
                 'employer1'          => $employer->name_ru,
                 'employer2'          => $employer->name_ru,
+                'employer3'          => $employer->name_ru,
                 'guest_name'         => $guestName,
                 'guest_info'         => $guestInfo,
                 'director'           => $director

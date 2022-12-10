@@ -10,7 +10,7 @@
             <div class="max-w-7xl mx-auto">
                 <dropdown
                     v-if="Object.keys(filters).length"
-                    align="left" width="9/12"
+                    align="left" width="10/12"
                     :buttonCustomClass="customClass"
                     :buttonOpenText="__('Open filters')"
                     :buttonCloseText="__('Close filters')">
@@ -80,7 +80,7 @@
                                     </div>
                                 </div>
 
-                                <form v-if="$page.props.canEdit"
+                                <form v-if="$page.props.isAdmin"
                                       :id="'delete-' + item.id"
                                       @submit.prevent="deleteItem(item)"
                                       class="p-2 align-middle table-cell">
@@ -177,7 +177,7 @@ export default {
         return {
             centeredItemWidth: {
                 md: 'full',
-                xl: '3/4',
+                xl: '10/12',
             },
             needAdditionalButton: this.items.length > 5,
             createNewItem: this.__('New ' + this.controllerName),

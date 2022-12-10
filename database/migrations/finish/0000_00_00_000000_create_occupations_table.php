@@ -16,8 +16,8 @@ class CreateOccupationsTable extends Migration
         $columns = [];
 
         $columns['none'] = [
-            'int_array' => [
-                'user_ids',
+            'jsonb' => [
+                'user_ids',    // previous type - int_array
             ],
         ];
 
@@ -29,12 +29,6 @@ class CreateOccupationsTable extends Migration
                 '128' => [
                     'name_ru',
                 ],
-            ],
-        ];
-
-        $columns['default:1'] = [
-            'tinyInteger' => [
-                'published',
             ],
         ];
 

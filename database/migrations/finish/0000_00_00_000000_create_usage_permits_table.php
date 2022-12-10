@@ -21,8 +21,8 @@ class CreateUsagePermitsTable extends Migration
                     'name_ru',
                 ],
             ],
-            'int_array' => [
-                'user_ids',
+            'jsonb' => [
+                'user_ids',    // previous type - int_array
             ],
         ];
 
@@ -47,6 +47,9 @@ class CreateUsagePermitsTable extends Migration
                 $table->id();
                 add_columns_from_array($columns, $table);
                 $table->timestamps();
+                $table->foreign('address_id')
+                      ->references('id')
+                      ->on('addresses')->onDelete('cascade');
             }
         );
     }

@@ -37,7 +37,7 @@ class StatusSeeder extends Seeder
             Status::withoutGlobalScopes()->insert([
                 'name_en' => $name_en,
                 'name_ru' => $name_ru,
-                'user_ids' => '{}',
+                'user_ids' => json_encode(['*']),
             ]);
         }
     }

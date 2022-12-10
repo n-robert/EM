@@ -22,14 +22,8 @@ class CreateCountriesTable extends Migration
                     'name_en',
                 ],
             ],
-            'int_array' => [
-                'user_ids',
-            ],
-        ];
-
-        $columns['default:1'] = [
-            'tinyInteger' => [
-                'published',
+            'jsonb' => [
+                'user_ids',    // previous type - int_array
             ],
         ];
 

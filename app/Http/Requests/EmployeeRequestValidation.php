@@ -11,7 +11,7 @@ class EmployeeRequestValidation extends BaseRequestValidation
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'status_id' => [

@@ -14,7 +14,7 @@
     </fieldgroup>
 
     <fieldgroup name="usage-permits">
-        <fieldset name="usage_permits" show="true" repeatable="true">
+        <fieldset name="usage_permits" show="true" repeatable="true" deletable="true">
             <field
                     name="id"
                     type="hidden"/>

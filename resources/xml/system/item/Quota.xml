@@ -20,7 +20,7 @@
             type="date"
             format="dd-MM-YYYY"/>
 
-    <fieldset name="details" show="true" repeatable="true">
+    <fieldset name="details" show="true" repeatable="true" deletable="true">
         <field
                 name="country_id"
                 type="select"

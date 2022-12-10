@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use App\Models\Address;
@@ -20,7 +21,6 @@ class AddressSeeder extends Seeder
             'name_ru',
             'description',
             'user_ids',
-            'published',
             'history',
         ];
 
@@ -48,7 +48,12 @@ class AddressSeeder extends Seeder
                 $value = $oldDatum->$key;
 
                 if ($column == 'user_ids') {
-                    $value = '{' . str_replace(['208', '209', '211', '214', '215'], [2, 3, 2, 4, 5], $value) . '}';
+                    $value = json_encode(array_map(
+                        function ($item) {
+                            return (int)str_replace(['208', '209', '211', '214', '215'], [2, 3, 2, 4, 5], trim($item));
+                        },
+                        explode(',', $value)
+                    ));
                 }
 
                 if ($column == 'history') {
@@ -73,9 +78,9 @@ class AddressSeeder extends Seeder
                             });
                             $user = preg_replace('~^#(\d+)\s.+~', '$1', $oldValue->user[$k]);
                             $newValue[] = [
-                                'date' => $date,
+                                'date'       => Carbon::parse($date)->isoFormat('YYYY-MM-DD H:m:s'),
                                 'prev_value' => $prevValue,
-                                'user' => $user,
+                                'user'       => $user,
                             ];
                         }
 

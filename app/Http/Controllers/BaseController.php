@@ -221,12 +221,12 @@ class BaseController extends Controller implements ControllerInterface
             $attributes = Schema::getColumnListing($this->model->names);
 
             foreach ($attributes as $attribute) {
-                $item->setAttribute($attribute, ($attribute == 'user_ids') ? Auth::id() : null);
+                $item->setAttribute($attribute, null);
             }
         }
 
-        $userIds = $item->user_ids ?: Auth::id();
-        session([$this->name . '.user_ids' => $userIds]);
+        $userIds = $item->user_ids ?: [Auth::id()];
+        session(['user_ids' => $userIds]);
 
         $canEdit = Gate::allows('is-admin') || Gate::allows('can-edit');
         $page = 'EM/Item';
@@ -254,23 +254,23 @@ class BaseController extends Controller implements ControllerInterface
 
     /**
      * Show items list.
-     * @param string $fieldName
+     * @param string $skippedField
      * @param bool $skip
      * @return InertiaResponse
      */
-    public function showAll(string $fieldName = '', bool $skip = true): InertiaResponse
+    public function showAll(string $skippedField = '', bool $skip = true): InertiaResponse
     {
         $query =
             $this->model
                 ->applyFilters()
                 ->applyDefaultOrder()
-                ->applyCustomClauses()
+                ->applyOwnQueryClauses()
                 ->select($this->model->listable);
 
         $items = $query->paginate(request('perPage'));
 
         $page = 'EM/Items';
-        $filters = $this->model->getFilters($skip, $fieldName);
+        $filters = $this->model->getFilters($skip, $skippedField);
         $hasFilters = session($this->names . '.filters') && !!array_filter(session($this->names . '.filters'));
         $pagination = $this->model->getPagination($items);
         $modal = [];
@@ -323,16 +323,12 @@ class BaseController extends Controller implements ControllerInterface
      */
     public function save(Model $model = null): RedirectResponse
     {
-        $attributes = $this->requestValidation->except('type');
-
         if (!$model) {
             $model = $this->model;
         }
 
-        $model->setAttribute('user_ids', session($this->name . '.user_ids'));
-
         $model
-            ->fill($attributes)
+            ->fill($this->requestValidation->except('type'))
             ->save();
 
         return

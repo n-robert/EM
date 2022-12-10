@@ -2,6 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\EmployeeJob;
+use App\Models\EmployeeTurnover;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use App\Models\Employee;
@@ -22,7 +25,6 @@ class EmployeeSeeder extends Seeder
             'last_name_ru',
             'first_name_ru',
             'birth_date',
-            'published',
             'gender',
             'passport_serie',
             'passport_issuer',
@@ -66,6 +68,7 @@ class EmployeeSeeder extends Seeder
             'citizenship_id',
             'status_id',
             'whence_id',
+            'work_address_id',
             'reg_address_id',
             'real_address_id',
             'host_id',
@@ -90,13 +93,39 @@ class EmployeeSeeder extends Seeder
 
         $columns = array_merge($columns, $changedColumns);
         $statuses = DB::connection('pgsql')->table('statuses')->pluck('id', 'name_en');
+        $employeeTurnoverColumns = [
+            'entry_date'     => $statuses['Arrived'],
+            'hired_date'     => $statuses['Hired'],
+            'fired_date'     => $statuses['Fired'],
+            'departure_date' => $statuses['Left'],
+        ];
+        $employeeJobColumns = [
+            'employer_id',
+            'contract_number',
+            'occupation_id',
+            'work_address_id',
+            'hired_date',
+            'fired_date',
+        ];
 
         Employee::truncate();
+        EmployeeJob::truncate();
+        EmployeeTurnover::truncate();
 
         DB::connection('mysqlx')->table('fmsdocs_employees')->orderBy('id')->chunk(100,
-            function ($oldData) use ($columns, $changedColumns, $statuses) {
+            function ($oldData) use (
+                $columns,
+                $changedColumns,
+                $statuses,
+                $employeeTurnoverColumns,
+                $employeeJobColumns
+            ) {
                 foreach ($oldData as $oldDatum) {
-                    $newData = [];
+                    // New employees table's row
+                    $newEmployeeData = [];
+                    // New employee_job table's row
+                    $newEmployeeJobData = [];
+                    $newEmployeeJobData['employee_id'] = $oldDatum->id;
 
                     foreach ($columns as $column) {
                         switch ($column) {
@@ -140,7 +169,10 @@ class EmployeeSeeder extends Seeder
                         ];
 
                         if (in_array($column, $dateFields)) {
-                            $value = $value == '0000-00-00' ? null : $value;
+                            $value =
+                                in_array($value, ['0000-00-00'], '0000-00-00 00:00:00') ?
+                                    null :
+                                    Carbon::parse($value)->isoFormat('YYYY-MM-DD');
                         }
 
                         if ($column == 'status_id') {
@@ -152,13 +184,23 @@ class EmployeeSeeder extends Seeder
                             $value = $statuses[ucfirst($value)];
                         }
 
-                        if ($column == 'user_ids') {
-                            $value =
-                                '{' . str_replace(['208', '209', '211', '214', '215'], [2, 3, 2, 4, 5], $value) . '}';
-                        }
-
                         if (str_ends_with($column, '_id')) {
                             $value = intval($value);
+                        }
+
+                        if ($column == 'user_ids') {
+                            $value = json_encode(array_map(
+                                function ($item) {
+                                    return (int)str_replace(
+                                        ['208', '209', '211', '214', '215'],
+                                        [2, 3, 2, 4, 5],
+                                        trim($item)
+                                    );
+                                },
+                                explode(',', $value)
+                            ));
+                            // employee_job table's user_ids column
+                            $newEmployeeJobData['user_ids'] = $value;
                         }
 
                         if ($column == 'history') {
@@ -170,22 +212,36 @@ class EmployeeSeeder extends Seeder
                                 foreach ($oldValue->date as $k => $date) {
                                     $prevValue = [];
                                     $tmp = explode(chr(10), $oldValue->prev_value[$k]);
-                                    array_walk($tmp, function ($item) use (&$prevValue) {
+                                    array_walk($tmp, function ($item) use (&$prevValue, $changedColumns, $dateFields) {
                                         $item = explode(': ', $item);
 
                                         if (count($item) == 2) {
                                             list($k, $v) = $item;
 
                                             if ($k != 'user_ids') {
+                                                foreach ($changedColumns as $column) {
+                                                    if (str_starts_with($column, trim($k))) {
+                                                        $k = $column;
+                                                        break;
+                                                    }
+                                                }
+
+                                                if (in_array($k, $dateFields)) {
+                                                    $v =
+                                                        in_array($v, ['0000-00-00'], '0000-00-00 00:00:00') ?
+                                                            null :
+                                                            Carbon::parse($v)->isoFormat('YYYY-MM-DD');
+                                                }
+
                                                 $prevValue[$k] = $v;
                                             }
                                         }
                                     });
                                     $user = preg_replace('~^#(\d+)\s.+~', '$1', $oldValue->user[$k]);
                                     $newValue[] = [
-                                        'date' => $date,
+                                        'date'       => Carbon::parse($date)->isoFormat('YYYY-MM-DD H:m:s'),
                                         'prev_value' => $prevValue,
-                                        'user' => $user,
+                                        'user'       => $user,
                                     ];
                                 }
 
@@ -193,10 +249,41 @@ class EmployeeSeeder extends Seeder
                             }
                         }
 
-                        $newData[$column] = $value;
+                        $newEmployeeData[$column] = $value;
                     }
 
-                    Employee::withoutGlobalScopes()->insert($newData);
+                    $tmpData = $newEmployeeData;
+
+                    foreach ($employeeJobColumns as $jobColumn) {
+                        // Add columns to new employee_job table's row
+                        $newEmployeeJobData[$jobColumn] = $tmpData[$jobColumn];
+                        // Remove columns from new employees table's row
+                        unset($newEmployeeData[$jobColumn]);
+                    }
+
+                    // Save new employees table's row
+                    Employee::withoutGlobalScopes()->insert($newEmployeeData);
+
+                    foreach ($employeeTurnoverColumns as $dateColumn => $status) {
+                        if ($tmpData[$dateColumn]) {
+                            // New employee_turnover table's row
+                            $newEmployeeTurnoverData = [
+                                'employee_id' => $tmpData['id'],
+                                'employer_id' => $tmpData['employer_id'],
+                                'date'        => $tmpData[$dateColumn],
+                                'status_id'   => $status,
+                                'user_ids'    => $tmpData['user_ids'],
+                            ];
+
+                            // Save new employee_turnover table's row
+                            EmployeeTurnover::withoutGlobalScopes()->insert($newEmployeeTurnoverData);
+                        }
+                    }
+
+                    // Save new employee_job table's row
+                    if ($newEmployeeJobData['employer_id']) {
+                        EmployeeJob::withoutGlobalScopes()->insert($newEmployeeJobData);
+                    }
                 }
             }
         );

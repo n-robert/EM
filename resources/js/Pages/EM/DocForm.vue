@@ -56,7 +56,7 @@ export default {
             actionUri: '/print/' + this.name + '/' + this.item.id,
             formFields: {},
             requiredFields: [],
-            isNotFields: ['type', 'show', 'repeatable'],
+            isNotFields: ['type', 'show', 'repeatable', 'deletable'],
             errors: {},
             dataLoaded: false,
         };

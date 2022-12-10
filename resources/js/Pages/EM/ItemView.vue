@@ -34,7 +34,7 @@ export default {
         return {
             centeredItemWidth: {
                 md: 'full',
-                xl: '3/5',
+                xl: '10/12',
             },
         };
     },

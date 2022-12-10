@@ -303,7 +303,7 @@ export default {
         filterFieldIsChecked: 'bg-indigo-400 text-white',
         paginationActive: 'bg-indigo-400 text-white rounded-md',
         paginationNull: 'bg-white text-gray-500',
-        leftColumn: 'table-cell align-middle text-right p-1 w-60',
+        leftColumn: 'table-cell align-middle text-right p-1 w-96',
         rightColumn: 'table-cell align-middle text-left p-1',
         warningClass: 'text-red-600',
         labelDefaultClass: 'text-sm',

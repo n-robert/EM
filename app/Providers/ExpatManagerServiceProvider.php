@@ -112,21 +112,20 @@ class ExpatManagerServiceProvider extends ServiceProvider
         // Will return Illuminate\Database\Query\Builder::whereNotEmpty()
         Builder::macro(
             'whereNotEmpty',
-            function (string $column, bool $distinct = true) {
+            function (string $column) {
                 return
                     $this
                         ->getQuery()
-                        ->whereNotEmpty($column, $distinct);
+                        ->whereNotEmpty($column);
             }
         );
 
         // Custom whereNotEmpty for Illuminate\Database\Query\Builder
         QueryBuilder::macro(
             'whereNotEmpty',
-            function (string $column, bool $distinct = true) {
-                $this
-                    ->distinct($distinct)
-                    ->whereNotNull($column);
+            function (string $column) {
+                $this->whereNotNull($column);
+
                 if (str_ends_with($column, '_id')) {
                     $this->where($column, '!=', 0);
                 } else {

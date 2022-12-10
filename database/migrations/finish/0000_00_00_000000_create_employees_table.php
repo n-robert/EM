@@ -29,14 +29,8 @@ class CreateEmployeesTable extends Migration
                 'citizenship_id',
                 'status_id',
             ],
-            'int_array' => [
+            'jsonb' => [
                 'user_ids',
-            ],
-        ];
-
-        $columns['default:1'] = [
-            'tinyInteger' => [
-                'published',
             ],
         ];
 
@@ -51,7 +45,6 @@ class CreateEmployeesTable extends Migration
                     'phone',
                     'work_permit_serie',
                     'work_permit_number',
-                    'contract_number',
                     'invitation_number',
                     'cert_number',
                     'visa_multiplicity',
@@ -91,8 +84,6 @@ class CreateEmployeesTable extends Migration
                 'work_permit_started_date',
                 'work_permit_expired_date',
                 'work_permit_paid_till_date',
-                'hired_date',
-                'fired_date',
                 'taxpayer_id_issued_date',
                 'cert_issued_date',
                 'visa_issued_date',
@@ -105,10 +96,7 @@ class CreateEmployeesTable extends Migration
             ],
             'unsignedBigInteger' => [
                 'whence_id',
-                'employer_id',
                 'employ_permit_id',
-                'occupation_id',
-                'work_address_id',
                 'taxpayer_id',
                 'host_id',
                 'reg_address_id',

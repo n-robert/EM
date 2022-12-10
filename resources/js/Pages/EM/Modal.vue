@@ -36,7 +36,7 @@ export default {
             default: false,
         },
         maxWidth: {
-            default: '2xl',
+            default: '4xl',
         },
         closeable: {
             default: true,
@@ -86,6 +86,8 @@ export default {
                 'lg': 'sm:max-w-lg',
                 'xl': 'sm:max-w-xl',
                 '2xl': 'sm:max-w-2xl',
+                '3xl': 'sm:max-w-3xl',
+                '4xl': 'sm:max-w-4xl',
                 'full': 'sm:max-w-full',
             }[this.maxWidth];
         },

@@ -8,7 +8,12 @@ class Type extends BaseModel
     /**
      * @var string
      */
-    static $defaultName = 'code';
+    public static $defaultName = 'code';
+
+    /**
+     * @var bool
+     */
+    public static $skipAuthUserScope = true;
 
     /**
      * @var array

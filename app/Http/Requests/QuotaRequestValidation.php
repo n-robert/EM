@@ -9,7 +9,7 @@ class QuotaRequestValidation extends BaseRequestValidation
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'year' => 'required',

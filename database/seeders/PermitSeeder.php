@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use App\Models\Permit;
@@ -24,7 +25,6 @@ class PermitSeeder extends Seeder
             'quota_id',
             'details',
             'user_ids',
-            'published',
             'history',
         ];
 
@@ -59,11 +59,19 @@ class PermitSeeder extends Seeder
                 ];
 
                 if (in_array($column, $dateFields)) {
-                    $value = $value == '0000-00-00' ? null : $value;
+                    $value =
+                        in_array($value, ['0000-00-00'], '0000-00-00 00:00:00') ?
+                            null :
+                            Carbon::parse($value)->isoFormat('YYYY-MM-DD');
                 }
 
                 if ($column == 'user_ids') {
-                    $value = '{' . str_replace(['208', '209', '211', '214', '215'], [2, 3, 2, 4, 5], $value) . '}';
+                    $value = json_encode(array_map(
+                        function ($item) {
+                            return (int)str_replace(['208', '209', '211', '214', '215'], [2, 3, 2, 4, 5], trim($item));
+                        },
+                        explode(',', $value)
+                    ));
                 }
 
                 if (str_ends_with($column, '_id')) {
@@ -96,20 +104,31 @@ class PermitSeeder extends Seeder
                         foreach ($oldValue->date as $k => $date) {
                             $prevValue = [];
                             $tmp = explode(chr(10), $oldValue->prev_value[$k]);
-                            array_walk($tmp, function ($item) use (&$prevValue) {
+                            array_walk($tmp, function ($item) use (&$prevValue, $dateFields) {
                                 $item = explode(': ', $item);
 
                                 if (count($item) == 2) {
                                     list($k, $v) = $item;
 
                                     if ($k != 'user_ids') {
+                                        foreach ($dateFields as $column) {
+                                            if (str_starts_with($column, $k)) {
+                                                $k = $column;
+                                                $v =
+                                                    in_array($v, ['0000-00-00'], '0000-00-00 00:00:00') ?
+                                                        null :
+                                                        Carbon::parse($v)->isoFormat('YYYY-MM-DD');
+                                                break;
+                                            }
+                                        }
+
                                         $prevValue[$k] = $v;
                                     }
                                 }
                             });
                             $user = preg_replace('~^#(\d+)\s.+~', '$1', $oldValue->user[$k]);
                             $newValue[] = [
-                                'date' => $date,
+                                'date' => Carbon::parse($date)->isoFormat('YYYY-MM-DD H:m:s'),
                                 'prev_value' => $prevValue,
                                 'user' => $user,
                             ];

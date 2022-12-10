@@ -14,21 +14,22 @@
                     <jet-section-border/>
                 </div>
 
-                <div v-if="$page.props.jetstream.canUpdatePassword">
+                <div v-if="$page.props.jetstream.canUpdatePassword && $page.props.isAdmin">
                     <update-password-form class="mt-10 sm:mt-0"/>
 
                     <jet-section-border/>
                 </div>
 
-                <div v-if="$page.props.jetstream.canManageTwoFactorAuthentication">
+                <div v-if="$page.props.jetstream.canManageTwoFactorAuthentication && $page.props.isAdmin">
                     <two-factor-authentication-form class="mt-10 sm:mt-0"/>
 
                     <jet-section-border/>
                 </div>
 
-                <logout-other-browser-sessions-form :sessions="sessions" class="mt-10 sm:mt-0"/>
+                <logout-other-browser-sessions-form v-if="$page.props.isAdmin"
+                                                    :sessions="sessions" class="mt-10 sm:mt-0"/>
 
-                <template v-if="$page.props.jetstream.hasAccountDeletionFeatures">
+                <template v-if="$page.props.jetstream.hasAccountDeletionFeatures && $page.props.isAdmin">
                     <jet-section-border/>
 
                     <delete-user-form class="mt-10 sm:mt-0"/>

@@ -20,17 +20,9 @@ class AuthUserScope implements Scope
      */
     public function apply(Builder $builder, Model $model)
     {
-        $user = Auth::user();
-        $connection = DB::connection()->getName();
-
-        if ($connection == 'mysqlx') {
-            return;
-        }
-
-        if ($connection == 'pgsql') {
-            $builder->whereRaw($user->id . ' = ANY(' . $model->getTable() . '.user_ids)');
-        } else {
-            $builder->whereRaw('FIND_IN_SET(' . $user->id . ', ' . $model->getTable() . '.user_ids)');
-        }
+        $builder->where(function ($builder) use ($model) {
+            $builder->whereJsonContains($model->getTable() . '.user_ids', Auth::id())
+                    ->orWhereJsonContains($model->getTable() . '.user_ids', '*');
+        });
     }
 }

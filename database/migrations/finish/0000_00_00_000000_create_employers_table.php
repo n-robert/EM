@@ -26,14 +26,8 @@ class CreateEmployersTable extends Migration
                 'director_id',
                 'type_id',
             ],
-            'int_array' => [
-                'user_ids',
-            ],
-        ];
-
-        $columns['default:1'] = [
-            'tinyInteger' => [
-                'published',
+            'jsonb' => [
+                'user_ids',    // previous type - int_array
             ],
         ];
 
@@ -50,11 +44,13 @@ class CreateEmployersTable extends Migration
                     'bic',
                     'acc_reg_number',
                     'uni_reg_number',
-                    'phone',
                     'prime_reg_number',
                 ],
                 '64' => [
                     'bank',
+                ],
+                '128' => [
+                    'phone',
                 ],
             ],
             'jsonb' => [

@@ -21,14 +21,8 @@ class CreateAddressesTable extends Migration
                     'name_ru',
                 ],
             ],
-            'int_array' => [
-                    'user_ids',
-            ],
-        ];
-
-        $columns['default:1'] = [
-            'tinyInteger' => [
-                'published',
+            'jsonb' => [
+                    'user_ids',    // previous type - int_array
             ],
         ];
 

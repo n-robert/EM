@@ -33,7 +33,7 @@ class CountrySeeder extends Seeder
 
             foreach ($columns as $column) {
                 $newData[$column] = $oldDatum->$column;
-                $newData['user_ids'] = '{}';
+                $newData['user_ids'] = json_encode(['*']);
                 $newData['created_at'] = Carbon::now();
             }
 

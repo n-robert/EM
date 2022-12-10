@@ -19,7 +19,7 @@ class Permit extends BaseModel
     /**
      * @var array
      */
-    public static $ownSelectOptionsCondtitions = [
+    public static $ownSelectOptionsConditions = [
         'Valid' => [
             ['whereRaw' => 'expired_date >= NOW()'],
         ],
@@ -33,7 +33,7 @@ class Permit extends BaseModel
         'number',
         'total',
         'expired_date',
-        'er.name_ru as employer',
+        'employers.name_ru as employer',
     ];
 
     /**
@@ -53,8 +53,8 @@ class Permit extends BaseModel
      * @var array
      */
     protected $filterFields = [
-        'employer_id'   => [
-            'model' => 'Employer',
+        'permits.employer_id'   => [
+            'nameModel' => 'Employer',
             ['leftJoin' => 'employers|employers.id|permits.employer_id'],
             ['leftJoin' => 'types|types.id|employers.type_id'],
             ['whereRaw' => 'types.code LIKE \'%LEGAL%\''],
@@ -120,10 +120,10 @@ class Permit extends BaseModel
      * @param Builder $builder
      * @return Builder
      */
-    public function scopeApplyCustomClauses(Builder $builder): Builder
+    public function scopeApplyOwnQueryClauses(Builder $builder): Builder
     {
         $builder
-            ->join('employers as er', 'er.id', '=', 'employer_id', 'left');
+            ->join('employers', 'employers.id', '=', 'employer_id', 'left');
 
         return $builder;
     }
@@ -139,7 +139,7 @@ class Permit extends BaseModel
         $options = ['id AS value', 'number AS text'];
         $query = $this->applyDefaultOrder()->applyAuthUser()->getQuery();
 
-        if ($args && $conditions = static::$ownSelectOptionsCondtitions[$args[0]]) {
+        if ($args && $conditions = static::$ownSelectOptionsConditions[$args[0]]) {
             static::applyQueryOptions($conditions, $query);
         }
 

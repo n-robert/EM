@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-class EmployeeHistory extends BaseModel
+class EmployeeJob extends BaseModel
 {
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'employee_history';
+    protected $table = 'employee_job';
 }

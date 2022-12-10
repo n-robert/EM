@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateQuotasTable extends Migration
+class CreateEmployeeJobTable extends Migration
 {
     /**
      * Run the migrations.
@@ -16,40 +16,41 @@ class CreateQuotasTable extends Migration
         $columns = [];
 
         $columns['none'] = [
-            'string' => [
-                '32' => [
-                    'year',
-                ],
-            ],
             'unsignedBigInteger' => [
+                'employee_id',
                 'employer_id',
             ],
-            'jsonb' => [
-                'user_ids',    // previous type - int_array
+            'jsonb'              => [
+                'user_ids',
             ],
         ];
 
         $columns['nullable:true'] = [
-            'integer' => [
-                'total',
+            'string'             => [
+                '32' => [
+                    'contract_number',
+                ],
             ],
-
+            'date'               => [
+                'hired_date',
+                'fired_date',
+            ],
+            'unsignedBigInteger' => [
+                'occupation_id',
+                'work_address_id',
+            ],
             'jsonb' => [
                 'history',
-                'details',
-            ],
-
-            'date' => [
-                'issued_date',
-                'expired_date',
             ],
         ];
 
-        Schema::create('quotas', function (Blueprint $table) use ($columns) {
+        Schema::create('employee_job', function (Blueprint $table) use ($columns) {
             $table->id();
             add_columns_from_array($columns, $table);
-            $table->index(['year', 'employer_id']);
             $table->timestamps();
+            $table->foreign('employee_id')
+                  ->references('id')
+                  ->on('employees')->onDelete('cascade');
         });
     }
 
@@ -60,6 +61,6 @@ class CreateQuotasTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('quotas');
+        Schema::dropIfExists('employee_job');
     }
 }

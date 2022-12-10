@@ -20,8 +20,8 @@ class CreatePermitsTable extends Migration
                 'employer_id',
                 'quota_id',
             ],
-            'int_array' => [
-                'user_ids',
+            'jsonb' => [
+                'user_ids',    // previous type - int_array
             ],
         ];
 
@@ -30,12 +30,6 @@ class CreatePermitsTable extends Migration
                 '64' => [
                     'number',
                 ],
-            ],
-        ];
-
-        $columns['default:1'] = [
-            'tinyInteger' => [
-                'published',
             ],
         ];
 

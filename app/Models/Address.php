@@ -63,59 +63,6 @@ class Address extends BaseModel
     }
 
     /**
-     * Save the model to the database.
-     *
-     * @param array $options
-     * @return bool
-     */
-    public function save(array $options = []): bool
-    {
-        parent::save($options);
-
-        $attributes = app(AddressRequestValidation::class)->except('type');
-        $existing = $this->usagePermits->all();
-
-        if (empty($attributes['usage_permits'])) {
-            if (!empty($existing)) {
-                array_map(function ($usagePermit) {
-                    UsagePermit::find($usagePermit->id)->delete();
-                }, $existing);
-            }
-
-            return true;
-        }
-
-        $new = [];
-        $abandoned = [];
-
-        if ($coming = $attributes['usage_permits']) {
-            array_map(function ($actual) use (&$new) {
-                $usagePermitsModel = $actual['id'] ? UsagePermit::find($actual['id']) : new UsagePermit();
-                $usagePermitsModel->setAttribute('address_id', $this->id);
-                $usagePermitsModel->setAttribute('user_ids', session($this->name . '.user_ids'));
-                $usagePermitsModel->fill($actual)->save();
-                $new[] = $actual['id'];
-            }, $coming);
-        }
-
-        if (!empty($existing)) {
-            array_map(function ($old) use ($new, &$abandoned) {
-                if (!in_array($old->id, $new)) {
-                    $abandoned[] = $old->id;
-                }
-            }, $existing);
-        }
-
-        if (!empty($abandoned)) {
-            array_map(function ($id) {
-                UsagePermit::find($id)->delete();
-            }, $abandoned);
-        }
-
-        return true;
-    }
-
-    /**
      * Get all usage permits of address.
      *
      * @return HasMany
@@ -123,5 +70,60 @@ class Address extends BaseModel
     public function usagePermits(): HasMany
     {
         return $this->hasMany(UsagePermit::class);
+    }
+
+    /**
+     * Save the model to the database.
+     *
+     * @param array $options
+     * @return bool
+     */
+    public function save(array $options = []): bool
+    {
+        if (parent::save($options)) {
+            $request = request()->except('type');
+            $existing = $this->usagePermits->all();
+
+            if (empty($request['usage_permits'])) {
+                if (!empty($existing)) {
+                    array_map(function ($usagePermit) {
+                        UsagePermit::find($usagePermit->id)->delete();
+                    }, $existing);
+                }
+
+                return true;
+            }
+
+            $new = [];
+            $abandoned = [];
+
+            if ($coming = $request['usage_permits']) {
+                array_map(function ($actual) use (&$new) {
+                    $usagePermitsModel = $actual['id'] ? UsagePermit::find($actual['id']) : new UsagePermit();
+                    $usagePermitsModel->setAttribute('address_id', $this->id);
+                    $usagePermitsModel->setAttribute('user_ids', session($this->name . '.user_ids'));
+                    $usagePermitsModel->fill($actual)->save();
+                    $new[] = $actual['id'];
+                }, $coming);
+            }
+
+            if (!empty($existing)) {
+                array_map(function ($old) use ($new, &$abandoned) {
+                    if (!in_array($old->id, $new)) {
+                        $abandoned[] = $old->id;
+                    }
+                }, $existing);
+            }
+
+            if (!empty($abandoned)) {
+                array_map(function ($id) {
+                    UsagePermit::find($id)->delete();
+                }, $abandoned);
+            }
+
+            return true;
+        }
+
+        return false;
     }
 }

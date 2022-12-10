@@ -80,11 +80,6 @@
     </fieldgroup>
     <fieldgroup name="job">
         <field
-                name="employer_id"
-                type="select"
-                label="Employer"
-                model="Employer"/>
-        <field
                 name="employ_permit_id"
                 type="select"
                 model="Permit"/>
@@ -115,25 +110,6 @@
                 type="date"
                 format="dd-MM-YYYY"/>
         <field
-                name="occupation_id"
-                type="select"
-                model="Occupation"/>
-        <field
-                name="work_address_id"
-                type="select"
-                model="Address"/>
-        <field
-                name="contract_number"
-                type="text"/>
-        <field
-                name="hired_date"
-                type="date"
-                format="dd-MM-YYYY"/>
-        <field
-                name="fired_date"
-                type="date"
-                format="dd-MM-YYYY"/>
-        <field
                 name="cert_number"
                 type="text"/>
         <field
@@ -151,8 +127,37 @@
                 name="taxpayer_id_issued_date"
                 type="date"
                 format="dd-MM-YYYY"/>
+        <fieldset name="employee_job" show="true" repeatable="true" deletable="false">
+            <field
+                name="id"
+                type="hidden"/>
+            <field
+                name="employer_id"
+                type="select"
+                label="employer_id"
+                model="Employer"/>
+            <field
+                name="occupation_id"
+                type="select"
+                model="Occupation"/>
+            <field
+                name="work_address_id"
+                type="select"
+                model="Address"/>
+            <field
+                name="contract_number"
+                type="text"/>
+            <field
+                name="hired_date"
+                type="date"
+                format="dd-MM-YYYY"/>
+            <field
+                name="fired_date"
+                type="date"
+                format="dd-MM-YYYY"/>
+        </fieldset>
     </fieldgroup>
-    <fieldgroup name="migration">
+    <fieldgroup name="immigration">
         <field
                 name="invitation_number"
                 type="text"/>

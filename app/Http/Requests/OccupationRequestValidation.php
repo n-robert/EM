@@ -9,7 +9,7 @@ class OccupationRequestValidation extends BaseRequestValidation
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'name_ru' => 'required',

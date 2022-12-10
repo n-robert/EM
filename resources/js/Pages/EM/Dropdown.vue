@@ -91,6 +91,7 @@ export default {
                 'max': 'w-max',
                 '6/12': 'w-6/12',
                 '9/12': 'w-9/12',
+                '10/12': 'w-10/12',
                 '48': 'w-48',
             }[this.width.toString()];
         },

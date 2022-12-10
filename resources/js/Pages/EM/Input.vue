@@ -12,13 +12,14 @@
 
             <span :class="rightColumn">
                 <select v-if="options"
+                        :multiple="multiple"
                         :name="name"
                         v-model="modelValue"
                         :id="id"
                         :onchange="onchange"
                         :disabled="! $page.props.canEdit"
                         :class="isRequired && (!modelValue || $page.props.errors[name]) ? fieldWarningClass : inputDefaultClass">
-                    <option v-for="option in options" :value="option.value">{{ __(option.text) }}</option>
+                    <option v-for="option in options" v-if="option !== null" :value="option.value">{{ __(option.text) }}</option>
                 </select>
 
                 <datepicker v-else-if="type === 'date'"
@@ -113,6 +114,9 @@ export default {
         type: {
             default: 'text',
         },
+        multiple: {
+            default: false,
+        },
         value: {
             default: null,
         },
@@ -174,13 +178,13 @@ export default {
         };
     },
 
-//        watch: {
-//            error: {
-//                immediate: true,
-//                handler: (newVal, oldVal) => {
-//                    console.log('new: %s, old: %s', newVal, oldVal);
-//                },
-//            },
-//        },
+       watch: {
+           error: {
+               immediate: true,
+               handler: (newVal, oldVal) => {
+                   console.log('new: %s, old: %s', newVal, oldVal);
+               },
+           },
+       },
 };
 </script>

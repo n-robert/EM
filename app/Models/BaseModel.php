@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Contracts\ModelInterface;
+use Carbon\Carbon;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
@@ -29,7 +30,7 @@ class BaseModel extends Model implements ModelInterface
     /**
      * @var array
      */
-    public static $ownSelectOptionsCondtitions = [];
+    public static $ownSelectOptionsConditions = [];
 
     /**
      * The base accessors to append to the model's array form.
@@ -58,7 +59,7 @@ class BaseModel extends Model implements ModelInterface
                     $query->getConnection()->getName() == 'mysql' ?
                         str_replace(['INTEGER', 'INT'], 'UNSIGNED', $args) : $args;
                 $args = preg_split('~\s*\|\s*~', $args);
-                $query = $query->$method(...$args);
+                $query = in_array($method, ['model', 'nameModel']) ? $query : $query->$method(...$args);
             });
         }
     }
@@ -74,6 +75,11 @@ class BaseModel extends Model implements ModelInterface
             static::addGlobalScope(new AuthUserScope());
         }
     }
+
+    /**
+     * @var bool
+     */
+    public $hasHistory = true;
 
     /**
      * @var array
@@ -138,7 +144,8 @@ class BaseModel extends Model implements ModelInterface
      * @var array
      */
     protected $casts = [
-        'history' => 'array',
+        'history'  => 'array',
+        'user_ids' => 'array',
     ];
 
     /**
@@ -150,9 +157,11 @@ class BaseModel extends Model implements ModelInterface
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
+
         $this->name = strtolower(
             str_replace('Model', '', class_basename(static::class))
         );
+
         $this->names = Str::plural($this->name);
 
         if (
@@ -187,14 +196,10 @@ class BaseModel extends Model implements ModelInterface
     public function scopeApplyAuthUser(Builder $builder): Builder
     {
         if (!Gate::allows('is-admin') && !static::$skipAuthUserScope) {
-            $user = Auth::user();
-            $connection = DB::connection()->getName();
-
-            if ($connection == 'pgsql') {
-                $builder->whereRaw($user->id . ' = ANY(' . $this->getTable() . '.user_ids)');
-            } else {
-                $builder->whereRaw('FIND_IN_SET(' . $user->id . ', ' . $this->getTable() . '.user_ids)');
-            }
+            $builder->where(function ($builder) {
+                $builder->whereJsonContains($this->getTable() . '.user_ids', Auth::id())
+                        ->orWhereJsonContains($this->getTable() . '.user_ids', '*');
+            });
         }
 
         return $builder;
@@ -206,7 +211,7 @@ class BaseModel extends Model implements ModelInterface
      * @param Builder $builder
      * @return Builder
      */
-    public function scopeApplyCustomClauses(Builder $builder): Builder
+    public function scopeApplyOwnQueryClauses(Builder $builder): Builder
     {
         return $builder;
     }
@@ -255,9 +260,9 @@ class BaseModel extends Model implements ModelInterface
     /**
      * Get the model's default name.
      *
-     * @return string
+     * @return string|null
      */
-    public function getDefaultNameAttribute(): string
+    public function getDefaultNameAttribute(): ?string
     {
         return
             array_key_exists(static::$defaultName, $this->getAttributes()) ?
@@ -278,9 +283,7 @@ class BaseModel extends Model implements ModelInterface
 
         # Generate absolute link URLs according to scheme
         array_walk($pagination['links'], function (&$link, $key) {
-            $link['url'] = app('url')->to(
-                ($link['url'])
-            );
+            $link['url'] = app('url')->to($link['url']);
         });
 
         $pagination['previous'] = array_shift($pagination['links']);
@@ -298,11 +301,11 @@ class BaseModel extends Model implements ModelInterface
      * Get the filters for showAll()
      *
      * @param bool $skip
-     * @param string $fieldName
+     * @param string $skippedField
      * @return array
      * @throws BindingResolutionException
      */
-    public function getFilters(bool $skip = true, string $fieldName = ''): array
+    public function getFilters(bool $skip = true, string $skippedField = ''): array
     {
         $filters = [];
 
@@ -314,8 +317,8 @@ class BaseModel extends Model implements ModelInterface
             $tmpKey = $this->names . '.filters.' . $field;
             // If field has no model, then we will assume that filter is simplified
             // and just store query clause in session
-            if (!isset($options['model'])) {
-                session([$this->names . '.queries.' . $field => $options]);
+            if (!isset($options['nameModel'])) {
+                session([$this->names . '.queries.' . $this->names . '.' . $field => $options]);
 
                 $key = $tmpKey;
                 $filters[$field][$field]['name'] = $field;
@@ -327,7 +330,7 @@ class BaseModel extends Model implements ModelInterface
                 continue;
             }
 
-            if (!$items = $this->getFilterFieldItems($field, $options, $skip, $fieldName)) {
+            if (!$items = $this->getFilterFieldItems($field, $options, $skip, $skippedField)) {
                 continue;
             }
 
@@ -352,27 +355,32 @@ class BaseModel extends Model implements ModelInterface
      * @param string $field
      * @param array $options
      * @param bool $skip
-     * @param string $fieldName
+     * @param string $skippedField
      * @return Collection
      * @throws BindingResolutionException
      */
     public function getFilterFieldItems(string $field,
                                         array  $options,
                                         bool   $skip = true,
-                                        string $fieldName = ''): Collection
+                                        string $skippedField = ''): Collection
     {
-        $valueField = $nameField = $this->names . '.' . $field;
-
         if (isset($options['model'])) {
             $model = app()->make(__NAMESPACE__ . '\\' . $options['model']);
-            $table = $model->getTable();
-            // This variable is used in getFilterFieldItems()
-            $nameField = $table . '.' . $model::$defaultName;
             unset($options['model']);
+        } else {
+            $model = new static();
+        }
+
+        $valueField = $nameField = strpos($field, '.') ? $field : $model->getTable() . '.' . $field;
+
+        if (isset($options['nameModel'])) {
+            $nameModel = app()->make(__NAMESPACE__ . '\\' . $options['nameModel']);
+            $nameField = $nameModel->getTable() . '.' . $nameModel::$defaultName;
+            unset($options['nameModel']);
         }
 
         // Determine whether to skip dynamic applying other fields filters when getting this field items
-        $query = ($skip || $field == $fieldName) ? new static() : static::applyFilters();
+        $query = ($skip || $field == $skippedField) ? $model : $model::applyFilters();
         $query =
             str_ends_with($field, '_date') ?
                 $query->whereNotNull($valueField) : $query->whereNotEmpty($valueField);
@@ -381,52 +389,13 @@ class BaseModel extends Model implements ModelInterface
 
         // Switch to Illuminate\Database\Eloquent\Builder to use global scopes
         if ($query instanceof QueryBuilder) {
-            $query = $this->newQuery()->setQuery($query);
+            $query = $model->newQuery()->setQuery($query);
         }
 
         return $query
             ->distinct($valueField)
             ->select([$valueField . ' AS value', $nameField . ' AS name'])
             ->get();
-    }
-
-    /**
-     * Access the transformed item's user_ids
-     *
-     * @return array|string|string[]
-     */
-    public function getUserIdsAttribute()
-    {
-        return str_replace(['{', '}'], '', $this->attributes['user_ids']);
-    }
-
-    /**
-     * Transform and set the item's user_ids
-     *
-     * @param $value
-     * @return void
-     */
-    public function setUserIdsAttribute($value)
-    {
-        $this->attributes['user_ids'] = '{' . $value . '}';
-    }
-
-    /**
-     * Delete the model from the database.
-     *
-     * @return bool|null|int
-     *
-     * @throws LogicException
-     */
-    public function delete()
-    {
-        $result = parent::delete();
-
-        if ($result && env('DB_SYNC', false) && $this->getConnectionName() == 'pgsql') {
-            $result = $this->on('mysql')->toBase()->delete($this->getKey());
-        }
-
-        return $result;
     }
 
     /**
@@ -437,21 +406,46 @@ class BaseModel extends Model implements ModelInterface
      */
     public function save(array $options = []): bool
     {
-        $key = $this->getKeyName();
-
-        if (is_null($this->attributes[$key])) {
-            unset($this->attributes[$key]);
+        foreach ($this->attributes as $key => $attribute) {
+            if (is_null($attribute)) {
+                unset($this->attributes[$key]);
+            }
         }
 
-        $result = parent::save($options);
-
-        if ($result && env('DB_SYNC', false) && $this->getConnectionName() == 'pgsql') {
-            $attributes = $this->getAttributes();
-            $attributes['user_ids'] = str_replace(['{', '}'], '', $attributes['user_ids']);
-            $result = $this->on('mysql')->upsert($attributes, [$this->getKeyName()]);
+        if (!$this->user_ids) {
+            $this->setAttribute('user_ids', session('user_ids'));
         }
 
-        return $result;
+        if ($this->hasHistory && $id = $this->getAttribute($this->getKeyName())) {
+            $existing = $this->make()->find($id);
+            $history = $existing['history'];
+            $prev = [];
+
+            if ($existing) {
+                foreach ($existing->attributes as $k => $v) {
+                    $actual = $this->getAttribute($k);
+
+                    if (
+                        !in_array($k, ['user_ids', 'history', 'created_at', 'updated_at'])
+                        && !is_null($actual)
+                        && $actual != $v
+                    ) {
+                        $prev[$k] = $v;
+                    }
+                }
+            }
+
+            if ($prev) {
+                $history[] = [
+                    'date'       => Carbon::now()->isoFormat('YYYY-MM-DD H:m:s'),
+                    'user'       => Auth::id(),
+                    'prev_value' => $prev,
+                ];
+                $this->setAttribute('history', $history);
+            }
+        }
+
+        return parent::save($options);
     }
 
     /**
@@ -474,22 +468,25 @@ class BaseModel extends Model implements ModelInterface
      *
      * @param $filters
      * @param $builder
-     * @param null $defaultKey
+     * @param string $table
      * @throws BindingResolutionException
      */
-    protected function applyFiltersRecursive($filters, $builder, $defaultKey = null)
+    protected function applyFiltersRecursive($filters, $builder, string $table = '')
     {
-        array_walk($filters, function ($value, $key) use ($builder, $defaultKey) {
+//        dd($filters);
+        array_walk($filters, function ($value, $key) use ($builder, $table) {
             if (count($value) != count($value, COUNT_RECURSIVE)) {
+                $key = $table ? $table . '.' . $key : $key;
                 $this->applyFiltersRecursive($value, $builder, $key);
-            }
-            // If there is a simplified filter, then we just apply its original options to query
-            // Otherwise we will apply the "where... IN" clause to query
-            if ($options = session($this->names . '.queries.' . $key)) {
-                static::applyQueryOptions($options, $builder);
             } else {
-                $key = $defaultKey ?: $key;
-                $builder->whereIn($this->names . '.' . $key, $value);
+                $table = $table ?: $this->names;
+                // If there is a simplified filter, then we just apply its original options to query
+                // Otherwise we will apply the "where... IN" clause to query
+                if ($options = session($this->names . '.queries.' . $table . '.' . $key)) {
+                    static::applyQueryOptions($options, $builder);
+                } elseif ($value = array_filter($value)) {
+                    $builder->whereIn($table . '.' . $key, $value);
+                }
             }
         });
     }

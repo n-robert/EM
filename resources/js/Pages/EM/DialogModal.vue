@@ -31,7 +31,7 @@ export default {
             default: false,
         },
         maxWidth: {
-            default: '2xl',
+            default: '4xl',
         },
         closeable: {
             default: true,

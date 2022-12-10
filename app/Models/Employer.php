@@ -16,7 +16,7 @@ class Employer extends BaseModel
     /**
      * @var array
      */
-    public static $ownSelectOptionsCondtitions = [
+    public static $ownSelectOptionsConditions = [
         'LEGAL' => [
             ['leftJoin' => 'types|types.id|type_id'],
             ['whereRaw' => 'types.code LIKE \'%LEGAL%\''],
@@ -42,7 +42,7 @@ class Employer extends BaseModel
      */
     protected $filterFields = [
         'type_id' => [
-            'model' => 'Type',
+            'nameModel' => 'Type',
             ['leftJoin' => 'types|types.id|type_id'],
         ],
     ];
@@ -59,7 +59,7 @@ class Employer extends BaseModel
         $options = ['employers.id AS value', 'name_ru AS text'];
         $query = $this->applyDefaultOrder()->applyAuthUser()->getQuery();
 
-        if ($args && $conditions = static::$ownSelectOptionsCondtitions[$args[0]]) {
+        if ($args && $conditions = static::$ownSelectOptionsConditions[$args[0]]) {
             static::applyQueryOptions($conditions, $query);
         }
 
@@ -88,7 +88,7 @@ class Employer extends BaseModel
      * @param Builder $builder
      * @return Builder
      */
-    public function scopeApplyCustomClauses(Builder $builder): Builder
+    public function scopeApplyOwnQueryClauses(Builder $builder): Builder
     {
         $builder
             ->join('types as t', 't.id', '=', 'type_id', 'left');

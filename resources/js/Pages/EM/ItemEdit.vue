@@ -81,7 +81,7 @@ export default {
             itemHeader: this.item.default_name || this.__('New ' + this.controllerName),
             centeredItemWidth: {
                 md: 'full',
-                xl: '3/5',
+                xl: '10/12',
             },
             errors: {},
         };

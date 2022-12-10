@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
@@ -30,7 +31,27 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             EmployeeSeeder::class,
-            EmployeeHistorySeeder::class,
+            MonthlyStaffSeeder::class,
         ]);
+
+        $tables = [
+            'countries',
+            'addresses',
+            'employees',
+            'employee_job',
+            'employee_turnover',
+            'employers',
+            'monthly_staff',
+            'occupations',
+            'usage_permits',
+            'permits',
+            'quotas',
+            'statuses',
+            'types',
+        ];
+
+        foreach ($tables as $table) {
+            DB::update(DB::raw("SELECT setval('" . $table . "_id_seq', (SELECT MAX(id) FROM " . $table . ")+1)"));
+        }
     }
 }

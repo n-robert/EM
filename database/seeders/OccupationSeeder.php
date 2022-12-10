@@ -22,7 +22,6 @@ class OccupationSeeder extends Seeder
             'code',
             'description',
             'user_ids',
-            'published',
             'history',
         ];
 
@@ -44,7 +43,12 @@ class OccupationSeeder extends Seeder
                 $value = $oldDatum->{$key};
 
                 if ($column == 'user_ids') {
-                    $value = '{' . str_replace(['208', '209', '211', '214', '215'], [2, 3, 2, 4, 5], $value) . '}';
+                    $value = json_encode(array_map(
+                        function ($item) {
+                            return (int)str_replace(['208', '209', '211', '214', '215'], [2, 3, 2, 4, 5], trim($item));
+                        },
+                        explode(',', $value)
+                    ));
                 }
 
                 if (str_ends_with($column, '_id')) {
@@ -73,7 +77,7 @@ class OccupationSeeder extends Seeder
                             });
                             $user = preg_replace('~^#(\d+)\s.+~', '$1', $oldValue->user[$k]);
                             $newValue[] = [
-                                'date' => $date,
+                                'date' => Carbon::parse($date)->isoFormat('YYYY-MM-DD H:m:s'),
                                 'prev_value' => $prevValue,
                                 'user' => $user,
                             ];

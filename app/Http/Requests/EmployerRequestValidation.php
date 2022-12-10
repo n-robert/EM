@@ -11,28 +11,28 @@ class EmployerRequestValidation extends BaseRequestValidation
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
-            'type_id' => [
+            'type_id'      => [
                 'required',
             ],
-            'name_ru' => [
+            'name_ru'      => [
                 'required',
             ],
             'full_name_ru' => [
                 'required',
             ],
-            'director_id' => [
+            'director_id'  => [
                 'required',
             ],
-//            'booker_id' => [
-//                'required',
-//            ],
-//            'taxpayer_id' => [
-//                'required',
-//                Rule::unique('employers')->ignore($this->employer),
-//            ],
+            //            'booker_id' => [
+            //                'required',
+            //            ],
+            //            'taxpayer_id' => [
+            //                'required',
+            //                Rule::unique('employers')->ignore($this->employer),
+            //            ],
         ];
     }
 }

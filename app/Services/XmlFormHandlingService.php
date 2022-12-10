@@ -7,6 +7,7 @@ use Exception;
 use Illuminate\Support\Collection;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use SimpleXMLElement;
 
 class XmlFormHandlingService
 {
@@ -31,13 +32,15 @@ class XmlFormHandlingService
 
         $data->transform(
             function ($item, $key) {
-                $item = (array)$item;
-                $keys = array_keys($item);
-                $tmp = new \stdClass();
-                $tmp->value = $item[$keys[0]];
-                $tmp->text = count($keys) > 1 ? $item[$keys[1]] : $tmp->value;
+                if ($item) {
+                    $item = (array)$item;
+                    $keys = array_keys($item);
+                    $tmp = new \stdClass();
+                    $tmp->value = $item[$keys[0]];
+                    $tmp->text = count($keys) > 1 ? $item[$keys[1]] : $tmp->value;
 
-                return $item = $tmp;
+                    return $item = $tmp;
+                }
             }
         );
 
@@ -71,12 +74,12 @@ class XmlFormHandlingService
      * Get form fields from XML-file.
      * @param string $dir
      * @param string $name
-     * @param int $id
+     * @param int|string $id
      * @return array[]
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public static function getFormFields(string $dir, string $name, int $id = 0): array
+    public static function getFormFields(string $dir, string $name, $id = 0): array
     {
         $dir = explode('.', $dir);
         $path = array_reduce(
@@ -94,13 +97,13 @@ class XmlFormHandlingService
     /**
      * Parse XML-form file to get array of form fields
      * @param string $xmlFile
-     * @param int $id
+     * @param int|string $id
      * @return array[]
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      * @throws Exception
      */
-    public static function parseFormFields(string $xmlFile, int $id = 0): array
+    public static function parseFormFields(string $xmlFile, $id = 0): array
     {
         $formFields = [
             'requiredFields' => [],
@@ -109,7 +112,7 @@ class XmlFormHandlingService
 
         if (!$fileSystem->missing($xmlFile)) {
             $xmlString = $fileSystem->get($xmlFile);
-            $root = new \SimpleXMLElement($xmlString);
+            $root = new SimpleXMLElement($xmlString);
 
             if ($root->getName() != 'root') {
                 return $formFields;
@@ -165,7 +168,7 @@ class XmlFormHandlingService
     /**
      * Get field options|value using "model" attribute
      *
-     * @param \SimpleXMLElement $fieldAttributes
+     * @param SimpleXMLElement $fieldAttributes
      * @param int $id
      * @param array $tmp
      * @return void
@@ -203,10 +206,10 @@ class XmlFormHandlingService
             $column = array_shift($params);
 
             if ($column) {
-                $model->whereNotEmpty($column, $distinct);
+                $model->whereNotEmpty($column);
             }
 
-            $options = $model->$method($column);
+            $options = $distinct ? $model->distinct()->$method($column) : $model->$method($column);
         } else {
             $options = $model->getOwnSelectOptions(...$args);
         }
@@ -242,8 +245,8 @@ class XmlFormHandlingService
     /**
      * Get field options by "option" attribute
      *
-     * @param \SimpleXMLElement $field
-     * @param \SimpleXMLElement $fieldAttributes
+     * @param SimpleXMLElement $field
+     * @param SimpleXMLElement $fieldAttributes
      * @param array $tmp
      * @return void
      */
@@ -267,7 +270,7 @@ class XmlFormHandlingService
     /**
      * Add field to collection
      *
-     * @param \SimpleXMLElement $field
+     * @param SimpleXMLElement $field
      * @param string $fieldName
      * @param array $formFields
      * @param array $tmpField
@@ -284,11 +287,10 @@ class XmlFormHandlingService
         $hasFieldGroup = $field->xpath('ancestor::fieldgroup[@name]/@name');
         $hasFieldSet = $field->xpath('ancestor::fieldset[@name]/@name');
 
-        $fieldGroupName = null;
-        $fieldGroupShow = null;
         $fieldSetName = null;
         $fieldSetShow = null;
         $fieldSetRepeatable = null;
+        $fieldSetDeletable = null;
         $tmpSet = [];
 
         if ($hasFieldSet) {
@@ -298,6 +300,8 @@ class XmlFormHandlingService
             $fieldSetShow = $fieldSetShow ? validate_boolean((string)$fieldSetShow[0], true) : false;
             $fieldSetRepeatable = $field->xpath('ancestor::fieldset[@name]/@repeatable');
             $fieldSetRepeatable = $fieldSetRepeatable ? validate_boolean((string)$fieldSetRepeatable[0], true) : false;
+            $fieldSetDeletable = $field->xpath('ancestor::fieldset[@name]/@deletable');
+            $fieldSetDeletable = $fieldSetDeletable ? validate_boolean((string)$fieldSetDeletable[0], true) : false;
         }
 
         if ($hasFieldGroup) {
@@ -311,6 +315,7 @@ class XmlFormHandlingService
                 $formFields[$fieldGroupName][$fieldSetName]['type'] = 'fieldset';
                 $formFields[$fieldGroupName][$fieldSetName]['show'] = $fieldSetShow;
                 $formFields[$fieldGroupName][$fieldSetName]['repeatable'] = $fieldSetRepeatable;
+                $formFields[$fieldGroupName][$fieldSetName]['deletable'] = $fieldSetDeletable;
                 $formFields[$fieldGroupName][$fieldSetName] =
                     array_merge_recursive($formFields[$fieldGroupName][$fieldSetName], $tmpSet);
                 $tmpSet = [];
@@ -323,6 +328,7 @@ class XmlFormHandlingService
             $formFields[$fieldSetName]['type'] = 'fieldset';
             $formFields[$fieldSetName]['show'] = $fieldSetShow;
             $formFields[$fieldSetName]['repeatable'] = $fieldSetRepeatable;
+            $formFields[$fieldSetName]['deletable'] = $fieldSetDeletable;
             $formFields[$fieldSetName] = array_merge_recursive($formFields[$fieldSetName], $tmpSet);
         }
     }

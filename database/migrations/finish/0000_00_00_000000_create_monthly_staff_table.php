@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateQuotasTable extends Migration
+class CreateMonthlyStaffTable extends Migration
 {
     /**
      * Run the migrations.
@@ -16,39 +16,30 @@ class CreateQuotasTable extends Migration
         $columns = [];
 
         $columns['none'] = [
-            'string' => [
+            'string'             => [
                 '32' => [
                     'year',
+                    'month',
                 ],
             ],
             'unsignedBigInteger' => [
                 'employer_id',
             ],
-            'jsonb' => [
-                'user_ids',    // previous type - int_array
+            'jsonb'              => [
+                'employees',
             ],
         ];
 
-        $columns['nullable:true'] = [
-            'integer' => [
-                'total',
-            ],
-
+        $columns['default:["*"]'] = [
             'jsonb' => [
-                'history',
-                'details',
-            ],
-
-            'date' => [
-                'issued_date',
-                'expired_date',
+                'user_ids',
             ],
         ];
 
-        Schema::create('quotas', function (Blueprint $table) use ($columns) {
+        Schema::create('monthly_staff', function (Blueprint $table) use ($columns) {
             $table->id();
             add_columns_from_array($columns, $table);
-            $table->index(['year', 'employer_id']);
+            $table->index(['year', 'month', 'employer_id']);
             $table->timestamps();
         });
     }
@@ -60,6 +51,6 @@ class CreateQuotasTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('quotas');
+        Schema::dropIfExists('monthly_staff');
     }
 }

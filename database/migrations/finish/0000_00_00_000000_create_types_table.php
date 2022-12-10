@@ -16,8 +16,8 @@ class CreateTypesTable extends Migration
         $columns = [];
 
         $columns['none'] = [
-            'int_array' => [
-                'user_ids',
+            'jsonb' => [
+                'user_ids',    // previous type - int_array
             ],
         ];
 
