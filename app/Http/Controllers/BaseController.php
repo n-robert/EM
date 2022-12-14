@@ -265,11 +265,13 @@ class BaseController extends Controller implements ControllerInterface
 
     /**
      * Show items list.
+     *
      * @param string $skippedField
      * @param bool $skip
+     * @param array $filters
      * @return InertiaResponse
      */
-    public function showAll(string $skippedField = '', bool $skip = true): InertiaResponse
+    public function showAll(string $skippedField = '', bool $skip = true, array $filters = []): InertiaResponse
     {
         $views = XmlFormHandlingService::getModelList();
 
@@ -282,7 +284,7 @@ class BaseController extends Controller implements ControllerInterface
 
         $query =
             $this->model
-                ->applyFilters()
+                ->applyFilters($filters)
                 ->applyDefaultOrder()
                 ->applyOwnQueryClauses()
                 ->select($this->model->listable);

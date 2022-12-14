@@ -247,12 +247,13 @@ class BaseModel extends Model implements ModelInterface
      * Scope a query to applied filters.
      *
      * @param Builder $builder
+     * @param array $filters
      * @return Builder
      * @throws BindingResolutionException
      */
-    public function scopeApplyFilters(Builder $builder): Builder
+    public function scopeApplyFilters(Builder $builder, array $filters = []): Builder
     {
-        $filters = session($this->names . '.filters');
+        $filters = $filters ?: session($this->names . '.filters');
 
         if ($filters && $filters = array_filter($filters)) {
             $this->applyFiltersRecursive($filters, $builder);
@@ -477,7 +478,6 @@ class BaseModel extends Model implements ModelInterface
      */
     protected function applyFiltersRecursive($filters, $builder, string $table = '')
     {
-//        dd($filters);
         array_walk($filters, function ($value, $key) use ($builder, $table) {
             if (count($value) != count($value, COUNT_RECURSIVE)) {
                 $key = $table ? $table . '.' . $key : $key;

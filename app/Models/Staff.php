@@ -20,14 +20,14 @@ class Staff extends BaseModel
      * @var array
      */
     public $listable = [
-        'tmp.year',
-        'tmp.month',
+        "tmp.year",
+        "tmp.month",
     ];
 
     /**
      * @var array
      */
-    public $listableRaw = 'count(employee) as staff';
+    public $listableRaw = "count(employee) as staff, '/staff/'||tmp.year||'/'||tmp.month as item_custom_link";
 
     /**
      * @var array
@@ -71,11 +71,12 @@ class Staff extends BaseModel
     {
         $builder
             ->joinSub(
-                'select year, month, employer_id, jsonb_array_elements(employees) as employee from staff',
+                'select year, month, employer_id, cast(jsonb_array_elements(employees) as integer) as employee from staff',
                 'tmp',
                 'tmp.employer_id',
                 '=',
-                'staff.employer_id'
+                'staff.employer_id',
+                'right',
             )
             ->groupBy($this->listable);
 

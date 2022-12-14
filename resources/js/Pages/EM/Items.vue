@@ -67,7 +67,7 @@
                                 <div v-for="field in formFields" class="p-2 align-middle table-cell">
                                     <h2 v-if="field.name === 'default_name'"
                                         class="pl-6 py-1 text-indigo-800 hover:text-indigo-500 text-left">
-                                        <inertia-link :href="customEditLink || '/' + controllerName + '/' + item.id">
+                                        <inertia-link :href="item.item_custom_link || '/' + controllerName + '/' + item.id">
                                             {{ item.default_name }}
                                         </inertia-link>
                                     </h2>
@@ -164,7 +164,6 @@ export default {
         'formFields',
         'controllerName',
         'controllerNames',
-        'customEditLink',
         'canCreateNewItem',
     ],
 
