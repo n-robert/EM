@@ -67,7 +67,7 @@
                                 <div v-for="field in formFields" class="p-2 align-middle table-cell">
                                     <h2 v-if="field.name === 'default_name'"
                                         class="pl-6 py-1 text-indigo-800 hover:text-indigo-500 text-left">
-                                        <inertia-link :href="'/' + controllerName + '/' + item.id">
+                                        <inertia-link :href="customEditLink || '/' + controllerName + '/' + item.id">
                                             {{ item.default_name }}
                                         </inertia-link>
                                     </h2>
@@ -112,7 +112,7 @@
                     </div>
 
                     <div class="p-2">
-                        <inertia-link :href="'/' + controllerName + '/new'"
+                        <inertia-link v-if="canCreateNewItem" :href="'/' + controllerName + '/new'"
                                       class="px-4 py-2 border border-gray-300 rounded-md text-white bg-indigo-400
                                       hover:bg-indigo-500">
                             {{ createNewItem }}
@@ -164,6 +164,8 @@ export default {
         'formFields',
         'controllerName',
         'controllerNames',
+        'customEditLink',
+        'canCreateNewItem',
     ],
 
     provide() {
@@ -179,7 +181,7 @@ export default {
                 md: 'full',
                 xl: '10/12',
             },
-            needAdditionalButton: this.items.length > 5,
+            needAdditionalButton: this.canCreateNewItem && this.items.length > 5,
             createNewItem: this.__('New ' + this.controllerName),
             itemCount: [
                 this.pagination.firstItem + '-' + this.pagination.lastItem,

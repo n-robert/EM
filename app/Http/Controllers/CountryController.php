@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-class CountryController extends Controller
+class CountryController extends BaseController
 {
     //
 }

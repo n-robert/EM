@@ -1,8 +1,6 @@
 <?xml version="1.0"?>
 <root>
-    <field
-            name="default_name"
-            label="Permit number"/>
+    4
     <field
             name="employer"/>
     <field

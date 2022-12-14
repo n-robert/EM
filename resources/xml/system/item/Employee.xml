@@ -203,6 +203,10 @@
                 type="select"
                 model="Employee:__pluck:entry_checkpoint"/>
         <field
+            name="departure_date"
+            type="date"
+            format="dd-MM-YYYY"/>
+        <field
                 name="migr_card_serie"
                 type="text"/>
         <field

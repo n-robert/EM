@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateMonthlyStaffTable extends Migration
+class CreateStaffTable extends Migration
 {
     /**
      * Run the migrations.
@@ -27,20 +27,18 @@ class CreateMonthlyStaffTable extends Migration
             ],
             'jsonb'              => [
                 'employees',
-            ],
-        ];
-
-        $columns['default:["*"]'] = [
-            'jsonb' => [
                 'user_ids',
             ],
         ];
 
-        Schema::create('monthly_staff', function (Blueprint $table) use ($columns) {
+        Schema::create('staff', function (Blueprint $table) use ($columns) {
             $table->id();
             add_columns_from_array($columns, $table);
-            $table->index(['year', 'month', 'employer_id']);
             $table->timestamps();
+            $table->unique(['year', 'month', 'employer_id']);
+            $table->foreign('employer_id')
+                  ->references('id')
+                  ->on('employers')->onDelete('cascade');
         });
     }
 
@@ -51,6 +49,6 @@ class CreateMonthlyStaffTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('monthly_staff');
+        Schema::dropIfExists('staff');
     }
 }

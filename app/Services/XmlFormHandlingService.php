@@ -243,6 +243,25 @@ class XmlFormHandlingService
     }
 
     /**
+     * Get list of available models
+     *
+     * @return array
+     */
+    public static function getModelList(): array
+    {
+        $fileSystem = app('files');
+        $systemViews = $fileSystem->files(config('app.xml_form_path')['system']['item']);
+        $models = [];
+
+        foreach ($systemViews as $file) {
+            $baseName = str_replace(['.', $file->getExtension()], '', $file->getFilename());
+            $models[] = strtolower($baseName);
+        }
+
+        return $models;
+    }
+
+    /**
      * Get field options by "option" attribute
      *
      * @param SimpleXMLElement $field

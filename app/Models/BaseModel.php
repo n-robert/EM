@@ -12,11 +12,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use App\Scopes\AuthUserScope;
-use LogicException;
 
 class BaseModel extends Model implements ModelInterface
 {
@@ -85,6 +83,11 @@ class BaseModel extends Model implements ModelInterface
      * @var array
      */
     public $listable = ['*'];
+
+    /**
+     * @var array
+     */
+    public $listableRaw = '';
 
     /**
      * @var string
@@ -165,8 +168,9 @@ class BaseModel extends Model implements ModelInterface
         $this->names = Str::plural($this->name);
 
         if (
-            in_array($this->name, session('views')) &&
-            url()->current() == route('gets.' . $this->names)
+            !app()->runningInConsole()
+            && in_array($this->name, session('views'))
+            && url()->current() == route('gets.' . $this->names)
         ) {
             $this->appends = [];
         }

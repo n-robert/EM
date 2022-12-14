@@ -31,7 +31,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             EmployeeSeeder::class,
-            MonthlyStaffSeeder::class,
+            StaffSeeder::class,
         ]);
 
         $tables = [
@@ -41,7 +41,7 @@ class DatabaseSeeder extends Seeder
             'employee_job',
             'employee_turnover',
             'employers',
-            'monthly_staff',
+            'staff',
             'occupations',
             'usage_permits',
             'permits',

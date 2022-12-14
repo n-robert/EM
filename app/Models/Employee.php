@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Http\Requests\EmployeeRequestValidation;
+use Carbon\Carbon;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -264,53 +265,79 @@ class Employee extends BaseModel
         if (parent::save($options)) {
             $request = request()->except('type');
             $statuses = Status::pluck('id', 'name_en');
-            $employee_job = $request['employee_job'] ?? [];
-            $employeeStatusColumns = [
+            $jobData = $request['employee_job'] ?? [];
+            $dateTypeStatus = [
                 'entry_date'     => $statuses['Arrived'],
                 'hired_date'     => $statuses['Hired'],
                 'fired_date'     => $statuses['Fired'],
                 'departure_date' => $statuses['Left'],
             ];
-            $newEmployeeTurnoverData = [];
+            $turnoverData = [];
 
             // Save employee_job data
-            if ($employee_job) {
+            if ($jobData) {
                 array_map(function ($job) {
-                    $EmployeeJobModel = $job['id'] ? EmployeeJob::find($job['id']) : new EmployeeJob();
-                    $EmployeeJobModel->setAttribute('employee_id', $this->id);
-                    $EmployeeJobModel->fill($job)->save();
-                }, $employee_job);
+                    $employeeJobModel = $job['id'] ? EmployeeJob::find($job['id']) : new EmployeeJob();
+                    $employeeJobModel->setAttribute('employee_id', $this->id);
+                    $employeeJobModel->fill($job)->save();
+                }, $jobData);
             }
 
-            foreach ($employeeStatusColumns as $dateColumn => $status) {
+            foreach ($dateTypeStatus as $dateType => $status) {
                 // Get arrived_date and departure_date
-                if (isset($request[$dateColumn]) && $request[$dateColumn]) {
-                    $newEmployeeTurnoverData[] = [
+                if (isset($request[$dateType]) && $request[$dateType]) {
+                    $turnoverData[] = [
                         'employee_id' => $this->id,
-                        'date'        => $request[$dateColumn],
+                        'date'        => $request[$dateType],
                         'status_id'   => $status,
-                        'user_ids'    => $this->user_ids,
                     ];
                 }
 
                 // Get hired_date and fired_date
-                if ($employee_job) {
-                    array_map(function ($job) use ($dateColumn, $status, &$newEmployeeTurnoverData) {
-                        if (isset($job[$dateColumn]) && $job[$dateColumn]) {
-                            $newEmployeeTurnoverData[] = [
+                if ($jobData) {
+                    array_map(function ($job) use ($dateType, $status, &$turnoverData) {
+                        if (isset($job[$dateType]) && $job[$dateType]) {
+                            $turnoverData[] = [
                                 'employee_id' => $this->id,
                                 'employer_id' => $job['employer_id'],
-                                'date'        => $job[$dateColumn],
+                                'date'        => $job[$dateType],
                                 'status_id'   => $status,
-                                'user_ids'    => $this->user_ids,
                             ];
+
+                            // Add new employee to current month staff
+                            if ($dateType == 'hired_date') {
+                                $year = Carbon::now()->isoFormat('YYYY');
+                                $month = Carbon::now()->isoFormat('MM');
+                                $employerId = $job['employer_id'];
+                                $staffModel =
+                                    Staff::withoutGlobalScopes()
+                                         ->where([
+                                             'year'  => $year,
+                                             'month' => $month,
+                                             'employer_id' => $employerId,
+                                         ])
+                                         ->first() ?? new Staff();
+
+                                $employees = $staffModel->employees ?? [];
+                                $employees[] = $this->id;
+
+                                $staffModel
+                                    ->fill([
+                                        'year'      => $year,
+                                        'month'     => $month,
+                                        'employer_id' => $employerId,
+                                        'employees' => array_unique($employees),
+                                        'user_ids'  => Employer::find($employerId)->user_ids,
+                                    ])
+                                    ->save();
+                            }
                         }
-                    }, $employee_job);
+                    }, $jobData);
                 }
             }
 
-            if ($newEmployeeTurnoverData) {
-                foreach ($newEmployeeTurnoverData as $datum) {
+            if ($turnoverData) {
+                foreach ($turnoverData as $datum) {
                     $test = $datum;
                     unset($test['user_ids']);
 

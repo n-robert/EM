@@ -46,6 +46,16 @@ class BaseController extends Controller implements ControllerInterface
     protected $formFillingService;
 
     /**
+     * @var string
+     */
+    protected $customEditLink;
+
+    /**
+     * @var bool
+     */
+    protected $canCreateNewItem = true;
+
+    /**
      * BaseController constructor.
      *
      * @param PdfFormFillingService $formFillingService
@@ -53,10 +63,11 @@ class BaseController extends Controller implements ControllerInterface
      * @param Request $request
      */
     public function __construct(
-        PdfFormFillingService $formFillingService,
+        PdfFormFillingService  $formFillingService,
         XmlFormHandlingService $formHandlingService,
-        Request $request
-    ) {
+        Request                $request
+    )
+    {
         $this->formFillingService = $formFillingService;
         $this->formHandlingService = $formHandlingService;
         $this->request = $request;
@@ -69,8 +80,8 @@ class BaseController extends Controller implements ControllerInterface
     /**
      * Handle dynamic method calls into the controller.
      *
-     * @param  string $method
-     * @param  array $parameters
+     * @param string $method
+     * @param array $parameters
      * @return mixed
      */
     public function __call($method, $parameters)
@@ -84,7 +95,7 @@ class BaseController extends Controller implements ControllerInterface
     /**
      * Dynamically retrieve class field.
      *
-     * @param  string $key
+     * @param string $key
      * @return mixed
      */
     public function __get($key)
@@ -209,7 +220,7 @@ class BaseController extends Controller implements ControllerInterface
     /**
      * Show item screen.
      *
-     * @param  int|string $id
+     * @param int|string $id
      * @return InertiaResponse
      */
     public function show($id): InertiaResponse
@@ -260,12 +271,25 @@ class BaseController extends Controller implements ControllerInterface
      */
     public function showAll(string $skippedField = '', bool $skip = true): InertiaResponse
     {
+        $views = XmlFormHandlingService::getModelList();
+
+        if (!Gate::allows('is-admin')) {
+            $superAdminAccess = ['staff'];
+            $views = array_diff($views, $superAdminAccess);
+        }
+
+        session(['views' => $views]);
+
         $query =
             $this->model
                 ->applyFilters()
                 ->applyDefaultOrder()
                 ->applyOwnQueryClauses()
                 ->select($this->model->listable);
+
+        if ($this->model->listableRaw) {
+            $query->selectRaw($this->model->listableRaw);
+        }
 
         $items = $query->paginate(request('perPage'));
 
@@ -293,15 +317,17 @@ class BaseController extends Controller implements ControllerInterface
         unset($formFields['requiredFields']);
 
         return Jetstream::inertia()->render($this->request, $page, [
-            'items'           => $items->all(),
-            'filters'         => $filters,
-            'hasFilters'      => $hasFilters,
-            'pagination'      => $pagination,
-            'modal'           => $modal,
-            'docList'         => $docList,
-            'formFields'      => $formFields,
-            'controllerName'  => $this->name,
-            'controllerNames' => $this->names,
+            'items'            => $items->all(),
+            'filters'          => $filters,
+            'hasFilters'       => $hasFilters,
+            'pagination'       => $pagination,
+            'modal'            => $modal,
+            'docList'          => $docList,
+            'formFields'       => $formFields,
+            'controllerName'   => $this->name,
+            'controllerNames'  => $this->names,
+            'customEditLink'   => $this->customEditLink,
+            'canCreateNewItem' => $this->canCreateNewItem,
         ]);
     }
 

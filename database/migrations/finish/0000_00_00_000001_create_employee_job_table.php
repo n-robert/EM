@@ -48,6 +48,7 @@ class CreateEmployeeJobTable extends Migration
             $table->id();
             add_columns_from_array($columns, $table);
             $table->timestamps();
+            $table->unique(['employee_id', 'employer_id', 'occupation_id', 'hired_date', 'fired_date']);
             $table->foreign('employee_id')
                   ->references('id')
                   ->on('employees')->onDelete('cascade');
