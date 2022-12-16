@@ -21,6 +21,11 @@ class BaseModel extends Model implements ModelInterface
     use HasFactory;
 
     /**
+     * @var bool
+     */
+    public static $adminOnly = false;
+
+    /**
      * @var string
      */
     public static $defaultName = 'name_ru';

@@ -197,6 +197,112 @@ class BaseController extends Controller implements ControllerInterface
     }
 
     /**
+     * Get item data.
+     *
+     * @param int|string $id
+     * @return array
+     */
+    public function getItem($id): array
+    {
+        if (is_numeric($id)) {
+            $item = $this->model->findOrFail($id);
+        } else {
+            $item = $this->model;
+            $attributes = Schema::getColumnListing($this->model->names);
+
+            foreach ($attributes as $attribute) {
+                $item->setAttribute($attribute, null);
+            }
+        }
+
+        $userIds = $item->user_ids ?: [Auth::id()];
+        session(['user_ids' => $userIds]);
+
+        $action = $id > 0 ? 'update' : 'store';
+        $listUrl = URL::route('gets.' . $this->names, ['page' => session('page')], false);
+
+        $formFields = call_user_func_array(
+            [$this->formHandlingService, 'getFormFields'],
+            ['system.item', $this->name, $id]
+        );
+        $requiredFields = $formFields['requiredFields'];
+        unset($formFields['requiredFields']);
+
+        return [
+            'item'            => $item,
+            'repeatable'      => $item->repeatable,
+            'action'          => $action,
+            'listUrl'         => $listUrl,
+            'formFields'      => $formFields,
+            'requiredFields'  => $requiredFields,
+            'controllerName'  => $this->name,
+            'controllerNames' => $this->names,
+        ];
+    }
+
+    /**
+     * Show items list.
+     *
+     * @param string $skippedField
+     * @param bool $skip
+     * @param array $filters
+     * @return array
+     */
+    public function getItems(string $skippedField = '',
+                             bool   $skip = true,
+                             array  $filters = []): array
+    {
+        session(['views' => XmlFormHandlingService::getModelList(true)]);
+        $query =
+            $this->model
+                ->applyFilters($filters)
+                ->applyDefaultOrder()
+                ->applyOwnQueryClauses()
+                ->select($this->model->listable);
+
+        if ($this->model->listableRaw) {
+            $query->selectRaw($this->model->listableRaw);
+        }
+
+        $items = $query->paginate(request('perPage'));
+        $frontFilters = $this->model->getFilters($skip, $skippedField);
+        $hasFilters = count_array_recursive(session($this->names . '.filters'));
+        $pagination = $this->model->getPagination($items);
+        $modal = [];
+        $docList = [];
+
+        foreach ($items->all() as $item) {
+            $key = $item->id ?: $item->default_name;
+            $modal[$key] = false;
+        }
+
+        $modal['filters'] = session('filtersModal');
+        session(['filtersModal' => false]);
+        session(['page' => $this->request->input('page')]);
+
+        call_user_func_array([$this->formHandlingService, 'checkDocList'], [$this->name, &$modal, &$docList]);
+
+        $formFields = call_user_func_array(
+            [$this->formHandlingService, 'getFormFields'],
+            ['system.list', $this->names]
+        );
+        unset($formFields['requiredFields']);
+
+        return [
+            'items'            => $items->all(),
+            'filters'          => $frontFilters,
+            'hasFilters'       => $hasFilters,
+            'pagination'       => $pagination,
+            'modal'            => $modal,
+            'docList'          => $docList,
+            'formFields'       => $formFields,
+            'controllerName'   => $this->name,
+            'controllerNames'  => $this->names,
+            'canCreateNewItem' => $this->canCreateNewItem,
+        ];
+    }
+
+    /**
      * Print WPM form.
      *
      * @param string $doc
@@ -225,42 +331,11 @@ class BaseController extends Controller implements ControllerInterface
      */
     public function show($id): InertiaResponse
     {
-        if (is_numeric($id)) {
-            $item = $this->model->findOrFail($id);
-        } else {
-            $item = $this->model;
-            $attributes = Schema::getColumnListing($this->model->names);
-
-            foreach ($attributes as $attribute) {
-                $item->setAttribute($attribute, null);
-            }
-        }
-
-        $userIds = $item->user_ids ?: [Auth::id()];
-        session(['user_ids' => $userIds]);
-
         $canEdit = Gate::allows('is-admin') || Gate::allows('can-edit');
         $page = 'EM/Item';
         $page .= $canEdit ? 'Edit' : 'View';
-        $action = $id > 0 ? 'update' : 'store';
-        $formFields = call_user_func_array(
-            [$this->formHandlingService, 'getFormFields'],
-            ['system.item', $this->name, $id]
-        );
 
-        $requiredFields = $formFields['requiredFields'];
-        unset($formFields['requiredFields']);
-
-        return Jetstream::inertia()->render($this->request, $page, [
-            'item'            => $item,
-            'repeatable'      => $item->repeatable,
-            'action'          => $action,
-            'formFields'      => $formFields,
-            'requiredFields'  => $requiredFields,
-            'controllerName'  => $this->name,
-            'controllerNames' => $this->names,
-            'listUrl'         => URL::route('gets.' . $this->names, ['page' => session('page')], false),
-        ]);
+        return Jetstream::inertia()->render($this->request, $page, $this->getItem($id));
     }
 
     /**
@@ -271,66 +346,14 @@ class BaseController extends Controller implements ControllerInterface
      * @param array $filters
      * @return InertiaResponse
      */
-    public function showAll(string $skippedField = '', bool $skip = true, array $filters = []): InertiaResponse
+    public function showAll(string $skippedField = '',
+                            bool   $skip = true,
+                            array  $filters = []): InertiaResponse
     {
-        $views = XmlFormHandlingService::getModelList();
-
-        if (!Gate::allows('is-admin')) {
-            $superAdminAccess = ['staff'];
-            $views = array_diff($views, $superAdminAccess);
-        }
-
-        session(['views' => $views]);
-
-        $query =
-            $this->model
-                ->applyFilters($filters)
-                ->applyDefaultOrder()
-                ->applyOwnQueryClauses()
-                ->select($this->model->listable);
-
-        if ($this->model->listableRaw) {
-            $query->selectRaw($this->model->listableRaw);
-        }
-
-        $items = $query->paginate(request('perPage'));
-
         $page = 'EM/Items';
-        $filters = $this->model->getFilters($skip, $skippedField);
-        $hasFilters = session($this->names . '.filters') && !!array_filter(session($this->names . '.filters'));
-        $pagination = $this->model->getPagination($items);
-        $modal = [];
-        $docList = [];
 
-        foreach ($items->all() as $item) {
-            $modal[$item->id] = false;
-        }
-
-        $modal['filters'] = session('filtersModal');
-        session(['filtersModal' => false]);
-        session(['page' => $this->request->input('page')]);
-
-        call_user_func_array([$this->formHandlingService, 'checkDocList'], [$this->name, &$modal, &$docList]);
-
-        $formFields = call_user_func_array(
-            [$this->formHandlingService, 'getFormFields'],
-            ['system.list', $this->names]
-        );
-        unset($formFields['requiredFields']);
-
-        return Jetstream::inertia()->render($this->request, $page, [
-            'items'            => $items->all(),
-            'filters'          => $filters,
-            'hasFilters'       => $hasFilters,
-            'pagination'       => $pagination,
-            'modal'            => $modal,
-            'docList'          => $docList,
-            'formFields'       => $formFields,
-            'controllerName'   => $this->name,
-            'controllerNames'  => $this->names,
-            'customEditLink'   => $this->customEditLink,
-            'canCreateNewItem' => $this->canCreateNewItem,
-        ]);
+        return Jetstream::inertia()
+                        ->render($this->request, $page, $this->getItems($skippedField, $skip, $filters));
     }
 
     /**

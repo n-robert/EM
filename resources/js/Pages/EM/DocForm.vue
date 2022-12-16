@@ -21,7 +21,7 @@
             <slot name="submit"></slot>
         </div>
 
-        <input type="hidden" name="_token" :value="$page.props._token"/>
+        <input type="hidden" name="_token" :value="page.props._token"/>
     </form>
 </template>
 
@@ -51,6 +51,7 @@ export default {
 
     data() {
         return {
+            page: this.$page,
             id: this.name + '-' + this.item.id,
             getFieldsUri: '/get-options/doc.' + this.controllerName + '/' + this.name + '/' + this.item.id,
             actionUri: '/print/' + this.name + '/' + this.item.id,
@@ -91,13 +92,13 @@ export default {
         },
     },
 
-//        watch: {
-//            errors: {
-//                immediate: true,
-//                handler: function (newVal, oldVal) {
-//                    console.log('new: %s, old: %s', newVal, oldVal);
-//                },
-//            },
-//        },
+    // watch: {
+    //     errors: {
+    //         immediate: true,
+    //         handler: function (newVal, oldVal) {
+    //             console.log('new: %s, old: %s', newVal, oldVal);
+    //         },
+    //     },
+    // },
 };
 </script>

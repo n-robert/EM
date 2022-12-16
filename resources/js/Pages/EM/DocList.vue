@@ -17,7 +17,6 @@
                               :modal="modal"
                               :leftColumn="leftColumn"
                               :rightColumn="rightColumn"
-                              @openModalFromDocForm="openModal"
                               @closeModalFromDocForm="closeModal"
                               @addFieldStateFromDocForm="addFieldToDocList">
                         <template #submit>

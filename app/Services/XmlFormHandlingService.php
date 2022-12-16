@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\BaseModel;
 use Exception;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Gate;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use SimpleXMLElement;
@@ -245,17 +246,22 @@ class XmlFormHandlingService
     /**
      * Get list of available models
      *
+     * @param $onlyAdmin
      * @return array
      */
-    public static function getModelList(): array
+    public static function getModelList($onlyAdmin = false): array
     {
         $fileSystem = app('files');
         $systemViews = $fileSystem->files(config('app.xml_form_path')['system']['item']);
         $models = [];
 
         foreach ($systemViews as $file) {
-            $baseName = str_replace(['.', $file->getExtension()], '', $file->getFilename());
-            $models[] = strtolower($baseName);
+            $model = str_replace(['.', $file->getExtension()], '', $file->getFilename());
+            $modelClass = 'App\\Models\\' . $model;
+
+            if (!($onlyAdmin && $modelClass::$adminOnly && !Gate::allows('is-admin'))) {
+                $models[] = strtolower($model);
+            }
         }
 
         return $models;

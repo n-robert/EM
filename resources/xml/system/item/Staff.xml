@@ -5,6 +5,5 @@
     <field
         name="month"/>
     <field
-        name="default_name"
-        label="Total numbers of employees"/>
+        name="quantity"/>
 </root>

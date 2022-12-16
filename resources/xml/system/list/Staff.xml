@@ -1,10 +1,9 @@
 <?xml version="1.0"?>
 <root>
     <field
-            name="year"/>
+        name="year"/>
     <field
-            name="month"/>
+        name="month"/>
     <field
-        name="default_name"
-        label="Staff"/>
+        name="quantity"/>
 </root>

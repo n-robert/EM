@@ -156,3 +156,22 @@ if (!function_exists('to_https')) {
         return preg_replace('~^(https://|http://|//)(.+)$~', 'https://$2', $url);
     }
 }
+
+if (!function_exists('count_array_recursive')) {
+    function count_array_recursive($arr)
+    {
+        $count = 0;
+
+        if (is_array($arr)) {
+            array_map(function ($value) use (&$count, $arr) {
+                if (is_array($value)) {
+                    $count += count_array_recursive($value);
+                } else {
+                    $count += 1;
+                }
+            }, $arr);
+        }
+
+        return $count;
+    }
+}

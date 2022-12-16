@@ -71,11 +71,16 @@ class ExpatManagerServiceProvider extends ServiceProvider
                         ::get('/' . $views, $controllerClass . '@showAll')
                         ->middleware('query.validate')
                         ->name('gets.' . $views);
+                    // Get items
+                    Route
+                        ::post('/' . $views, $controllerClass . '@getItems')
+                        ->middleware('query.validate')
+                        ->name('posts.' . $views);
                     // Apply filter to items view
                     Route::post('/' . $views, $controllerClass . '@applyFilter');
                 }
 
-                Route::get('/staff/{year}/{month}', 'App\Http\Controllers\StaffController@staffByMonth');
+                Route::post('/staff/{year}/{month}', 'App\Http\Controllers\StaffController@staffByMonth');
                 Route::post('/get-options/{dir}/{name}/{id}',
                     'App\Http\Controllers\BaseController@getFormFields');
                 Route::post('/print/{doc}/{id}', 'App\Http\Controllers\BaseController@printDoc');

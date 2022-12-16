@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <root>
-    4
+    <field
+        name="default_name"
+        label="number"/>
     <field
             name="employer"/>
     <field

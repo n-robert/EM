@@ -1,5 +1,5 @@
 <template>
-    <modal :show="show" :max-width="maxWidth" :closeable="closeable" @close="closeModal">
+    <modal :show="show" :max-width="maxWidth" :closeable="closeable" :position="position" @close="closeModal">
         <div class="px-6 py-4">
             <e-m-button class="relative float-right cursor-pointer m-1" @click.native="closeModal">X</e-m-button>
 
@@ -38,6 +38,9 @@ export default {
         },
         id: {
             default: null,
+        },
+        position: {
+            default: 'fixed',
         },
     },
 

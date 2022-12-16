@@ -18,7 +18,8 @@
 
                     <template #content>
                         <div v-for="(elements, field) in filters" class="p-2 my-4 border rounded-lg w-full">
-                            <div v-if="!(Object.keys(elements).length === 1 && elements[field])" class="font-bold text-indigo-600">
+                            <div v-if="!(Object.keys(elements).length === 1 && elements[field])"
+                                 class="font-bold text-indigo-600">
                                 {{ field && __(field).ucFirst() }}
                             </div>
 
@@ -65,11 +66,15 @@
                         <div v-for="item in items" class="even:bg-indigo-100 text-sm table-row-group">
                             <div class="table-row">
                                 <div v-for="field in formFields" class="p-2 align-middle table-cell">
-                                    <h2 v-if="field.name === 'default_name'"
-                                        class="pl-6 py-1 text-indigo-800 hover:text-indigo-500 text-left">
-                                        <inertia-link :href="item.item_custom_link || '/' + controllerName + '/' + item.id">
+                                    <h2 v-if="field.name === 'default_name'" class="pl-6 py-1 text-left">
+                                        <inertia-link
+                                            v-if="!item.no_link"
+                                            :href="item.item_custom_link || '/' + controllerName + '/' + item.id"
+                                            class="font-bold text-indigo-500 hover:text-indigo-700">
                                             {{ item.default_name }}
                                         </inertia-link>
+
+                                        <span v-else>{{ item.default_name }}</span>
                                     </h2>
 
                                     <div v-else>
@@ -80,33 +85,73 @@
                                     </div>
                                 </div>
 
-                                <form v-if="$page.props.isAdmin"
-                                      :id="'delete-' + item.id"
-                                      @submit.prevent="deleteItem(item)"
-                                      class="p-2 align-middle table-cell">
-                                    <e-m-button class="hover:text-white hover:bg-indigo-500">
-                                        {{ __('Delete') }}
+                                <div class="p-2 align-middle table-cell">
+                                    <form v-if="page.props.isAdmin && !item.no_link"
+                                          :id="'delete-' + item.id"
+                                          @submit.prevent="deleteItem(item)">
+                                        <e-m-button class="hover:text-white hover:bg-indigo-500">
+                                            {{ __('Delete') }}
+                                        </e-m-button>
+                                    </form>
+
+                                    <e-m-button v-else
+                                                class="hover:text-white hover:bg-indigo-500"
+                                                @click.native="openModal(item.default_name)">
+                                        {{ __('Detailed information') }}
                                     </e-m-button>
-                                </form>
+                                </div>
 
                                 <div v-if="Object.keys(docList).length"
                                      class="p-2 align-middle table-cell">
                                     <e-m-button :type="'button'"
                                                 class="hover:text-white hover:bg-indigo-500"
-                                                @click.native="openModalFromItems(item.id)">
+                                                @click.native="openModal(item.id)">
                                         {{ __('Print documents') }}
                                     </e-m-button>
                                 </div>
 
-                                <dialog-modal v-if="modal[item.id]" :show="modal[item.id]" :id="item.id"
-                                              @closeModalFromDialog="closeModalFromItems">
-                                    <template #content>
-                                        <doc-list :modal="modal" :item="item" :docList="docList"
-                                                  @openModalFromDocList="openModalFromItems"
-                                                  @closeModalFromDocList="closeModalFromItems"
-                                                  @addFieldStateFromDocList="addFieldToDocList"/>
-                                    </template>
-                                </dialog-modal>
+                                <div v-if="modal[item.id] || modal[item.default_name]">
+                                    <dialog-modal
+                                        v-if="!item.item_custom_link"
+                                        :show="modal[item.id] || modal[item.default_name]"
+                                        :id="item.id || modal[item.default_name]"
+                                        @closeModalFromDialog="closeModal">
+                                        <template #content>
+                                            <doc-list v-if="Object.keys(docList).length"
+                                                      :modal="modal"
+                                                      :item="item"
+                                                      :docList="docList"
+                                                      @openModalFromDocList="openModal"
+                                                      @closeModalFromDocList="closeModal"
+                                                      @addFieldStateFromDocList="addFieldToDocList">
+                                            </doc-list>
+                                        </template>
+                                    </dialog-modal>
+
+                                    <dialog-modal v-else-if="item.modal_items_count"
+                                                  :show="modal[item.id] || modal[item.default_name]"
+                                                  :id="item.id || item.default_name"
+                                                  :position="'absolute'"
+                                                  @closeModalFromDialog="closeModal">
+                                        <template #content>
+                                            <div v-for="k in item.modal_items_count">
+                                                <items-modal v-if="k === 1"
+                                                             :itemCustomLink="item.item_custom_link"
+                                                             :modalId="item.id || item.default_name"
+                                                             @openModalFromItemsModal="openModal"
+                                                             @closeModalFromItemsModal="closeModal">
+                                                </items-modal>
+
+                                                <items-modal v-else
+                                                             :itemCustomLink="item.item_custom_link + '?page=' + k"
+                                                             :modalId="item.id || item.default_name"
+                                                             @openModalFromItemsModal="openModal"
+                                                             @closeModalFromItemsModal="closeModal">
+                                                </items-modal>
+                                            </div>
+                                        </template>
+                                    </dialog-modal>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -141,6 +186,7 @@ import DocList from './DocList';
 import Pagination from './Pagination';
 import FilterByField from './FilterByField';
 import Dropdown from './Dropdown';
+import ItemsModal from './ItemsModal';
 
 export default {
     components: {
@@ -152,6 +198,7 @@ export default {
         Pagination,
         FilterByField,
         Dropdown,
+        ItemsModal,
     },
 
     props: [
@@ -176,17 +223,13 @@ export default {
 
     data() {
         return {
+            page: this.$page,
             centeredItemWidth: {
                 md: 'full',
                 xl: '10/12',
             },
             needAdditionalButton: this.canCreateNewItem && this.items.length > 5,
             createNewItem: this.__('New ' + this.controllerName),
-            itemCount: [
-                this.pagination.firstItem + '-' + this.pagination.lastItem,
-                this.__('from'),
-                this.pagination.total
-            ].join(' '),
         };
     },
 
@@ -227,16 +270,20 @@ export default {
             confirm && this.$inertia.post('/' + this.controllerName + '/delete', formData);
         },
 
-        openModalFromItems(doc) {
+        openModal(doc) {
             this.modal[doc] = true;
         },
 
-        closeModalFromItems(doc) {
+        closeModal(doc) {
             this.modal[doc] = false;
         },
 
         addFieldToDocList(doc, id) {
             this.docList[doc][id] = true;
+        },
+
+        visit(url) {
+            this.$inertia.visit(url);
         },
     },
 };

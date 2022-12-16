@@ -7,9 +7,9 @@ use Illuminate\Database\Eloquent\Builder;
 class Staff extends BaseModel
 {
     /**
-     * @var string
+     * @var bool
      */
-    public static $defaultName = 'staff';
+    public static $adminOnly = true;
 
     /**
      * @var bool
@@ -27,7 +27,10 @@ class Staff extends BaseModel
     /**
      * @var array
      */
-    public $listableRaw = "count(employee) as staff, '/staff/'||tmp.year||'/'||tmp.month as item_custom_link";
+    public $listableRaw =
+        "count(employee) as quantity,
+        '/staff/'||tmp.year||'/'||tmp.month as item_custom_link,
+        1 as no_link";
 
     /**
      * @var array
@@ -60,6 +63,16 @@ class Staff extends BaseModel
      * @var string
      */
     protected $table = 'staff';
+
+    /**
+     * Get the model's default name.
+     *
+     * @return string|null
+     */
+    public function getDefaultNameAttribute(): ?string
+    {
+        return $this->year. $this->month;
+    }
 
     /**
      * Scope a query to model's custom clauses.

@@ -22,7 +22,7 @@ class StaffSeeder extends Seeder
         Staff::truncate();
 
         DB::table('employees')
-          ->select(['employees.id as employee_id', 'employee_job.employer_id as employer_id'])
+          ->select(['employees.id as employee_id', 'employees.status_id as status_id', 'employee_job.employer_id as employer_id'])
           ->leftJoin('employee_job', 'employee_job.employee_id', '=', 'employees.id')
           ->whereIn('employees.status_id', [1, 2, 12])
           ->whereNotEmpty('employee_job.employee_id')
