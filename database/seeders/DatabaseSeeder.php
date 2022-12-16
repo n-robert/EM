@@ -15,18 +15,18 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call([
-            StatusSeeder::class,
+//            StatusSeeder::class,
         ]);
 
         $this->call([
-            CountrySeeder::class,
-            AddressSeeder::class,
-            UsagePermitSeeder::class,
-            TypeSeeder::class,
-            EmployerSeeder::class,
-            QuotaSeeder::class,
+//            CountrySeeder::class,
+//            AddressSeeder::class,
+//            UsagePermitSeeder::class,
+//            TypeSeeder::class,
+//            EmployerSeeder::class,
+//            QuotaSeeder::class,
             PermitSeeder::class,
-            OccupationSeeder::class,
+//            OccupationSeeder::class,
         ]);
 
         $this->call([
