@@ -19,7 +19,7 @@ class StaffSeeder extends Seeder
      */
     public function run()
     {
-        Staff::truncate();
+//        Staff::truncate();
 
         DB::table('employees')
           ->select(['employees.id as employee_id', 'employees.status_id as status_id', 'employee_job.employer_id as employer_id'])
