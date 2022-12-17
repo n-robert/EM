@@ -39,7 +39,6 @@ class StaffSeeder extends Seeder
                   $tmpEmployees[$datum->employer_id][] = $datum->employee_id;
               }
 
-//              dd($tmpEmployees);
               foreach ($tmpEmployees as $employerId => $newEmployees) {
                   $year = Carbon::now()->isoFormat('YYYY');
                   $month = Carbon::now()->isoFormat('MM');
