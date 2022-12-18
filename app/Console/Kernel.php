@@ -27,7 +27,7 @@ class Kernel extends ConsoleKernel
         $schedule->job(new \Database\Seeders\StaffSeeder)
                  ->everyFiveMinutes()
                  ->withoutOverlapping()
-                 ->sendOutputTo('/home/bob/tmp/nrobert.org.schedule.log');
+                 ->sendOutputTo('/tmp/nrobert.org.schedule.log');
     }
 
     /**
