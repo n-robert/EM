@@ -24,7 +24,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->call(new \Database\Seeders\StaffSeeder)->daily();
+        $schedule->call(new \Database\Seeders\StaffSeeder)->hourlyAt(35);
     }
 
     /**
