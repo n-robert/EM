@@ -86,18 +86,19 @@
                                 </div>
 
                                 <div v-if="page.props.isAdmin" class="p-2 align-middle table-cell">
-                                    <e-m-button v-if="item.no_link"
-                                                class="hover:text-white hover:bg-indigo-500"
-                                                @click.native="openModal(item.default_name)">
-                                        {{ __('Detailed information') }}
-                                    </e-m-button>
-
-                                    <form :id="'delete-' + item.id"
+                                    <form v-if="!item.no_link"
+                                          :id="'delete-' + item.id"
                                           @submit.prevent="deleteItem(item)">
                                         <e-m-button class="hover:text-white hover:bg-indigo-500">
                                             {{ __('Delete') }}
                                         </e-m-button>
                                     </form>
+
+                                    <e-m-button v-else
+                                                class="hover:text-white hover:bg-indigo-500"
+                                                @click.native="openModal(item.default_name)">
+                                        {{ __('Detailed information') }}
+                                    </e-m-button>
                                 </div>
 
                                 <div v-if="Object.keys(docList).length"

@@ -20,16 +20,16 @@ class Staff extends BaseModel
      * @var array
      */
     public $listable = [
-        "tmp.year",
-        "tmp.month",
+        'year',
+        'month',
     ];
 
     /**
      * @var array
      */
     public $listableRaw =
-        "count(employee) as quantity,
-        '/staff/'||tmp.year||'/'||tmp.month as item_custom_link,
+        "jsonb_agg(employees) as employees,
+        '/staff/'||year||'/'||month as item_custom_link,
         1 as no_link";
 
     /**
@@ -43,7 +43,7 @@ class Staff extends BaseModel
     /**
      * @var array
      */
-    protected $defaultOrderBy = ['tmp.year', 'tmp.month'];
+    protected $defaultOrderBy = ['year', 'month'];
 
     /**
      * @var array
@@ -90,14 +90,6 @@ class Staff extends BaseModel
     public function scopeApplyOwnQueryClauses(Builder $builder): Builder
     {
         $builder
-            ->joinSub(
-                'select year, month, employer_id, cast(jsonb_array_elements(employees) as integer) as employee from staff',
-                'tmp',
-                'tmp.employer_id',
-                '=',
-                'staff.employer_id',
-                'right',
-            )
             ->groupBy($this->listable);
 
         return $builder;

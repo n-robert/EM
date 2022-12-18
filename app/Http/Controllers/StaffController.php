@@ -25,9 +25,17 @@ class StaffController extends BaseController
     {
         $items = parent::getItems($skippedField, $skip, $filters);
 
-        foreach ($items['items'] as $item) {
+        array_walk($items['items'], function (&$item) {
+            $tmpEmployees = [];
+
+            foreach ($item->employees as $employees) {
+                $tmpEmployees = array_merge($tmpEmployees, $employees);
+            }
+
+            $item->employees = array_unique($tmpEmployees);
+            $item->quantity = count($item->employees);
             $item->modal_items_count = count($this->staffByMonth($item->year, $item->month)['pagination']['links']);
-        }
+        });
 
         return $items;
     }
@@ -51,21 +59,20 @@ class StaffController extends BaseController
      */
     public function getStaffByMonthFilters($year, $month): array
     {
-        $ids = array_map(
-            function ($item) {
-                return $item->employee_id;
-            },
-            $this->model
+        $employees = $this->model
                 ->applyFilters()
-                ->selectRaw('cast(jsonb_array_elements(employees) as integer) as employee_id')
                 ->where(compact('year', 'month'))
-                ->get()
-                ->all()
-        );
+                ->pluck('employees')
+                ->all();
+        $tmpEmployees = [];
+
+        foreach ($employees as $employee) {
+            $tmpEmployees = array_merge($tmpEmployees, $employee);
+        }
 
         return [
             'employees' => [
-                'id' => $ids
+                'id' => array_unique($tmpEmployees)
             ]
         ];
     }
