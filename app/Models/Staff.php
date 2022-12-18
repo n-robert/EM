@@ -58,6 +58,13 @@ class Staff extends BaseModel
     ];
 
     /**
+     * The attributes that aren't mass assignable.
+     *
+     * @var array|bool
+     */
+    protected $guarded = [];
+
+    /**
      * The table associated with the model.
      *
      * @var string
