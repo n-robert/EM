@@ -24,7 +24,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->job(new \Database\Seeders\StaffSeeder)->hourlyAt(5)->withoutOverlapping();
+        $schedule->job(new \Database\Seeders\StaffSeeder)->everyFiveMinutes()->withoutOverlapping();
     }
 
     /**
