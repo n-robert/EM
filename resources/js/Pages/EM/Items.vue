@@ -115,6 +115,7 @@
                                         v-if="!item.item_custom_link"
                                         :show="modal[item.id] || modal[item.default_name]"
                                         :id="item.id || modal[item.default_name]"
+                                        :position="'absolute'"
                                         @closeModalFromDialog="closeModal">
                                         <template #content>
                                             <doc-list v-if="Object.keys(docList).length"

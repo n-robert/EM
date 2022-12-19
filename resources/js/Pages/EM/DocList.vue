@@ -9,7 +9,10 @@
         </div>
 
         <div v-for="(state, doc) in docList">
-            <dialog-modal v-if="modal[doc] || state[item.id]" :show="modal[doc]" :id="doc"
+            <dialog-modal v-if="modal[doc] || state[item.id]"
+                          :show="modal[doc]"
+                          :id="doc"
+                          :position="'absolute'"
                           @closeModalFromDialog="closeModal">
                 <template #content>
                     <doc-form :name="doc.toKebabCase()"
