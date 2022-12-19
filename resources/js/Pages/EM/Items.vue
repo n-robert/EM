@@ -89,13 +89,13 @@
                                     <form v-if="!item.no_link"
                                           :id="'delete-' + item.id"
                                           @submit.prevent="deleteItem(item)">
-                                        <e-m-button class="hover:text-white hover:bg-indigo-500">
+                                        <e-m-button class="font-bold text-indigo-500 hover:text-white hover:bg-indigo-500">
                                             {{ __('Delete') }}
                                         </e-m-button>
                                     </form>
 
                                     <e-m-button v-else
-                                                class="hover:text-white hover:bg-indigo-500"
+                                                class="font-bold text-indigo-500 hover:text-white hover:bg-indigo-500"
                                                 @click.native="openModal(item.default_name)">
                                         {{ __('Detailed information') }}
                                     </e-m-button>
@@ -104,7 +104,7 @@
                                 <div v-if="Object.keys(docList).length"
                                      class="p-2 align-middle table-cell">
                                     <e-m-button :type="'button'"
-                                                class="hover:text-white hover:bg-indigo-500"
+                                                class="font-bold text-indigo-500 hover:text-white hover:bg-indigo-500"
                                                 @click.native="openModal(item.id)">
                                         {{ __('Print documents') }}
                                     </e-m-button>

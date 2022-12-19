@@ -295,7 +295,7 @@ class Employee extends BaseModel
 
                 // Get hired_date and fired_date
                 if ($jobData) {
-                    array_map(function ($job) use ($dateType, $status, &$turnoverData) {
+                    array_map(function ($job) use ($request, $dateType, $status, &$turnoverData) {
                         if (isset($job[$dateType]) && $job[$dateType]) {
                             $turnoverData[] = [
                                 'employee_id' => $this->id,
@@ -305,7 +305,7 @@ class Employee extends BaseModel
                             ];
 
                             // Add new employee to current month staff
-                            if ($dateType == 'hired_date') {
+                            if ($dateType == 'hired_date' && $request['status_id'] == $status) {
                                 $year = Carbon::now()->isoFormat('YYYY');
                                 $month = Carbon::now()->isoFormat('MM');
                                 $employerId = $job['employer_id'];
