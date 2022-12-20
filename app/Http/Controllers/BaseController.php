@@ -257,7 +257,7 @@ class BaseController extends Controller implements ControllerInterface
             $this->model
                 ->applyFilters($filters)
                 ->applyDefaultOrder()
-                ->applyOwnQueryClauses()
+                ->applyItemsClauses()
                 ->select($this->model->listable);
 
         if ($this->model->listableRaw) {

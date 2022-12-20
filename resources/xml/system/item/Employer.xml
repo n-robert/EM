@@ -23,7 +23,7 @@
             model="Address"/>
         <field
             name="phone"
-            type="text"/>
+            type="textarea"/>
         <field
             name="email"
             type="text"/>

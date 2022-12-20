@@ -141,20 +141,20 @@ class BaseModel extends Model implements ModelInterface
     /**
      * @var array
      */
+    protected $casts = [
+        'history'  => 'array',
+        'user_ids' => 'array',
+    ];
+
+    /**
+     * @var array
+     */
     protected $defaultOrderBy = ['name_ru'];
 
     /**
      * @var array
      */
     protected $filterFields = [];
-
-    /**
-     * @var array
-     */
-    protected $casts = [
-        'history'  => 'array',
-        'user_ids' => 'array',
-    ];
 
     /**
      * BaseModel constructor.
@@ -220,7 +220,7 @@ class BaseModel extends Model implements ModelInterface
      * @param Builder $builder
      * @return Builder
      */
-    public function scopeApplyOwnQueryClauses(Builder $builder): Builder
+    public function scopeApplyItemsClauses(Builder $builder): Builder
     {
         return $builder;
     }

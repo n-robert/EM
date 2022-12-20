@@ -217,7 +217,7 @@ class Employee extends BaseModel
      * @param Builder $builder
      * @return Builder
      */
-    public function scopeApplyOwnQueryClauses(Builder $builder): Builder
+    public function scopeApplyItemsClauses(Builder $builder): Builder
     {
         $listable = array_map(
             function ($column) {
