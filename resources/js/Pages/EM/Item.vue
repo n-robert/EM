@@ -130,9 +130,9 @@ export default {
         if (this.noBorder) {
             backLayer = '';
             frontLayer = hasTab ? 'table w-full p-2 rounded-b-lg bg-white' : '';
-            tabLayer = hasTab ? 'm-4 rounded-lg bg-gradient-to-b from-indigo-100 to-white' : '';
-            tabActive = 'py-2 px-8 rounded-t-lg bg-white text-indigo-500';
-            tabInActive = 'py-2 px-8 rounded-t-lg hover:text-indigo-500';
+            tabLayer = hasTab ? 'my-4 rounded-lg bg-gradient-to-b from-indigo-100 to-white' : '';
+            tabActive = 'font-bold py-4 px-8 text-center rounded-t-lg bg-white text-indigo-500';
+            tabInActive = 'py-4 px-8 text-center rounded-t-lg hover:text-indigo-500';
         } else {
             backLayer = hasTab ? 'shadow-xl m-4 sm:rounded-lg' : 'shadow-xl m-4 sm:rounded-lg';
             frontLayer =
@@ -140,8 +140,8 @@ export default {
                     'table w-full p-4 rounded-b-lg bg-white' :
                     'table w-full p-4 pt-6 rounded-lg bg-white';
             tabLayer = 'bg-gradient-to-b rounded-t-lg from-indigo-100 to-white';
-            tabActive = 'py-4 px-8 rounded-t-lg bg-white text-indigo-500';
-            tabInActive = 'py-4 px-8 rounded-lg hover:text-indigo-500';
+            tabActive = 'font-bold py-4 px-8 text-center rounded-t-lg bg-white text-indigo-500';
+            tabInActive = 'py-4 px-8 text-center rounded-lg hover:text-indigo-500';
         }
 
         return {
