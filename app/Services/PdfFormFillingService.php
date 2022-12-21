@@ -394,7 +394,7 @@ class PdfFormFillingService
             }
 
             if (in_array($key + 1, $keys) || !$keys) {
-                $result[] = preg_replace($patterns, [$code . '$2', ''], trim($phone));
+                $result[] = preg_replace($patterns, [$code . '$2', ''], trim($phone['phone']));
             }
         }
 
