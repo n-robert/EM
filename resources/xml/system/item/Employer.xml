@@ -21,13 +21,6 @@
             name="address_id"
             type="select"
             model="Address"/>
-
-        <fieldset name="phone" show="true" repeatable="true" deletable="true">
-            <field
-                name="phone"
-                type="text"/>
-        </fieldset>
-
         <field
             name="email"
             type="text"/>
@@ -40,6 +33,12 @@
             name="booker_id"
             type="select"
             model="Employee:Booker"/>
+
+        <fieldset name="phone" show="true" repeatable="true" deletable="true">
+            <field
+                name="phone"
+                type="text"/>
+        </fieldset>
     </fieldgroup>
 
     <fieldgroup name="details">
