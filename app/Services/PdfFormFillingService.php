@@ -379,7 +379,11 @@ class PdfFormFillingService
     public static function handlePhones($phones, $code = '', $keys = [], $no_spaces = true, $delimiter = ',')
     {
         if (!is_array($phones)) {
-            $phones = [$phones];
+            $phones = array_filter([$phones]);
+        }
+
+        if (!$phones) {
+            return '';
         }
 
         $patterns = ['#^\s*(\+7|8)(.*)$#'];
