@@ -49,11 +49,9 @@ class CreateEmployersTable extends Migration
                 '64' => [
                     'bank',
                 ],
-                '128' => [
-                    'phone',
-                ],
             ],
             'jsonb' => [
+                'phone',
                 'history',
             ],
             'date' => [

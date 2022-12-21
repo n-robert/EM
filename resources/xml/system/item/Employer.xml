@@ -21,9 +21,13 @@
             name="address_id"
             type="select"
             model="Address"/>
-        <field
-            name="phone"
-            type="textarea"/>
+
+        <fieldset name="phone" show="true" repeatable="true" deletable="true">
+            <field
+                name="phone"
+                type="text"/>
+        </fieldset>
+
         <field
             name="email"
             type="text"/>

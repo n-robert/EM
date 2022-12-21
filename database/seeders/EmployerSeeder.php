@@ -103,6 +103,10 @@ class EmployerSeeder extends Seeder
                     $value = $types[$value];
                 }
 
+                if ($column == 'phone') {
+                    $value = json_encode(['phone' => $value]);
+                }
+
                 if ($column == 'user_ids') {
                     $value = json_encode(array_map(
                         function ($item) {

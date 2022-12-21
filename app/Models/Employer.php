@@ -38,6 +38,24 @@ class Employer extends BaseModel
     ];
 
     /**
+     * Repeatable fields.
+     *
+     * @var array
+     */
+    public $repeatable = [
+        'phone' => []
+    ];
+
+    /**
+     * @var array
+     */
+    protected $casts = [
+        'phone'  => 'array',
+        'history'  => 'array',
+        'user_ids' => 'array',
+    ];
+
+    /**
      * @var array
      */
     protected $filterFields = [
