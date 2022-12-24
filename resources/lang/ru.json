@@ -352,6 +352,8 @@
     "Employer": "Работодатель",
     "employer": "Организация",
     "employer_id": "Организация",
+    "permits.employer_id": "Организация",
+    "quotas.employer_id": "Организация",
     "employee_job.employer_id": "Организация",
     "staff.employer_id": "Организация",
     "Employee": "Работник",
