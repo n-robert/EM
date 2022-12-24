@@ -41,9 +41,22 @@ class Employee extends BaseModel
     ];
 
     /**
+     * @var string[]
+     */
+    public $groupBy = [
+        'employees.id',
+        'last_name_ru',
+        'middle_name_ru',
+        'first_name_ru',
+        'statuses.name_ru',
+        'occupations.name_ru',
+        'work_permit_expired_date',
+    ];
+
+    /**
      * @var array
      */
-    public $listable = [
+    public $toSelect = [
         'employees.id',
         'last_name_ru',
         'middle_name_ru',
@@ -100,9 +113,9 @@ class Employee extends BaseModel
             ['leftJoin' => 'addresses|addresses.id|employees.reg_address_id'],
         ],
 
-        'employees.employ_permit_id' => [
+        'employees.permit_id' => [
             'nameModel' => 'Permit',
-            ['leftJoin' => 'permits|permits.id|employees.employ_permit_id'],
+            ['leftJoin' => 'permits|permits.id|employees.permit_id'],
             ['whereRaw' => 'permits.expired_date >= NOW()'],
         ],
 
@@ -217,19 +230,12 @@ class Employee extends BaseModel
      * @param Builder $builder
      * @return Builder
      */
-    public function scopeApplyItemsClauses(Builder $builder): Builder
+    public function scopeApplySelectClauses(Builder $builder): Builder
     {
-        $listable = array_map(
-            function ($column) {
-                return explode(' ', $column)[0];
-            },
-            $this->listable
-        );
         $builder
-            ->join('employee_job', 'employee_job.employee_id', '=', 'employees.id', 'left')
-            ->join('occupations', 'occupations.id', '=', 'employee_job.occupation_id', 'left')
-            ->join('statuses', 'statuses.id', '=', 'employees.status_id', 'left')
-            ->groupBy($listable);
+            ->leftJoin('employee_job', 'employee_job.employee_id', 'employees.id')
+            ->leftJoin('occupations', 'occupations.id', 'employee_job.occupation_id')
+            ->leftJoin('statuses', 'statuses.id', 'employees.status_id');
 
         return $builder;
     }

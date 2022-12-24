@@ -14,14 +14,28 @@ class Quota extends BaseModel
     public static $defaultName = 'year';
 
     /**
+     * @var string[]
+     */
+    public $groupBy = [
+        'quotas.id',
+        'year',
+        'employers.name_ru',
+    ];
+
+    /**
      * @var array
      */
-    public $listable = [
+    public $toSelect = [
         'quotas.id',
         'year',
         'employers.name_ru as employer',
-        'total',
+        'quotas.total',
     ];
+
+    /**
+     * @var string
+     */
+    public $toSelectRaw = 'total - sum(quantity) unused_total';
 
     /**
      * Repeatable fields.
@@ -54,16 +68,49 @@ class Quota extends BaseModel
      * @var array
      */
     protected $filterFields = [
-        'quotas.employer_id'       => [
+        'quotas.employer_id' => [
             'nameModel' => 'Employer',
             ['leftJoin' => 'employers|employers.id|quotas.employer_id'],
             ['leftJoin' => 'types|types.id|employers.type_id'],
             ['whereRaw' => 'types.code LIKE \'%LEGAL%\''],
         ],
-        'valid_quotas' => [
+        'valid_quotas'       => [
             ['whereRaw' => 'CAST(quotas.year AS INTEGER) >= EXTRACT(YEAR FROM NOW())']
         ],
     ];
+
+    /**
+     * Access unused attribute
+     *
+     * @return array
+     */
+    public function getUnusedAttribute(): array
+    {
+        $used = $this::joinSub("select quota_id,
+                        (jsonb_array_elements(details)->'occupation_id') occupation_id,
+                        (jsonb_array_elements(details)->'quantity')::bigint quantity from permits",
+                        'tmp',
+                        'tmp.quota_id',
+                        'quotas.id',
+                        'left')
+                     ->whereRaw("tmp.occupation_id IN(
+                        select distinct (jsonb_array_elements(details)->'occupation_id') from quotas
+                        )")
+                     ->where('tmp.quota_id', $this->id)
+                     ->groupBy('tmp.occupation_id')
+                     ->selectRaw('tmp.occupation_id, sum(quantity)::bigint used')
+                     ->pluck('used', 'occupation_id')
+                     ->all();
+        $unused = [];
+
+        foreach ($this->details as $key => $detail) {
+            $unused[$key] = isset($used[$detail['occupation_id']])
+                ? $detail['quantity'] - $used[$detail['occupation_id']]
+                : $detail['quantity'];
+        }
+
+        return $unused;
+    }
 
     /**
      * Scope a query to model's custom clauses.
@@ -71,10 +118,20 @@ class Quota extends BaseModel
      * @param Builder $builder
      * @return Builder
      */
-    public function scopeApplyItemsClauses(Builder $builder): Builder
+    public function scopeApplySelectClauses(Builder $builder): Builder
     {
         $builder
-            ->join('employers', 'employers.id', '=', 'employer_id', 'left');
+            ->leftJoin('employers', 'employers.id', 'employer_id')
+            ->joinSub("select quota_id,
+                (jsonb_array_elements(details)->'occupation_id') occupation_id,
+                (jsonb_array_elements(details)->'quantity')::bigint quantity from permits",
+                'tmp',
+                'tmp.quota_id',
+                'quotas.id',
+                'left'
+            )->whereRaw("tmp.occupation_id IN(
+                select distinct (jsonb_array_elements(details)->'occupation_id') from quotas
+            )");
 
         return $builder;
     }

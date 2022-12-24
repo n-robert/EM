@@ -7,7 +7,7 @@
         onchange="getPerson(this);"
         model="Employer:FMS"/>
     <field
-        name="employ_permit_id"
+        name="permit_id"
         type="select"
         required="true"
         model="Permit:Valid"/>

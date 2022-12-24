@@ -12,6 +12,14 @@ class Staff extends BaseModel
     public static $adminOnly = true;
 
     /**
+     * @var string[]
+     */
+    public $groupBy = [
+        'year',
+        'month',
+    ];
+
+    /**
      * @var bool
      */
     public $hasHistory = false;
@@ -19,7 +27,7 @@ class Staff extends BaseModel
     /**
      * @var array
      */
-    public $listable = [
+    public $toSelect = [
         'year',
         'month',
     ];
@@ -27,7 +35,7 @@ class Staff extends BaseModel
     /**
      * @var array
      */
-    public $listableRaw =
+    public $toSelectRaw =
         "jsonb_agg(employees) as employees,
         '/staff/'||year||'/'||month as item_custom_link,
         1 as no_link";
@@ -79,19 +87,5 @@ class Staff extends BaseModel
     public function getDefaultNameAttribute(): ?string
     {
         return $this->year. $this->month;
-    }
-
-    /**
-     * Scope a query to model's custom clauses.
-     *
-     * @param Builder $builder
-     * @return Builder
-     */
-    public function scopeApplyItemsClauses(Builder $builder): Builder
-    {
-        $builder
-            ->groupBy($this->listable);
-
-        return $builder;
     }
 }

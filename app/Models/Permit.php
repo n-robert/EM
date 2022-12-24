@@ -26,15 +26,29 @@ class Permit extends BaseModel
     ];
 
     /**
+     * @var string[]
+     */
+    public $groupBy = [
+        'permits.id',
+        'number',
+        'employers.name_ru',
+    ];
+
+    /**
      * @var array
      */
-    public $listable = [
+    public $toSelect = [
         'permits.id',
         'number',
         'total',
         'expired_date',
         'employers.name_ru as employer',
     ];
+
+    /**
+     * @var string
+     */
+    public $toSelectRaw = 'total - count(employee_job.occupation_id) unused_total';
 
     /**
      * Repeatable fields.
@@ -67,19 +81,46 @@ class Permit extends BaseModel
      * @var array
      */
     protected $filterFields = [
-        'permits.employer_id'   => [
+        'permits.employer_id' => [
             'nameModel' => 'Employer',
             ['leftJoin' => 'employers|employers.id|permits.employer_id'],
             ['leftJoin' => 'types|types.id|employers.type_id'],
             ['whereRaw' => 'types.code LIKE \'%LEGAL%\''],
         ],
-        'valid_permits' => [
+        'valid_permits'       => [
             ['whereRaw' => 'permits.expired_date > NOW()']
         ],
     ];
 
     /**
-     * Calculate the total
+     * Access unused attribute
+     *
+     * @return array
+     */
+    public function getUnusedAttribute(): array
+    {
+        $used = EmployeeJob::query()
+                           ->leftJoin('employees', 'employees.id', 'employee_job.employee_id')
+                           ->leftJoin('statuses', 'statuses.id', 'employees.status_id')
+                           ->where('statuses.name_en', '<>', 'Cancelled')
+                           ->where('employees.permit_id', $this->id)
+                           ->groupBy('occupation_id')
+                           ->selectRaw('count(occupation_id) used, occupation_id')
+                           ->pluck('used', 'occupation_id')
+                           ->all();
+        $unused = [];
+
+        foreach ($this->details as $key => $detail) {
+            $unused[$key] = isset($used[$detail['occupation_id']])
+                ? $detail['quantity'] - $used[$detail['occupation_id']]
+                : $detail['quantity'];
+        }
+
+        return $unused;
+    }
+
+    /**
+     * Mutate the total attribute
      *
      * @return void
      */
@@ -101,10 +142,14 @@ class Permit extends BaseModel
      * @param Builder $builder
      * @return Builder
      */
-    public function scopeApplyItemsClauses(Builder $builder): Builder
+    public function scopeApplySelectClauses(Builder $builder): Builder
     {
         $builder
-            ->join('employers', 'employers.id', '=', 'employer_id', 'left');
+            ->leftJoin('employers', 'employers.id', 'employer_id')
+            ->leftJoin('employees', 'employees.permit_id', 'permits.id')
+            ->leftJoin('employee_job', 'employee_job.employee_id', 'employees.id')
+            ->leftJoin('statuses', 'statuses.id', 'employees.status_id')
+            ->where('statuses.name_en', '<>', 'Cancelled');
 
         return $builder;
     }
@@ -136,12 +181,22 @@ class Permit extends BaseModel
     public function save(array $options = []): bool
     {
         $details = request('details') ?? [];
-        array_walk($details, function ($child, $key) use (&$value) {
+        array_walk($details, function (&$child, $key) use (&$value) {
+            array_walk($child, function (&$element) {
+                $element = (int)$element;
+            });
+
             if (!array_sum(array_filter($child))) {
                 unset($value[$key]);
             }
         });
         $this->setAttribute('details', $details);
+
+        $issuedDate = request('issued_date');
+        $year = Carbon::parse($issuedDate)->isoFormat('YYYY');
+        $employerId = request('employer_id');
+        $quotaId = Quota::where(['year' => $year, 'employer_id' => $employerId])->first()->id;
+        $this->setAttribute('quota_id', (int)$quotaId);
 
         return parent::save($options);
     }

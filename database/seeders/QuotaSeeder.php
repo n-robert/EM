@@ -26,7 +26,11 @@ class QuotaSeeder extends Seeder
             'history',
         ];
 
-        $oldData = DB::connection('mysqlx')->table('fmsdocs_quotas')->get();
+        $oldData = DB::connection('mysqlx')
+                     ->table('fmsdocs_quotas')
+                     ->orderBy('year')
+                     ->orderBy('employer_id')
+                     ->get();
         Quota::truncate();
 
         foreach ($oldData as $oldDatum) {
@@ -64,6 +68,10 @@ class QuotaSeeder extends Seeder
                             Carbon::parse($value)->isoFormat('YYYY-MM-DD');
                 }
 
+                if ($column == 'years') {
+                    $value = (string)$value;
+                }
+
                 if ($column == 'user_ids') {
                     $value = json_encode(array_map(
                         function ($item) {
@@ -74,7 +82,7 @@ class QuotaSeeder extends Seeder
                 }
 
                 if (str_ends_with($column, '_id')) {
-                    $value = intval($value);
+                    $value = (int)$value;
                 }
 
                 if ($column == 'details') {
@@ -84,9 +92,9 @@ class QuotaSeeder extends Seeder
                     if ($value) {
                         foreach ($value->country as $key => $country) {
                             $tmpObj = new \stdClass();
-                            $tmpObj->country_id = $country;
-                            $tmpObj->occupation_id = $value->occupation[$key];
-                            $tmpObj->quantity = $value->quantity[$key];
+                            $tmpObj->country_id = (int)$country;
+                            $tmpObj->occupation_id = (int)$value->occupation[$key];
+                            $tmpObj->quantity = (int)$value->quantity[$key];
                             $newValue[] = $tmpObj;
                         }
                     }

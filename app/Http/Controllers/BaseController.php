@@ -257,11 +257,15 @@ class BaseController extends Controller implements ControllerInterface
             $this->model
                 ->applyFilters($filters)
                 ->applyDefaultOrder()
-                ->applyItemsClauses()
-                ->select($this->model->listable);
+                ->applySelectClauses()
+                ->select($this->model->toSelect);
 
-        if ($this->model->listableRaw) {
-            $query->selectRaw($this->model->listableRaw);
+        if ($this->model->toSelectRaw) {
+            $query->selectRaw($this->model->toSelectRaw);
+        }
+
+        if ($this->model->groupBy) {
+            $query->groupBy($this->model->groupBy);
         }
 
         $items = $query->paginate(request('perPage'));

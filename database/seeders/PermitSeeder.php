@@ -22,7 +22,6 @@ class PermitSeeder extends Seeder
             'issued_date',
             'expired_date',
             'employer_id',
-            'quota_id',
             'details',
             'user_ids',
             'history',
@@ -75,7 +74,7 @@ class PermitSeeder extends Seeder
                 }
 
                 if (str_ends_with($column, '_id')) {
-                    $value = intval($value);
+                    $value = (int)$value;
                 }
 
                 if ($column == 'details') {
@@ -85,9 +84,9 @@ class PermitSeeder extends Seeder
                     if ($value) {
                         foreach ($value->country as $key => $country) {
                             $tmpObj = new \stdClass();
-                            $tmpObj->country_id = $country;
-                            $tmpObj->occupation_id = $value->occupation[$key];
-                            $tmpObj->quantity = $value->quantity[$key];
+                            $tmpObj->country_id = (int)$country;
+                            $tmpObj->occupation_id = (int)$value->occupation[$key];
+                            $tmpObj->quantity = (int)$value->quantity[$key];
                             $newValue[] = $tmpObj;
                         }
                     }
@@ -128,9 +127,9 @@ class PermitSeeder extends Seeder
                             });
                             $user = preg_replace('~^#(\d+)\s.+~', '$1', $oldValue->user[$k]);
                             $newValue[] = [
-                                'date' => Carbon::parse($date)->isoFormat('YYYY-MM-DD H:m:s'),
+                                'date'       => Carbon::parse($date)->isoFormat('YYYY-MM-DD H:m:s'),
                                 'prev_value' => $prevValue,
-                                'user' => $user,
+                                'user'       => $user,
                             ];
                         }
 
@@ -139,6 +138,19 @@ class PermitSeeder extends Seeder
                 }
 
                 $newData[$column] = $value;
+            }
+
+            $year = $newData['issued_date']
+                ? Carbon::parse($newData['issued_date'])->isoFormat('YYYY')
+                : Carbon::parse($newData['expired_date'])->subYear(1)->isoFormat('YYYY');
+            $quota = DB::table('quotas')
+                       ->where([
+                           'year'        => $year,
+                           'employer_id' => $newData['employer_id']
+                       ])->first();
+
+            if ($quota) {
+                $newData['quota_id'] = $quota->id;
             }
 
             $newData['total'] =

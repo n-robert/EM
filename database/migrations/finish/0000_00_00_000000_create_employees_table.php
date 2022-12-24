@@ -96,7 +96,7 @@ class CreateEmployeesTable extends Migration
             ],
             'unsignedBigInteger' => [
                 'whence_id',
-                'employ_permit_id',
+                'permit_id',
                 'taxpayer_id',
                 'host_id',
                 'reg_address_id',

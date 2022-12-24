@@ -17,7 +17,7 @@
                         v-model="modelValue"
                         :id="id"
                         :onchange="onchange"
-                        :disabled="! page.props.canEdit"
+                        :disabled="disabled || ! page.props.canEdit"
                         :class="isRequired && (!modelValue || page.props.errors[name]) ? fieldWarningClass : inputDefaultClass">
                     <option v-for="option in options" v-if="option !== null" :value="option.value">{{
                             __(option.text)
@@ -50,7 +50,7 @@
                             :onclick="onclick"
                             :open="open"
                             :originalText="__(value)"
-                            :disabled="! page.props.canEdit"
+                            :disabled="disabled || ! page.props.canEdit"
                             :customClass="customClass">
                 </e-m-button>
 
@@ -59,7 +59,7 @@
                        :type="type"
                        v-model="modelValue"
                        :id="id"
-                       :disabled="! page.props.canEdit"
+                       :disabled="disabled || ! page.props.canEdit"
                        :onclick="onclick"
                        :class=
                            "isRequired && (!modelValue || page.props.errors[name]) ?
@@ -69,7 +69,7 @@
                        :name="name"
                        :id="id"
                        :type="type"
-                       :disabled="! page.props.canEdit"
+                       :disabled="disabled || ! page.props.canEdit"
                        v-model="modelValue"
                        :onclick="onclick"
                        :class=
@@ -115,6 +115,9 @@ export default {
         },
         type: {
             default: 'text',
+        },
+        disabled: {
+            default: false,
         },
         multiple: {
             default: false,

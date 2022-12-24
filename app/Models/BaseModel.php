@@ -80,6 +80,11 @@ class BaseModel extends Model implements ModelInterface
     }
 
     /**
+     * @var string[]
+     */
+    public $groupBy = [];
+
+    /**
      * @var bool
      */
     public $hasHistory = true;
@@ -87,12 +92,12 @@ class BaseModel extends Model implements ModelInterface
     /**
      * @var array
      */
-    public $listable = ['*'];
+    public $toSelect = ['*'];
 
     /**
      * @var array
      */
-    public $listableRaw = '';
+    public $toSelectRaw = '';
 
     /**
      * @var string
@@ -220,7 +225,7 @@ class BaseModel extends Model implements ModelInterface
      * @param Builder $builder
      * @return Builder
      */
-    public function scopeApplyItemsClauses(Builder $builder): Builder
+    public function scopeApplySelectClauses(Builder $builder): Builder
     {
         return $builder;
     }

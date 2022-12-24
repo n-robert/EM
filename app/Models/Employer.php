@@ -30,11 +30,11 @@ class Employer extends BaseModel
     /**
      * @var array
      */
-    public $listable = [
+    public $toSelect = [
         'employers.id',
         'name_ru',
         'full_name_ru',
-        't.code as type',
+        'types.code as type',
     ];
 
     /**
@@ -106,10 +106,10 @@ class Employer extends BaseModel
      * @param Builder $builder
      * @return Builder
      */
-    public function scopeApplyItemsClauses(Builder $builder): Builder
+    public function scopeApplySelectClauses(Builder $builder): Builder
     {
         $builder
-            ->join('types as t', 't.id', '=', 'type_id', 'left');
+            ->leftJoin('types', 'types.id', 'type_id');
 
         return $builder;
     }

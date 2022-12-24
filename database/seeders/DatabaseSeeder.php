@@ -24,14 +24,14 @@ class DatabaseSeeder extends Seeder
 //            UsagePermitSeeder::class,
 //            TypeSeeder::class,
 //            EmployerSeeder::class,
-//            QuotaSeeder::class,
-            PermitSeeder::class,
+            QuotaSeeder::class,
 //            OccupationSeeder::class,
         ]);
 
         $this->call([
+            PermitSeeder::class,
             EmployeeSeeder::class,
-//            StaffSeeder::class,
+            StaffSeeder::class,
         ]);
 
         $tables = [

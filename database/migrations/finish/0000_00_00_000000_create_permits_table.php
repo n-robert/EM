@@ -18,7 +18,6 @@ class CreatePermitsTable extends Migration
         $columns['none'] = [
             'unsignedBigInteger' => [
                 'employer_id',
-                'quota_id',
             ],
             'jsonb' => [
                 'user_ids',    // previous type - int_array
@@ -34,15 +33,16 @@ class CreatePermitsTable extends Migration
         ];
 
         $columns['nullable:true'] = [
+            'unsignedBigInteger' => [
+                'quota_id',
+            ],
             'integer' => [
                 'total',
             ],
-
             'date' => [
                 'issued_date',
                 'expired_date',
             ],
-
             'jsonb' => [
                 'history',
                 'details',

@@ -31,7 +31,7 @@ class EmployeeSeeder extends Seeder
             'resident_document_number',
             'phone',
             'employer_id',
-            'employ_permit_id',
+            'permit_id',
             'work_permit_serie',
             'work_permit_number',
             'occupation_id',

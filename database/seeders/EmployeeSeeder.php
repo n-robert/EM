@@ -33,7 +33,7 @@ class EmployeeSeeder extends Seeder
             'resident_document_number',
             'phone',
             'employer_id',
-            'employ_permit_id',
+            'permit_id',
             'work_permit_serie',
             'work_permit_number',
             'occupation_id',
@@ -129,6 +129,9 @@ class EmployeeSeeder extends Seeder
 
                     foreach ($columns as $column) {
                         switch ($column) {
+                            case 'permit_id':
+                                $key = 'employ_permit_id';
+                                break;
                             case 'created_at':
                                 $key = 'created';
                                 break;

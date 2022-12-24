@@ -6,7 +6,9 @@
     <field
             name="employer"/>
     <field
-            name="total"/>
-    <field
             name="expired_date"/>
+    <field
+        name="total"/>
+    <field
+        name="unused_total"/>
 </root>

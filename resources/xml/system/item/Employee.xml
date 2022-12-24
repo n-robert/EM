@@ -80,7 +80,7 @@
     </fieldgroup>
     <fieldgroup name="job">
         <field
-                name="employ_permit_id"
+                name="permit_id"
                 type="select"
                 model="Permit"/>
         <field

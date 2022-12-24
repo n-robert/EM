@@ -13,7 +13,7 @@ class Address extends BaseModel
     /**
      * @var array
      */
-    public $listable = ['id', 'name_ru'];
+    public $toSelect = ['id', 'name_ru'];
 
     /**
      * Repeatable fields.

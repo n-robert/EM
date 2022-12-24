@@ -7,4 +7,6 @@
             name="employer"/>
     <field
             name="total"/>
+    <field
+        name="unused_total"/>
 </root>

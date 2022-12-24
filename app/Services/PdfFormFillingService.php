@@ -1467,7 +1467,7 @@ class PdfFormFillingService
     public static function printWorkPermit($docData, $doc, $id)
     {
         $recipient = Employer::find($docData['authority_id']);
-        $permit = Permit::find($docData['employ_permit_id']);
+        $permit = Permit::find($docData['permit_id']);
         $permitIssued = Carbon::parse($permit->issued_date)->isoFormat('DD.MM.YYYY');
 
         $permitInfo =

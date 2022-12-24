@@ -66,6 +66,7 @@
                         <div v-else>
                             <e-m-input :name="element.name"
                                        :type="element.type"
+                                       :disabled="element.disabled"
                                        :value="item[element.name] || element.value"
                                        :options="element.options"
                                        :onclick="element.onclick"
@@ -107,7 +108,7 @@ export default {
             default: {},
         },
         requiredFields: {
-            default: {},
+            default: null,
         },
         controllerName: {
             default: null,

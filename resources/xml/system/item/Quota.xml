@@ -32,5 +32,9 @@
         <field
                 name="quantity"
                 type="text"/>
+        <field
+            name="unused"
+            type="text"
+            disabled="true"/>
     </fieldset>
 </root>
