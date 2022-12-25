@@ -1,7 +1,10 @@
 <template>
     <portal to="modal">
         <transition leave-active-class="duration-200">
-            <div v-show="show" :class="[position, topScroll]" class="inset-x-0 px-4 py-6 sm:px-0 sm:flex sm:items-top sm:justify-center">
+            <div v-show="show"
+                 :style="topScrollTop"
+                 :class="[position]"
+                 class="inset-x-0 px-4 py-6 sm:px-0 sm:flex sm:items-top sm:justify-center">
                 <transition enter-active-class="ease-out duration-300"
                             enter-class="opacity-0"
                             enter-to-class="opacity-100"
@@ -47,33 +50,8 @@ export default {
     },
 
     data() {
-        let rate = window.scrollY/window.innerHeight;
-
-        switch (true) {
-            case rate > 0.84:
-                rate = 'full';
-                break;
-            case  rate > 0.7:
-                rate = '3/4';
-                break;
-            case rate > 0.56:
-                rate = '2/3';
-                break;
-            case rate > 0.42:
-                rate = '1/2';
-                break;
-            case rate > 0.28:
-                rate = '1/3';
-                break;
-            case rate > 0.14:
-                rate = '1/4';
-                break;
-            default:
-                rate = '0';
-        }
-
         return {
-            topScroll: 'top-' + rate
+            topScrollTop: 'top:' + (document.documentElement.scrollTop || document.body.scrollTop) + 'px'
         };
     },
 
