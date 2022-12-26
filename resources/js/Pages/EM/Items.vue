@@ -174,6 +174,14 @@
             <div v-if="pagination.hasPages" class="p-2">
                 <pagination :pagination="pagination"></pagination>
             </div>
+
+            <div class="text-right">
+                <e-m-button :type="'button'"
+                            class="font-bold text-indigo-500 hover:text-white hover:bg-indigo-500"
+                            @click.native="printPage()">
+                    {{ __('Print page') }}
+                </e-m-button>
+            </div>
         </centered-item>
     </app-layout>
 </template>
@@ -286,6 +294,10 @@ export default {
         visit(url) {
             this.$inertia.visit(url);
         },
+
+        printPage() {
+            window.print();
+        }
     },
 };
 </script>

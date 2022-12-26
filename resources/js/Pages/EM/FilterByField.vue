@@ -4,7 +4,9 @@
         <input type="hidden" name="field" :value="element.field"/>
         <input type="hidden" name="value" :value="element.value"/>
         <input type="hidden" name="action" :value="element.action"/>
-        <input type="submit" :value="__(element.name)" onclick="this.blur();"
+        <input type="submit"
+               :value="element.field.endsWith('_date') ? formatDate(element.name) : __(element.name)"
+               onclick="this.blur();"
                :class="{[filterFieldDefaultClass] : true, [filterFieldIsChecked] : element.checked }"/>
     </form>
 </template>

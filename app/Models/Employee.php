@@ -113,6 +113,11 @@ class Employee extends BaseModel
             ['leftJoin' => 'addresses|addresses.id|employees.reg_address_id'],
         ],
 
+        'employees.visa_expired_date' => [
+            'nameModel' => 'Employee',
+            ['whereRaw' => 'employees.visa_expired_date >= NOW()'],
+        ],
+
         'employees.permit_id' => [
             'nameModel' => 'Permit',
             ['leftJoin' => 'permits|permits.id|employees.permit_id'],

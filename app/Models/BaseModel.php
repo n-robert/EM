@@ -389,8 +389,11 @@ class BaseModel extends Model implements ModelInterface
         $valueField = $nameField = strpos($field, '.') ? $field : $model->getTable() . '.' . $field;
 
         if (isset($options['nameModel'])) {
-            $nameModel = app()->make(__NAMESPACE__ . '\\' . $options['nameModel']);
-            $nameField = $nameModel->getTable() . '.' . $nameModel::$defaultName;
+            if ($options['nameModel'] != ucfirst($this->name)) {
+                $nameModel = app()->make(__NAMESPACE__ . '\\' . $options['nameModel']);
+                $nameField = $nameModel->getTable() . '.' . $nameModel::$defaultName;
+            }
+
             unset($options['nameModel']);
         }
 

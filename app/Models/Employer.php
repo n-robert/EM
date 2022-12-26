@@ -59,7 +59,7 @@ class Employer extends BaseModel
      * @var array
      */
     protected $filterFields = [
-        'type_id' => [
+        'employers.type_id' => [
             'nameModel' => 'Type',
             ['leftJoin' => 'types|types.id|type_id'],
         ],
