@@ -1,6 +1,6 @@
 <template>
     <nav role="navigation" aria-label="Pagination Navigation" class="flex items-center justify-between">
-        <div class="sm:flex-1 sm:flex sm:items-center sm:justify-between">
+        <div class="sm:flex-1">
                 <span class="relative inline-flex shadow-sm rounded-md m-auto">
 
                     <span v-if="pagination.onFirstPage"
