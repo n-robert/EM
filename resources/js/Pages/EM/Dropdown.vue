@@ -1,5 +1,5 @@
 <template>
-    <div class="relative m-1">
+    <div class="relative mx-1 mt-2">
         <div @click="open = ! open" :class="{'relative z-50': open}" class="w-48 text-left">
             <slot name="trigger"></slot>
             <e-m-button :type="'button'"

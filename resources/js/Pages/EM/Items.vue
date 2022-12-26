@@ -30,11 +30,11 @@
                     </template>
                 </dropdown>
 
-                <div v-if="pagination.hasPages" class="m-2">
+                <div v-if="pagination.hasPages" class="mx-1 mt-2">
                     <pagination :pagination="pagination"></pagination>
                 </div>
 
-                <div class="p-2 m-1 bg-white shadow-xl sm:rounded-lg">
+                <div class="p-2 mx-1 mt-2 bg-white shadow-xl sm:rounded-lg">
                     <div class="p-2">
                         <div class="text-right text-xs pr-5">
                             {{ pageInfo }}
