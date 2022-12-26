@@ -16,7 +16,7 @@
                             </div>
 
                             <!-- Navigation Links -->
-                            <div class="space-x-8 sm:-my-px sm:flex">
+                            <div class="hidden space-x-8 sm:flex">
                                 <e-m-nav-link v-for="view in page.props.views"
                                               :key="view"
                                               :href="'/' + view.pluralize()"
@@ -26,7 +26,7 @@
                             </div>
                         </div>
 
-                        <div class="hidden sm:flex sm:items-center sm:ml-6">
+                        <div class="hidden sm:flex sm:items-center">
                             <div class="ml-3 relative">
                                 <!-- Teams Dropdown -->
                                 <jet-dropdown
