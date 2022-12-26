@@ -138,16 +138,12 @@
                                             <div v-for="k in item.modal_items_count">
                                                 <items-modal v-if="k === 1"
                                                              :itemCustomLink="item.item_custom_link"
-                                                             :modalId="item.id || item.default_name"
-                                                             @openModalFromItemsModal="openModal"
-                                                             @closeModalFromItemsModal="closeModal">
+                                                             :modalId="item.id || item.default_name">
                                                 </items-modal>
 
                                                 <items-modal v-else
                                                              :itemCustomLink="item.item_custom_link + '?page=' + k"
-                                                             :modalId="item.id || item.default_name"
-                                                             @openModalFromItemsModal="openModal"
-                                                             @closeModalFromItemsModal="closeModal">
+                                                             :modalId="item.id || item.default_name">
                                                 </items-modal>
                                             </div>
                                         </template>

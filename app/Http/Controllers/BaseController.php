@@ -272,7 +272,7 @@ class BaseController extends Controller implements ControllerInterface
         $frontFilters = $this->model->getFilters($skip, $skippedField);
         $hasFilters = count_array_recursive(session($this->names . '.filters'));
         $pagination = $this->model->getPagination($items);
-        $modal = [];
+        $modal = [$this->names => false];
         $docList = [];
 
         foreach ($items->all() as $item) {

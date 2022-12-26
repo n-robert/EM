@@ -35,7 +35,7 @@ export default {
 
     methods: {
         submit() {
-            this.$inertia.post('/' + this.controllerNames, new FormData(this.$refs[this.id]));
+            this.$inertia.post('/' + this.controllerNames + '/filter', new FormData(this.$refs[this.id]));
         },
     },
 };

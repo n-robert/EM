@@ -105,7 +105,7 @@ export default {
             this.formFields = response.data.formFields;
             this.controllerName = response.data.controllerName;
             this.controllerNames = response.data.controllerNames;
-            this.pageInfo = this.pagination.total ?
+            this.pageInfo = this.pagination ?
                 [
                     this.pagination.firstItem + '-' + this.pagination.lastItem,
                     this.__('from'),
@@ -114,16 +114,6 @@ export default {
         }).then(() => {
             this.dataLoaded = true;
         });
-    },
-
-    methods: {
-        openModal(doc) {
-            this.$emit('openModalFromItemsModal', doc);
-        },
-
-        closeModal(doc) {
-            this.$emit('closeModalFromItemsModal', doc);
-        },
     },
 };
 </script>

@@ -77,7 +77,7 @@ class ExpatManagerServiceProvider extends ServiceProvider
                         ->middleware('query.validate')
                         ->name('posts.' . $views);
                     // Apply filter to items view
-                    Route::post('/' . $views, $controllerClass . '@applyFilter');
+                    Route::post('/' . $views . '/filter', $controllerClass . '@applyFilter');
                 }
 
                 Route::post('/staff/{year}/{month}', 'App\Http\Controllers\StaffController@staffByMonth');
