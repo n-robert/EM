@@ -179,7 +179,7 @@
 </template>
 
 <script>
-import AppLayout from '../../Layouts/AppLayout';
+import AppLayout from './AppLayout';
 import EMButton from './Button';
 import CenteredItem from './CenteredItem';
 import DialogModal from './DialogModal';

@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import AppLayout from '../../Layouts/AppLayout';
+import AppLayout from './AppLayout';
 import CenteredItem from './CenteredItem';
 import Item from './Item';
 import EMButton from './Button';
