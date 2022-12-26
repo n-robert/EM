@@ -47,7 +47,7 @@
                         </inertia-link>
                     </div>
 
-                    <div class="p-4 table w-full">
+                    <div class="p-4 sm:px-0 table w-full">
                         <div class="even:bg-indigo-100 text-indigo-600 table-row-group font-bold">
                             <div class="table-row">
                                 <div v-for="field in formFields" class="p-2 align-top table-cell">
@@ -65,7 +65,7 @@
 
                         <div v-for="item in items" class="even:bg-indigo-100 text-sm table-row-group">
                             <div class="table-row">
-                                <div v-for="field in formFields" class="p-2 align-middle table-cell">
+                                <div v-for="field in formFields" class="p-2 sm:px-0 align-middle table-cell">
                                     <h2 v-if="field.name === 'default_name'" class="pl-6 py-1 text-left">
                                         <inertia-link
                                             v-if="!item.no_link"
