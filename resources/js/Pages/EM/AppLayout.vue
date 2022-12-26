@@ -10,13 +10,13 @@
                         <div class="flex">
                             <!-- Logo -->
                             <div class="flex-shrink-0 flex items-center">
-                                <inertia-link :href="route('gets.employees')">
-                                    <jet-application-mark class="block h-9 w-auto"/>
-                                </inertia-link>
+<!--                                <inertia-link :href="route('gets.employees')">-->
+<!--                                    <jet-application-mark class="block h-9 w-auto"/>-->
+<!--                                </inertia-link>-->
                             </div>
 
                             <!-- Navigation Links -->
-                            <div class="hidden pl-10 space-x-8 sm:-my-px sm:flex">
+                            <div class="hidden pl-20 space-x-8 sm:-my-px sm:flex">
                                 <e-m-nav-link v-for="view in page.props.views"
                                               :key="view"
                                               :href="'/' + view.pluralize()"
