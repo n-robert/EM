@@ -175,12 +175,12 @@
                 <div :class="{'block': showingNavigationDropdown, 'hidden': ! showingNavigationDropdown}"
                      class="sm:hidden">
                     <div class="pt-2 pb-3 space-y-1">
-                        <e-m-nav-link v-for="view in page.props.views"
+                        <e-m-responsive-nav-link v-for="view in page.props.views"
                                       :key="view"
                                       :href="'/' + view.pluralize()"
                                       :active="(page.props.currentRouteName === 'gets.' + view) || (page.props.currentRouteName === 'gets.' + view.pluralize())">
                             {{ __(view.ucFirst().pluralize()) }}
-                        </e-m-nav-link>
+                        </e-m-responsive-nav-link>
                     </div>
 
                     <!-- Responsive Settings Options -->
