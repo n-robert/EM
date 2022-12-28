@@ -6,17 +6,17 @@
             <!-- Add Team Member -->
             <jet-form-section @submitted="addTeamMember">
                 <template #title>
-                    Add Team Member
+                    {{ __('Add Team Member') }}
                 </template>
 
                 <template #description>
-                    Add a new team member to your team, allowing them to collaborate with you.
+                    {{ __('Add a new team member to your team, allowing them to collaborate with you.') }}
                 </template>
 
                 <template #form>
                     <div class="col-span-6">
                         <div class="max-w-xl text-sm text-gray-600">
-                            Please provide the email address of the person you would like to add to this team.
+                            {{ __('Please provide the email address of the person you would like to add to this team.') }}
                         </div>
                     </div>
 
@@ -60,11 +60,11 @@
 
                 <template #actions>
                     <jet-action-message :on="addTeamMemberForm.recentlySuccessful" class="mr-3">
-                        Added.
+                        {{ __('Added.') }}
                     </jet-action-message>
 
                     <jet-button :class="{ 'opacity-25': addTeamMemberForm.processing }" :disabled="addTeamMemberForm.processing">
-                        Add
+                        {{ __('Add') }}
                     </jet-button>
                 </template>
             </jet-form-section>
@@ -76,11 +76,11 @@
             <!-- Team Member Invitations -->
             <jet-action-section class="mt-10 sm:mt-0">
                 <template #title>
-                    Pending Team Invitations
+                    {{ __('Pending Team Invitations') }}
                 </template>
 
                 <template #description>
-                    These people have been invited to your team and have been sent an invitation email. They may join the team by accepting the email invitation.
+                    {{ __('These people have been invited to your team and have been sent an invitation email. They may join the team by accepting the email invitation.') }}
                 </template>
 
                 <!-- Pending Team Member Invitation List -->
@@ -94,7 +94,7 @@
                                 <button class="cursor-pointer ml-6 text-sm text-red-500 focus:outline-none"
                                                     @click="cancelTeamInvitation(invitation)"
                                                     v-if="userPermissions.canRemoveTeamMembers">
-                                    Cancel
+                                    {{ __('Cancel') }}
                                 </button>
                             </div>
                         </div>
@@ -109,11 +109,11 @@
             <!-- Manage Team Members -->
             <jet-action-section class="mt-10 sm:mt-0">
                 <template #title>
-                    Team Members
+                    {{ __('Team Members') }}
                 </template>
 
                 <template #description>
-                    All of the people that are part of this team.
+                    {{ __('All of the people that are part of this team.') }}
                 </template>
 
                 <!-- Team Member List -->
@@ -141,14 +141,14 @@
                                 <button class="cursor-pointer ml-6 text-sm text-red-500"
                                                     @click="confirmLeavingTeam"
                                                     v-if="$page.props.user.id === user.id">
-                                    Leave
+                                    {{ __('Leave') }}
                                 </button>
 
                                 <!-- Remove Team Member -->
                                 <button class="cursor-pointer ml-6 text-sm text-red-500"
                                                     @click="confirmTeamMemberRemoval(user)"
                                                     v-if="userPermissions.canRemoveTeamMembers">
-                                    Remove
+                                    {{ __('Remove') }}
                                 </button>
                             </div>
                         </div>
@@ -160,7 +160,7 @@
         <!-- Role Management Modal -->
         <jet-dialog-modal :show="currentlyManagingRole" @close="currentlyManagingRole = false">
             <template #title>
-                Manage Role
+                {{ __('Manage Role') }}
             </template>
 
             <template #content>
@@ -193,11 +193,11 @@
 
             <template #footer>
                 <jet-secondary-button @click.native="currentlyManagingRole = false">
-                    Nevermind
+                    {{ __('Nevermind') }}
                 </jet-secondary-button>
 
                 <jet-button class="ml-2" @click.native="updateRole" :class="{ 'opacity-25': updateRoleForm.processing }" :disabled="updateRoleForm.processing">
-                    Save
+                    {{ __('Save') }}
                 </jet-button>
             </template>
         </jet-dialog-modal>
@@ -205,20 +205,20 @@
         <!-- Leave Team Confirmation Modal -->
         <jet-confirmation-modal :show="confirmingLeavingTeam" @close="confirmingLeavingTeam = false">
             <template #title>
-                Leave Team
+                {{ __('Leave Team') }}
             </template>
 
             <template #content>
-                Are you sure you would like to leave this team?
+                {{ __('Are you sure you would like to leave this team?') }}
             </template>
 
             <template #footer>
                 <jet-secondary-button @click.native="confirmingLeavingTeam = false">
-                    Nevermind
+                    {{ __('Nevermind') }}
                 </jet-secondary-button>
 
                 <jet-danger-button class="ml-2" @click.native="leaveTeam" :class="{ 'opacity-25': leaveTeamForm.processing }" :disabled="leaveTeamForm.processing">
-                    Leave
+                    {{ __('Leave') }}
                 </jet-danger-button>
             </template>
         </jet-confirmation-modal>
@@ -226,20 +226,20 @@
         <!-- Remove Team Member Confirmation Modal -->
         <jet-confirmation-modal :show="teamMemberBeingRemoved" @close="teamMemberBeingRemoved = null">
             <template #title>
-                Remove Team Member
+                {{ __('Remove Team Member') }}
             </template>
 
             <template #content>
-                Are you sure you would like to remove this person from the team?
+                {{ __('Are you sure you would like to remove this person from the team?') }}
             </template>
 
             <template #footer>
                 <jet-secondary-button @click.native="teamMemberBeingRemoved = null">
-                    Nevermind
+                    {{ __('Nevermind') }}
                 </jet-secondary-button>
 
                 <jet-danger-button class="ml-2" @click.native="removeTeamMember" :class="{ 'opacity-25': removeTeamMemberForm.processing }" :disabled="removeTeamMemberForm.processing">
-                    Remove
+                    {{ __('Remove') }}
                 </jet-danger-button>
             </template>
         </jet-confirmation-modal>

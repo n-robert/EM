@@ -200,19 +200,19 @@
                         <div class="mt-3 space-y-1">
                             <e-m-responsive-nav-link :href="route('profile.show')"
                                                      :active="route().current('profile.show')">
-                                Profile
+                                {{ __('Profile') }}
                             </e-m-responsive-nav-link>
 
                             <e-m-responsive-nav-link :href="route('api-tokens.index')"
                                                      :active="route().current('api-tokens.index')"
                                                      v-if="page.props.jetstream.hasApiFeatures">
-                                API Tokens
+                                {{ __('API Tokens') }}
                             </e-m-responsive-nav-link>
 
                             <!-- Authentication -->
                             <form method="POST" @submit.prevent="logout">
                                 <e-m-responsive-nav-link as="button">
-                                    Logout
+                                    {{ __('Logout') }}
                                 </e-m-responsive-nav-link>
                             </form>
 
@@ -221,25 +221,25 @@
                                 <div class="border-t border-gray-200"></div>
 
                                 <div class="block px-4 py-2 text-xs text-gray-400">
-                                    Manage Team
+                                    {{ __('Manage Team') }}
                                 </div>
 
                                 <!-- Team Settings -->
                                 <e-m-responsive-nav-link :href="route('teams.show', page.props.user.current_team)"
                                                          :active="route().current('teams.show')">
-                                    Team Settings
+                                    {{ __('Team Settings') }}
                                 </e-m-responsive-nav-link>
 
                                 <e-m-responsive-nav-link :href="route('teams.create')"
                                                          :active="route().current('teams.create')">
-                                    Create New Team
+                                    {{ __('Create New Team') }}
                                 </e-m-responsive-nav-link>
 
                                 <div class="border-t border-gray-200"></div>
 
                                 <!-- Team Switcher -->
                                 <div class="block px-4 py-2 text-xs text-gray-400">
-                                    Switch Teams
+                                    {{ __('Switch Teams') }}
                                 </div>
 
                                 <template v-for="team in page.props.user.all_teams">
