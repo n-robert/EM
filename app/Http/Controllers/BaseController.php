@@ -116,11 +116,11 @@ class BaseController extends Controller implements ControllerInterface
 
     /**
      * Apply a filter from request.
-     * @return bool|InertiaResponse
+     *
+     * @return RedirectResponse|true
      */
     public function applyFilter()
     {
-//        dd($this->request->input());
         $name = $this->request->input('name', '');
         $field = $this->request->input('field', '');
         $value = $this->request->input('value', '');
@@ -160,7 +160,7 @@ class BaseController extends Controller implements ControllerInterface
 
         session(['filtersModal' => true]);
 
-        return $this->showAll($field);
+        return redirect()->route('gets.' . $this->names);
     }
 
     /**
@@ -245,17 +245,17 @@ class BaseController extends Controller implements ControllerInterface
      *
      * @param string $skippedField
      * @param bool $skip
-     * @param array $filters
+     * @param array $selectedFilters
      * @return array
      */
     public function getItems(string $skippedField = '',
                              bool   $skip = true,
-                             array  $filters = []): array
+                             array  $selectedFilters = []): array
     {
         session(['views' => XmlFormHandlingService::getModelList(true)]);
         $query =
             $this->model
-                ->applyFilters($filters)
+                ->applyFilters($selectedFilters)
                 ->applyDefaultOrder()
                 ->applySelectClauses()
                 ->select($this->model->toSelect);
@@ -269,7 +269,7 @@ class BaseController extends Controller implements ControllerInterface
         }
 
         $items = $query->paginate(request('perPage'));
-        $frontFilters = $this->model->getFilters($skip, $skippedField);
+        $filters = $this->model->getFilters($skip, $skippedField);
         $hasFilters = count_array_recursive(session($this->names . '.filters'));
         $pagination = $this->model->getPagination($items);
         $modal = [$this->names => false];
@@ -294,7 +294,7 @@ class BaseController extends Controller implements ControllerInterface
 
         return [
             'items'            => $items->all(),
-            'filters'          => $frontFilters,
+            'filters'          => $filters,
             'hasFilters'       => $hasFilters,
             'pagination'       => $pagination,
             'modal'            => $modal,

@@ -16,14 +16,14 @@ class StaffController extends BaseController
      *
      * @param string $skippedField
      * @param bool $skip
-     * @param array $filters
+     * @param array $selectedFilters
      * @return array
      */
     public function getItems(string $skippedField = '',
                              bool   $skip = true,
-                             array  $filters = []): array
+                             array  $selectedFilters = []): array
     {
-        $items = parent::getItems($skippedField, $skip, $filters);
+        $items = parent::getItems($skippedField, $skip, $selectedFilters);
 
         array_walk($items['items'], function (&$item) {
             $tmpEmployees = [];

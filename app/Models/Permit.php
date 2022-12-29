@@ -19,7 +19,7 @@ class Permit extends BaseModel
     /**
      * @var array
      */
-    public static $ownSelectOptionsConditions = [
+    public static $selfSelectOptionsConditions = [
         'Valid' => [
             ['whereRaw' => 'expired_date >= NOW()'],
         ],
@@ -160,12 +160,12 @@ class Permit extends BaseModel
      * @return Collection
      * @throws BindingResolutionException
      */
-    public function getOwnSelectOptions(...$args): Collection
+    public function getSelfSelectOptions(...$args): Collection
     {
         $options = ['id AS value', 'number AS text'];
         $query = $this->applyDefaultOrder()->applyAuthUser()->getQuery();
 
-        if ($args && $conditions = static::$ownSelectOptionsConditions[$args[0]]) {
+        if ($args && $conditions = static::$selfSelectOptionsConditions[$args[0]]) {
             static::applyQueryOptions($conditions, $query);
         }
 

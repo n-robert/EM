@@ -21,22 +21,18 @@ class Employee extends BaseModel
     /**
      * @var array
      */
-    public static $ownSelectOptionsConditions = [
+    public static $selfSelectOptionsConditions = [
         'Officer'  => [
             ['leftJoin' => 'statuses|statuses.id|status_id'],
             ['where' => 'statuses.name_en|Official'],
         ],
-        'Agent'    => [
+        'Boss'    => [
             ['leftJoin' => 'statuses|statuses.id|status_id'],
-            ['whereRaw' => 'statuses.name_en IN(\'Boss\', \'Booker\')'],
+            ['where' => 'statuses.name_en|Boss'],
         ],
         'Director' => [
             ['leftJoin' => 'statuses|statuses.id|status_id'],
-            ['whereRaw' => 'statuses.name_en IN(\'Boss\', \'Booker\', \'Official\', \'Client\')'],
-        ],
-        'Booker'   => [
-            ['leftJoin' => 'statuses|statuses.id|status_id'],
-            ['whereRaw' => 'statuses.name_en IN(\'Boss\', \'Booker\')'],
+            ['whereRaw' => 'statuses.name_en IN(\'Boss\', \'Official\', \'Client\')'],
         ],
     ];
 
@@ -211,7 +207,7 @@ class Employee extends BaseModel
      * @return Collection
      * @throws BindingResolutionException
      */
-    public function getOwnSelectOptions(...$args): Collection
+    public function getSelfSelectOptions(...$args): Collection
     {
         $options = [
             'employees.id AS value',
@@ -222,7 +218,7 @@ class Employee extends BaseModel
         ];
         $query = $this->applyDefaultOrder()->applyAuthUser()->getQuery();
 
-        if ($args && $conditions = static::$ownSelectOptionsConditions[$args[0]]) {
+        if ($args && $conditions = static::$selfSelectOptionsConditions[$args[0]]) {
             static::applyQueryOptions($conditions, $query);
         }
 

@@ -33,7 +33,7 @@ class BaseModel extends Model implements ModelInterface
     /**
      * @var array
      */
-    public static $ownSelectOptionsConditions = [];
+    public static $selfSelectOptionsConditions = [];
 
     /**
      * The base accessors to append to the model's array form.
@@ -332,7 +332,7 @@ class BaseModel extends Model implements ModelInterface
             $tmpKey = $this->names . '.filters.' . $field;
             // If field has no model, then we will assume that filter is simplified
             // and just store query clause in session
-            if (!isset($options['nameModel'])) {
+            if (!isset($options['model']) && !isset($options['nameModel'])) {
                 session([$this->names . '.queries.' . $this->names . '.' . $field => $options]);
 
                 $key = $tmpKey;
@@ -471,7 +471,7 @@ class BaseModel extends Model implements ModelInterface
      * @return Collection
      * @throws BindingResolutionException
      */
-    protected function getOwnSelectOptions(): Collection
+    protected function getSelfSelectOptions(): Collection
     {
         return
             $this->applyDefaultOrder()

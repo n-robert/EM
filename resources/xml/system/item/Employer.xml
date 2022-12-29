@@ -28,11 +28,11 @@
             name="director_id"
             type="select"
             required="true"
-            model="Employee:Director"/>
+            model="Employee:Boss"/>
         <field
             name="booker_id"
             type="select"
-            model="Employee:Booker"/>
+            model="Employee:Boss"/>
 
         <fieldset name="phone" show="true" repeatable="true" deletable="true">
             <field

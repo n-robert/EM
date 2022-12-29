@@ -212,7 +212,7 @@ class XmlFormHandlingService
 
             $options = $distinct ? $model->distinct()->$method($column) : $model->$method($column);
         } else {
-            $options = $model->getOwnSelectOptions(...$args);
+            $options = $model->getSelfSelectOptions(...$args);
         }
 
         return XmlFormHandlingService::buildSelectOptions($options);

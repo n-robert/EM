@@ -33,6 +33,6 @@
         <field
             name="agent_id"
             type="select"
-            model="Employee:Agent"/>
+            model="Employee:Boss"/>
     </fieldset>
 </root>

@@ -9,5 +9,5 @@
         name="rep_id"
         type="select"
         required="true"
-        model="Employee:Agent"/>
+        model="Employee:Boss"/>
 </root>

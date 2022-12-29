@@ -16,7 +16,7 @@ class Employer extends BaseModel
     /**
      * @var array
      */
-    public static $ownSelectOptionsConditions = [
+    public static $selfSelectOptionsConditions = [
         'LEGAL' => [
             ['leftJoin' => 'types|types.id|type_id'],
             ['whereRaw' => 'types.code LIKE \'%LEGAL%\''],
@@ -71,13 +71,13 @@ class Employer extends BaseModel
      * @return Collection
      * @throws BindingResolutionException
      */
-    public function getOwnSelectOptions(...$args): Collection
+    public function getSelfSelectOptions(...$args): Collection
     {
         $args = $args ?: ['LEGAL'];
         $options = ['employers.id AS value', 'name_ru AS text'];
         $query = $this->applyDefaultOrder()->applyAuthUser()->getQuery();
 
-        if ($args && $conditions = static::$ownSelectOptionsConditions[$args[0]]) {
+        if ($args && $conditions = static::$selfSelectOptionsConditions[$args[0]]) {
             static::applyQueryOptions($conditions, $query);
         }
 
