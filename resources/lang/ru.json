@@ -449,7 +449,7 @@
     "Permit expired": "РнР / патент до",
     "status": "статус",
     "occupation": "профессия",
-    "occupation_id": "профессия",
+    "occupation_id": "профессия / должность",
     "employee_job.occupation_id": "профессия",
     "code": "код",
     "country": "страна",
