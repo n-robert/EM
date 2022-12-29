@@ -17,7 +17,6 @@ class StatusSeeder extends Seeder
     public function run()
     {
         $statuses = [
-            'Booker' => 'Главбух',
             'Boss' => 'Руководитель',
             'Cancelled' => 'Аннулирован',
             'Client' => 'Контрагент',

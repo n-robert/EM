@@ -180,8 +180,8 @@ class EmployeeSeeder extends Seeder
 
                         if ($column == 'status_id') {
                             $value = str_replace(
-                                ['family', 'furlough', 'worker'],
-                                ['family member', 'on leave', 'hired'],
+                                ['booker', 'family', 'furlough', 'worker'],
+                                ['boss', 'family member', 'on leave', 'hired'],
                                 strtolower($value)
                             );
                             $value = $statuses[ucfirst($value)];
