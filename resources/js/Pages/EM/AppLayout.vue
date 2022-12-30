@@ -11,16 +11,17 @@
                             <!-- Logo -->
                             <div class="pt-1 flex-shrink-0 flex items-center">
                                 <inertia-link :href="'/'">
-                                    <em-application-mark/>
+                                    <em-application-mark :class="'h-9'"/>
                                 </inertia-link>
                             </div>
 
                             <!-- Navigation Links -->
                             <div class="hidden pl-10 space-x-8 sm:-my-px sm:flex sm:items-center">
                                 <em-nav-link v-for="view in page.props.views"
-                                              :key="view"
-                                              :href="'/' + view.pluralize()"
-                                              :active="(page.props.currentRouteName === 'gets.' + view) || (page.props.currentRouteName === 'gets.' + view.pluralize())">
+                                             :class="'h-9'"
+                                             :key="view"
+                                             :href="'/' + view.pluralize()"
+                                             :active="(page.props.currentRouteName === 'gets.' + view) || (page.props.currentRouteName === 'gets.' + view.pluralize())">
                                     {{ __(view.ucFirst().pluralize()) }}
                                 </em-nav-link>
                             </div>
@@ -64,7 +65,7 @@
                                                 </em-dropdown-link>
 
                                                 <em-dropdown-link :href="route('teams.create')"
-                                                                   v-if="page.props.jetstream.canCreateTeams">
+                                                                  v-if="page.props.jetstream.canCreateTeams">
                                                     {{ __('Create New Team') }}
                                                 </em-dropdown-link>
 
@@ -135,7 +136,7 @@
                                         </em-dropdown-link>
 
                                         <em-dropdown-link :href="route('api-tokens.index')"
-                                                           v-if="page.props.jetstream.hasApiFeatures">
+                                                          v-if="page.props.jetstream.hasApiFeatures">
                                             {{ __('API Tokens') }}
                                         </em-dropdown-link>
 
@@ -176,9 +177,9 @@
                      class="sm:hidden">
                     <div class="pt-2 pb-3 space-y-1">
                         <em-responsive-nav-link v-for="view in page.props.views"
-                                      :key="view"
-                                      :href="'/' + view.pluralize()"
-                                      :active="(page.props.currentRouteName === 'gets.' + view) || (page.props.currentRouteName === 'gets.' + view.pluralize())">
+                                                :key="view"
+                                                :href="'/' + view.pluralize()"
+                                                :active="(page.props.currentRouteName === 'gets.' + view) || (page.props.currentRouteName === 'gets.' + view.pluralize())">
                             {{ __(view.ucFirst().pluralize()) }}
                         </em-responsive-nav-link>
                     </div>
@@ -199,13 +200,13 @@
 
                         <div class="mt-3 space-y-1">
                             <em-responsive-nav-link :href="route('profile.show')"
-                                                     :active="route().current('profile.show')">
+                                                    :active="route().current('profile.show')">
                                 {{ __('Profile') }}
                             </em-responsive-nav-link>
 
                             <em-responsive-nav-link :href="route('api-tokens.index')"
-                                                     :active="route().current('api-tokens.index')"
-                                                     v-if="page.props.jetstream.hasApiFeatures">
+                                                    :active="route().current('api-tokens.index')"
+                                                    v-if="page.props.jetstream.hasApiFeatures">
                                 {{ __('API Tokens') }}
                             </em-responsive-nav-link>
 
@@ -226,12 +227,12 @@
 
                                 <!-- Team Settings -->
                                 <em-responsive-nav-link :href="route('teams.show', page.props.user.current_team)"
-                                                         :active="route().current('teams.show')">
+                                                        :active="route().current('teams.show')">
                                     {{ __('Team Settings') }}
                                 </em-responsive-nav-link>
 
                                 <em-responsive-nav-link :href="route('teams.create')"
-                                                         :active="route().current('teams.create')">
+                                                        :active="route().current('teams.create')">
                                     {{ __('Create New Team') }}
                                 </em-responsive-nav-link>
 

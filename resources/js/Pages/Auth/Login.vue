@@ -1,7 +1,7 @@
 <template>
     <em-authentication-card>
         <template #logo>
-            <em-application-mark />
+            <em-application-mark :class="'h-16'"/>
         </template>
 
         <jet-validation-errors class="mb-4" />
