@@ -11,18 +11,18 @@
                             <!-- Logo -->
                             <div class="pt-1 flex-shrink-0 flex items-center">
                                 <inertia-link :href="'/'">
-                                    <e-m-application-mark class="block h-9 w-auto"/>
+                                    <em-application-mark/>
                                 </inertia-link>
                             </div>
 
                             <!-- Navigation Links -->
-                            <div class="hidden pl-7 space-x-8 sm:-my-px sm:flex sm:items-center">
-                                <e-m-nav-link v-for="view in page.props.views"
+                            <div class="hidden pl-10 space-x-8 sm:-my-px sm:flex sm:items-center">
+                                <em-nav-link v-for="view in page.props.views"
                                               :key="view"
                                               :href="'/' + view.pluralize()"
                                               :active="(page.props.currentRouteName === 'gets.' + view) || (page.props.currentRouteName === 'gets.' + view.pluralize())">
                                     {{ __(view.ucFirst().pluralize()) }}
-                                </e-m-nav-link>
+                                </em-nav-link>
                             </div>
                         </div>
 
@@ -58,15 +58,15 @@
                                                 </div>
 
                                                 <!-- Team Settings -->
-                                                <e-m-dropdown-link
+                                                <em-dropdown-link
                                                     :href="route('teams.show', page.props.user.current_team)">
                                                     {{ __('Team Settings') }}
-                                                </e-m-dropdown-link>
+                                                </em-dropdown-link>
 
-                                                <e-m-dropdown-link :href="route('teams.create')"
+                                                <em-dropdown-link :href="route('teams.create')"
                                                                    v-if="page.props.jetstream.canCreateTeams">
                                                     {{ __('Create New Team') }}
-                                                </e-m-dropdown-link>
+                                                </em-dropdown-link>
 
                                                 <div class="border-t border-gray-100"></div>
 
@@ -77,7 +77,7 @@
 
                                                 <template v-for="team in page.props.user.all_teams">
                                                     <form @submit.prevent="switchToTeam(team)" :key="team.id">
-                                                        <e-m-dropdown-link as="button">
+                                                        <em-dropdown-link as="button">
                                                             <div class="flex items-center">
                                                                 <svg v-if="team.id == page.props.user.current_team_id"
                                                                      class="mr-2 h-5 w-5 text-green-400" fill="none"
@@ -89,7 +89,7 @@
                                                                 </svg>
                                                                 <div>{{ __(team.name.ucFirst().pluralize()) }}</div>
                                                             </div>
-                                                        </e-m-dropdown-link>
+                                                        </em-dropdown-link>
                                                     </form>
                                                 </template>
                                             </template>
@@ -130,22 +130,22 @@
                                             {{ __('Manage Account') }}
                                         </div>
 
-                                        <e-m-dropdown-link :href="route('profile.show')">
+                                        <em-dropdown-link :href="route('profile.show')">
                                             {{ __('Profile') }}
-                                        </e-m-dropdown-link>
+                                        </em-dropdown-link>
 
-                                        <e-m-dropdown-link :href="route('api-tokens.index')"
+                                        <em-dropdown-link :href="route('api-tokens.index')"
                                                            v-if="page.props.jetstream.hasApiFeatures">
                                             {{ __('API Tokens') }}
-                                        </e-m-dropdown-link>
+                                        </em-dropdown-link>
 
                                         <div class="border-t border-gray-100"></div>
 
                                         <!-- Authentication -->
                                         <form @submit.prevent="logout">
-                                            <e-m-dropdown-link as="button">
+                                            <em-dropdown-link as="button">
                                                 {{ __('Logout') }}
-                                            </e-m-dropdown-link>
+                                            </em-dropdown-link>
                                         </form>
                                     </template>
                                 </jet-dropdown>
@@ -175,12 +175,12 @@
                 <div :class="{'block': showingNavigationDropdown, 'hidden': ! showingNavigationDropdown}"
                      class="sm:hidden">
                     <div class="pt-2 pb-3 space-y-1">
-                        <e-m-responsive-nav-link v-for="view in page.props.views"
+                        <em-responsive-nav-link v-for="view in page.props.views"
                                       :key="view"
                                       :href="'/' + view.pluralize()"
                                       :active="(page.props.currentRouteName === 'gets.' + view) || (page.props.currentRouteName === 'gets.' + view.pluralize())">
                             {{ __(view.ucFirst().pluralize()) }}
-                        </e-m-responsive-nav-link>
+                        </em-responsive-nav-link>
                     </div>
 
                     <!-- Responsive Settings Options -->
@@ -198,22 +198,22 @@
                         </div>
 
                         <div class="mt-3 space-y-1">
-                            <e-m-responsive-nav-link :href="route('profile.show')"
+                            <em-responsive-nav-link :href="route('profile.show')"
                                                      :active="route().current('profile.show')">
                                 {{ __('Profile') }}
-                            </e-m-responsive-nav-link>
+                            </em-responsive-nav-link>
 
-                            <e-m-responsive-nav-link :href="route('api-tokens.index')"
+                            <em-responsive-nav-link :href="route('api-tokens.index')"
                                                      :active="route().current('api-tokens.index')"
                                                      v-if="page.props.jetstream.hasApiFeatures">
                                 {{ __('API Tokens') }}
-                            </e-m-responsive-nav-link>
+                            </em-responsive-nav-link>
 
                             <!-- Authentication -->
                             <form method="POST" @submit.prevent="logout">
-                                <e-m-responsive-nav-link as="button">
+                                <em-responsive-nav-link as="button">
                                     {{ __('Logout') }}
-                                </e-m-responsive-nav-link>
+                                </em-responsive-nav-link>
                             </form>
 
                             <!-- Team Management -->
@@ -225,15 +225,15 @@
                                 </div>
 
                                 <!-- Team Settings -->
-                                <e-m-responsive-nav-link :href="route('teams.show', page.props.user.current_team)"
+                                <em-responsive-nav-link :href="route('teams.show', page.props.user.current_team)"
                                                          :active="route().current('teams.show')">
                                     {{ __('Team Settings') }}
-                                </e-m-responsive-nav-link>
+                                </em-responsive-nav-link>
 
-                                <e-m-responsive-nav-link :href="route('teams.create')"
+                                <em-responsive-nav-link :href="route('teams.create')"
                                                          :active="route().current('teams.create')">
                                     {{ __('Create New Team') }}
-                                </e-m-responsive-nav-link>
+                                </em-responsive-nav-link>
 
                                 <div class="border-t border-gray-200"></div>
 
@@ -244,7 +244,7 @@
 
                                 <template v-for="team in page.props.user.all_teams">
                                     <form @submit.prevent="switchToTeam(team)" :key="team.id">
-                                        <e-m-responsive-nav-link as="button">
+                                        <em-responsive-nav-link as="button">
                                             <div class="flex items-center">
                                                 <svg v-if="team.id == page.props.user.current_team_id"
                                                      class="mr-2 h-5 w-5 text-green-400" fill="none"
@@ -254,7 +254,7 @@
                                                 </svg>
                                                 <div>{{ team.name }}</div>
                                             </div>
-                                        </e-m-responsive-nav-link>
+                                        </em-responsive-nav-link>
                                     </form>
                                 </template>
                             </template>
@@ -283,21 +283,21 @@
 </template>
 
 <script>
-import EMApplicationMark from './ApplicationMark';
+import EmApplicationMark from './ApplicationMark';
 import JetBanner from '@/Jetstream/Banner';
 import JetDropdown from '@/Jetstream/Dropdown';
-import EMDropdownLink from './DropdownLink';
-import EMNavLink from './NavLink';
-import EMResponsiveNavLink from './ResponsiveNavLink';
+import EmDropdownLink from './DropdownLink';
+import EmNavLink from './NavLink';
+import EmResponsiveNavLink from './ResponsiveNavLink';
 
 export default {
     components: {
-        EMApplicationMark,
+        EmApplicationMark,
         JetBanner,
         JetDropdown,
-        EMDropdownLink,
-        EMNavLink,
-        EMResponsiveNavLink,
+        EmDropdownLink,
+        EmNavLink,
+        EmResponsiveNavLink,
     },
 
     provide: {

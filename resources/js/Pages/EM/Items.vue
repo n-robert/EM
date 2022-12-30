@@ -89,25 +89,25 @@
                                     <form v-if="!item.no_link"
                                           :id="'delete-' + item.id"
                                           @submit.prevent="deleteItem(item)">
-                                        <e-m-button class="font-bold text-indigo-500 hover:text-white hover:bg-indigo-500">
+                                        <em-button class="font-bold text-indigo-500 hover:text-white hover:bg-indigo-500">
                                             {{ __('Delete') }}
-                                        </e-m-button>
+                                        </em-button>
                                     </form>
 
-                                    <e-m-button v-else
+                                    <em-button v-else
                                                 class="font-bold text-indigo-500 hover:text-white hover:bg-indigo-500"
                                                 @click.native="openModal(item.default_name)">
                                         {{ __('Detailed information') }}
-                                    </e-m-button>
+                                    </em-button>
                                 </div>
 
                                 <div v-if="Object.keys(docList).length"
                                      class="p-2 align-middle table-cell">
-                                    <e-m-button :type="'button'"
+                                    <em-button :type="'button'"
                                                 class="font-bold text-indigo-500 hover:text-white hover:bg-indigo-500"
                                                 @click.native="openModal(item.id)">
                                         {{ __('Print documents') }}
-                                    </e-m-button>
+                                    </em-button>
                                 </div>
 
                                 <div v-if="modal[item.id] || modal[item.default_name]">
@@ -172,11 +172,11 @@
             </div>
 
             <div class="text-right">
-                <e-m-button :type="'button'"
+                <em-button :type="'button'"
                             class="font-bold text-indigo-500 hover:text-white hover:bg-indigo-500"
                             @click.native="printPage()">
                     {{ __('Print page') }}
-                </e-m-button>
+                </em-button>
             </div>
         </centered-item>
     </app-layout>
@@ -184,7 +184,7 @@
 
 <script>
 import AppLayout from './AppLayout';
-import EMButton from './Button';
+import EmButton from './Button';
 import CenteredItem from './CenteredItem';
 import DialogModal from './DialogModal';
 import DocList from './DocList';
@@ -196,7 +196,7 @@ import ItemsModal from './ItemsModal';
 export default {
     components: {
         AppLayout,
-        EMButton,
+        EmButton,
         CenteredItem,
         DialogModal,
         DocList,

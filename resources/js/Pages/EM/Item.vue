@@ -32,7 +32,7 @@
                             @addItem="addItem"
                             @removeItem="removeItem"></field-set>
 
-                        <e-m-input v-else
+                        <em-input v-else
                                    :name="field.name"
                                    :type="field.type"
                                    :value="item[field.name] || field.value"
@@ -45,7 +45,7 @@
                                    :id="field.name.toString().toKebabCase()"
                                    :isRequired="field.required"
                                    :parenId="field.parent_id"
-                                   :show="field.show"></e-m-input>
+                                   :show="field.show"></em-input>
                     </div>
                 </tab>
 
@@ -64,7 +64,7 @@
                             @removeItem="removeItem"></field-set>
 
                         <div v-else>
-                            <e-m-input :name="element.name"
+                            <em-input :name="element.name"
                                        :type="element.type"
                                        :disabled="element.disabled"
                                        :value="item[element.name] || element.value"
@@ -77,7 +77,7 @@
                                        :id="element.name && element.name.toString().toKebabCase()"
                                        :isRequired="element.required"
                                        :parenId="element.parent_id"
-                                       :show="element.show"></e-m-input>
+                                       :show="element.show"></em-input>
                         </div>
                     </div>
                 </div>
@@ -91,13 +91,13 @@
 <script>
 import Tab from './Tab';
 import FieldSet from './FieldSet';
-import EMInput from './Input';
+import EmInput from './Input';
 
 export default {
     components: {
         Tab,
         FieldSet,
-        EMInput,
+        EmInput,
     },
 
     props: {

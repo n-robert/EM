@@ -2,12 +2,12 @@
     <div class="relative mx-1 mt-2">
         <div @click="open = ! open" :class="{'relative z-50': open}" class="w-48 text-left">
             <slot name="trigger"></slot>
-            <e-m-button :type="'button'"
+            <em-button :type="'button'"
                         :open="open"
                         :originalText="buttonOpenText"
                         :alternativeText="buttonCloseText"
                         :customClass="buttonCustomClass">
-            </e-m-button>
+            </em-button>
         </div>
 
         <!-- Full Screen Dropdown Overlay -->
@@ -34,11 +34,11 @@
 </template>
 
 <script>
-import EMButton from './Button';
+import EmButton from './Button';
 
 export default {
     components: {
-        EMButton,
+        EmButton,
     },
 
     props: {

@@ -4,10 +4,10 @@
 
         <div v-else>
             <span :class="leftColumn">
-                <e-m-label
+                <em-label
                     :text="(hasLabel && hasLabel !== 'false' && labelText) ? (__(labelText).toPhrase(true)) : ''"
                     :for="name"
-                    :class="[isRequired && (!modelValue || page.props.errors[name]) ? warningClass : '', labelDefaultClass]"></e-m-label>
+                    :class="[isRequired && (!modelValue || page.props.errors[name]) ? warningClass : '', labelDefaultClass]"></em-label>
             </span>
 
             <span :class="rightColumn">
@@ -45,14 +45,14 @@
                               isRequired && (!modelValue || page.props.errors[name]) ? fieldWarningClass : inputDefaultClass,
                               textareaDefaultClass]"></textarea>
 
-                <e-m-button v-else-if="type === 'button' || type === 'submit'"
+                <em-button v-else-if="type === 'button' || type === 'submit'"
                             :type="type"
                             :onclick="onclick"
                             :open="open"
                             :originalText="__(value)"
                             :disabled="disabled || ! page.props.canEdit"
                             :customClass="customClass">
-                </e-m-button>
+                </em-button>
 
                 <input v-else-if="type === 'checkbox'"
                        :name="name"
@@ -86,15 +86,15 @@
 </template>
 
 <script>
-import EMLabel from './Label';
-import EMButton from './Button';
+import EmLabel from './Label';
+import EmButton from './Button';
 import Datepicker from 'vuejs-datepicker';
 import {ru} from 'vuejs-datepicker/dist/locale';
 
 export default {
     components: {
-        EMLabel,
-        EMButton,
+        EmLabel,
+        EmButton,
         Datepicker,
     },
 

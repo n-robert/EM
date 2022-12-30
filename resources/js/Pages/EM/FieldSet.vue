@@ -1,6 +1,6 @@
 <template>
     <div v-if="!field.repeatable" :id="name">
-        <e-m-input
+        <em-input
             v-for="(subField, subName) in field"
             v-if="!isNotFields.includes(subName)"
             :key="subName"
@@ -15,13 +15,13 @@
             :id="subField.name.toString().toKebabCase()"
             :isRequired="subField.required"
             :parenId="subField.parent_id"
-            :show="subField.show"></e-m-input>
+            :show="subField.show"></em-input>
     </div>
 
     <div v-else class="space-y-3" :id="name">
         <div v-for="(subItem, subKey) in item[name]"
              class="py-2 pr-2 mt-2 rounded-md bg-gradient-to-b from-indigo-100 to-white">
-            <e-m-input
+            <em-input
                 v-for="(subField, subName) in field"
                 v-if="!isNotFields.includes(subName)"
                 :key="subName"
@@ -36,38 +36,38 @@
                 :id="subField.name.toString().toKebabCase()"
                 :isRequired="subField.required"
                 :parenId="subField.parent_id"
-                :show="subField.show"></e-m-input>
+                :show="subField.show"></em-input>
 
             <span :class="leftColumn"></span>
             <span :class="rightColumn">
-                <e-m-button
+                <em-button
                     v-if="field.deletable || page.props.isAdmin"
                     type="button"
                     :originalText="__('Remove ' + name)"
                     customClass="hover:text-white hover:bg-indigo-500"
-                    @click.native="removeItem(name, subKey)"></e-m-button>
+                    @click.native="removeItem(name, subKey)"></em-button>
             </span>
         </div>
 
         <span :class="leftColumn"></span>
         <span :class="rightColumn">
-            <e-m-button
+            <em-button
                 type="button"
                 :originalText="__('Add ' + name)"
                 customClass="hover:text-white hover:bg-indigo-500"
-                @click.native="addItem(name)"></e-m-button>
+                @click.native="addItem(name)"></em-button>
         </span>
     </div>
 </template>
 
 <script>
-import EMInput from './Input';
-import EMButton from './Button';
+import EmInput from './Input';
+import EmButton from './Button';
 
 export default {
     components: {
-        EMInput,
-        EMButton,
+        EmInput,
+        EmButton,
     },
 
     inject: [

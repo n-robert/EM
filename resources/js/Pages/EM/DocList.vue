@@ -1,11 +1,11 @@
 <template>
     <div>
         <div v-for="(state, doc) in docList" class="pl-10 py-1">
-            <e-m-button :type="'button'"
+            <em-button :type="'button'"
                         @click.native="openModal(doc)"
                         class="hover:text-white hover:bg-indigo-500">
                 {{ __(doc.toPhrase()) }}
-            </e-m-button>
+            </em-button>
         </div>
 
         <div v-for="(state, doc) in docList">
@@ -29,13 +29,13 @@
                                         <span :class="leftColumn"></span>
 
                                         <span :class="rightColumn">
-                                            <e-m-button :type="'button'"
+                                            <em-button :type="'button'"
                                                         class="mr-6 hover:text-white hover:bg-indigo-500"
-                                                        @click.native="closeModal(doc)">{{ __('Cancel') }}</e-m-button>
+                                                        @click.native="closeModal(doc)">{{ __('Cancel') }}</em-button>
 
-                                            <e-m-button :type="'submit'" class="hover:text-white hover:bg-indigo-500">
+                                            <em-button :type="'submit'" class="hover:text-white hover:bg-indigo-500">
                                                 {{ __('Print') }}
-                                            </e-m-button>
+                                            </em-button>
                                         </span>
                                     </div>
                                 </div>
@@ -51,7 +51,7 @@
 <script>
 const
     components = {
-        EMButton: () => import('./Button'),
+        EmButton: () => import('./Button'),
         DialogModal: () => import('./DialogModal'),
         DocForm: () => import('./DocForm'),
     };

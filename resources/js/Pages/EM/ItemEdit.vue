@@ -17,23 +17,23 @@
                       @addItem="addItem"
                       @removeItem="removeItem">
                     <div class="mt-4">
-                        <e-m-button type="button"
+                        <em-button type="button"
                                     @click.native="visit(listUrl)"
                                     class="hover:text-white hover:bg-indigo-500">
                             {{ __('Cancel') }}
-                        </e-m-button>
+                        </em-button>
 
-                        <e-m-button type="button"
+                        <em-button type="button"
                                     @click.native="submit(action, 'apply')"
                                     class="hover:text-white hover:bg-indigo-500">
                             {{ __('Apply') }}
-                        </e-m-button>
+                        </em-button>
 
-                        <e-m-button type="button"
+                        <em-button type="button"
                                     @click.native="submit(action, 'save')"
                                     class="hover:text-white hover:bg-indigo-500">
                             {{ __('Save') }}
-                        </e-m-button>
+                        </em-button>
                     </div>
                 </item>
             </form>
@@ -45,7 +45,7 @@
 import AppLayout from './AppLayout';
 import CenteredItem from './CenteredItem';
 import Item from './Item';
-import EMButton from './Button';
+import EmButton from './Button';
 import qs from 'qs';
 
 export default {
@@ -53,7 +53,7 @@ export default {
         AppLayout,
         CenteredItem,
         Item,
-        EMButton,
+        EmButton,
     },
 
     props: [

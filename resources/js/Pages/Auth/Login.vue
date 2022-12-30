@@ -1,7 +1,7 @@
 <template>
-    <jet-authentication-card>
+    <em-authentication-card>
         <template #logo>
-            <jet-authentication-card-logo />
+            <em-application-mark />
         </template>
 
         <jet-validation-errors class="mb-4" />
@@ -38,12 +38,12 @@
                 </jet-button>
             </div>
         </form>
-    </jet-authentication-card>
+    </em-authentication-card>
 </template>
 
 <script>
-    import JetAuthenticationCard from '@/Jetstream/AuthenticationCard'
-    import JetAuthenticationCardLogo from '@/Jetstream/AuthenticationCardLogo'
+    import EmAuthenticationCard from '../EM/AuthenticationCard'
+    import EmApplicationMark from '../EM/ApplicationMark'
     import JetButton from '@/Jetstream/Button'
     import JetInput from '@/Jetstream/Input'
     import JetCheckbox from '@/Jetstream/Checkbox'
@@ -52,8 +52,8 @@
 
     export default {
         components: {
-            JetAuthenticationCard,
-            JetAuthenticationCardLogo,
+            EmAuthenticationCard,
+            EmApplicationMark,
             JetButton,
             JetInput,
             JetCheckbox,

@@ -9,13 +9,13 @@
                         {{ pagination.previous.label }}
                     </span>
 
-                    <e-m-button v-else @click.native="openModal(modalId + pagination.previous.label)"
+                    <em-button v-else @click.native="openModal(modalId + pagination.previous.label)"
                                   class="relative inline-flex items-center px-4 py-2 text-sm font-medium border
                                   border-gray-300 leading-5 rounded-md focus:outline-none focus:shadow-outline-indigo
                                   focus:border-indigo-300 hover:bg-indigo-500 hover:text-white active:bg-indigo-500
                                   active:text-white transition ease-in-out duration-150">
                         {{ pagination.previous.label }}
-                    </e-m-button>
+                    </em-button>
 
                     <span v-for="link in pagination.links">
                         <span v-if="link.active || link.url === null" aria-current="page"
@@ -25,22 +25,22 @@
                             {{ link.label }}
                         </span>
 
-                        <e-m-button v-else @click.native="openModal(modalId + link.label)"
+                        <em-button v-else @click.native="openModal(modalId + link.label)"
                                       class="relative inline-flex items-center px-4 py-2 text-sm font-medium border
                                       border-gray-300 leading-5 rounded-md focus:outline-none focus:shadow-outline-indigo
                                       focus:border-indigo-300 hover:bg-indigo-500 hover:text-white active:bg-indigo-500
                                       active:text-white transition ease-in-out duration-150">
                             {{ link.label }}
-                        </e-m-button>
+                        </em-button>
                     </span>
 
-                    <e-m-button v-if="pagination.hasPages" @click.native="openModal(modalId + pagination.next.label)"
+                    <em-button v-if="pagination.hasPages" @click.native="openModal(modalId + pagination.next.label)"
                                   class="relative inline-flex items-center px-4 py-2 text-sm font-medium border
                                   border-gray-300 leading-5 rounded-md focus:outline-none focus:shadow-outline-indigo
                                   focus:border-indigo-300 hover:bg-indigo-500 hover:text-white active:bg-indigo-500
                                   active:text-white transition ease-in-out duration-150">
                         {{ pagination.next.label }}
-                    </e-m-button>
+                    </em-button>
 
                     <span v-else
                           class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500
@@ -54,11 +54,11 @@
 </template>
 
 <script>
-import EMButton from './Button';
+import EmButton from './Button';
 
 export default {
     components: {
-        EMButton,
+        EmButton,
     },
 
     props: [
