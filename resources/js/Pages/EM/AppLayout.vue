@@ -16,7 +16,7 @@
                             </div>
 
                             <!-- Navigation Links -->
-                            <div class="hidden pl-10 space-x-8 sm:-my-px sm:flex sm:items-center">
+                            <div class="hidden pl-6 space-x-8 sm:-my-px sm:flex sm:items-center">
                                 <em-nav-link v-for="view in page.props.views"
                                              :class="'h-9'"
                                              :key="view"
