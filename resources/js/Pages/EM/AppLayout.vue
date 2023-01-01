@@ -9,7 +9,7 @@
                     <div class="flex justify-between h-16">
                         <div class="flex">
                             <!-- Logo -->
-                            <div class="pt-1 flex-shrink-0 flex items-center">
+                            <div class="pt-4 flex-shrink-0 flex items-center">
                                 <inertia-link :href="'/'">
                                     <em-application-mark :class="'h-9'"/>
                                 </inertia-link>
