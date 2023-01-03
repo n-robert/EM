@@ -75,7 +75,7 @@ class Permit extends BaseModel
     /**
      * @var array
      */
-    protected $defaultOrderBy = ['desc' => 'number'];
+    protected $defaultOrderBy = ['number desc'];
 
     /**
      * @var array

@@ -27,7 +27,7 @@ class StatusSeeder extends Seeder
             'Left' => 'Убыл',
             'Official' => 'Чиновник',
             'Seeker' => 'Соискатель',
-            'Hired' => 'Сотрудник',
+            'Hired' => 'Работник',
             'Arrived' => 'Прибыл',
         ];
         Status::truncate();

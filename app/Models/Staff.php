@@ -51,7 +51,7 @@ class Staff extends BaseModel
     /**
      * @var array
      */
-    protected $defaultOrderBy = ['year', 'month'];
+    protected $defaultOrderBy = ['year desc', 'month desc'];
 
     /**
      * @var array

@@ -62,7 +62,7 @@ class Quota extends BaseModel
     /**
      * @var array
      */
-    protected $defaultOrderBy = ['desc' => 'year'];
+    protected $defaultOrderBy = ['year desc'];
 
     /**
      * @var array

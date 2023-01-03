@@ -241,11 +241,14 @@ class BaseModel extends Model implements ModelInterface
         if ($this->defaultOrderBy) {
             array_walk(
                 $this->defaultOrderBy,
-                function ($value, $direction) use ($builder) {
+                function ($value) use ($builder) {
+                    $value = explode(' ', $value);
+                    $column = $value[0];
                     $direction =
-                        (is_string($direction) && in_array($direction, ['asc', 'desc'])) ?
-                            $direction : 'asc';
-                    $builder->orderBy($value, $direction);
+                        (isset($value[1]) && in_array($value[1], ['asc', 'desc']))
+                            ? $value[1]
+                            : 'asc';
+                    $builder->orderBy($column, $direction);
                 }
             );
         }
