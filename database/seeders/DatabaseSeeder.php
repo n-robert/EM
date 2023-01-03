@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call([
-            StatusSeeder::class,
+//            StatusSeeder::class,
         ]);
 
         $this->call([
@@ -30,7 +30,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
 //            PermitSeeder::class,
-            EmployeeSeeder::class,
+//            EmployeeSeeder::class,
             StaffSeeder::class,
         ]);
 
