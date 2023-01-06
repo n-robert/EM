@@ -24,8 +24,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->call(new \Database\Seeders\StaffSeeder)
-                 ->monthly();
+        $schedule->call(new \Database\Seeders\StaffSeeder, [true])
+                 ->everyMinute();
     }
 
     /**

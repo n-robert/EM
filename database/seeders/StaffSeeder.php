@@ -7,17 +7,20 @@ use App\Models\Employer;
 use App\Models\Staff;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
+use Illuminate\Mail\Message;
 use Illuminate\Support\Facades\DB;
 use App\Models\Employee;
+use Illuminate\Support\Facades\Mail;
 
 class StaffSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      *
+     * @param bool $monthly
      * @return void
      */
-    public function run()
+    public function run(bool $monthly = false)
     {
         $types = DB::table('types')->pluck('id', 'code');
         $employerIds = DB::table('employers')
@@ -27,32 +30,46 @@ class StaffSeeder extends Seeder
         $bossStatus = $statuses['Boss'];
         $hiredStatus = $statuses['Hired'];
         $firedStatus = $statuses['Fired'];
+        $thisYear = Carbon::now()->isoFormat('YYYY');
+        $thisMonth = Carbon::now()->isoFormat('MM');
         $hired = [];
         $fired = [];
-        Staff::truncate();
+        $query = DB::table('employee_turnover')
+                   ->select(['employee_id', 'employer_id', 'date', 'status_id'])
+                   ->whereIn('status_id', [$bossStatus, $hiredStatus, $firedStatus])
+                   ->orderBy('date');
 
-        DB::table('employee_turnover')
-          ->select(['employee_id', 'employer_id', 'date', 'status_id'])
-          ->whereIn('status_id', [$hiredStatus, $firedStatus])
-          ->orderBy('date')
-          ->chunk(100, function ($data) use ($hiredStatus, $firedStatus, $employerIds, &$hired, &$fired) {
-              foreach ($data as $datum) {
-                  $tmpYear = Carbon::parse($datum->date)->isoFormat('YYYY');
-                  $tmpMonth = Carbon::parse($datum->date)->isoFormat('MM');
-                  $tmpEmployerId = $datum->employer_id;
-                  $hired[$tmpYear][$tmpMonth][$tmpEmployerId] = $hired[$tmpYear][$tmpMonth][$tmpEmployerId] ?? [];
-                  $fired[$tmpYear][$tmpMonth][$tmpEmployerId] = $fired[$tmpYear][$tmpMonth][$tmpEmployerId] ?? [];
+        if ($monthly) {
+            if ($thisMonth == '01') {
+                $query->whereYear('date', (string)((int)$thisYear - 1))
+                      ->whereMonth('date', '12');
+            } else {
+                $query->whereYear('date', $thisYear)
+                      ->whereMonth('date', (string)((int)$thisMonth - 1));
+            }
+        } else {
+            Staff::truncate();
+        }
 
-                  if ($datum->status_id == $hiredStatus) {
-                      $hired[$tmpYear][$tmpMonth][$tmpEmployerId][] = $datum->employee_id;
-                  } else {
-                      $fired[$tmpYear][$tmpMonth][$tmpEmployerId][] = $datum->employee_id;
-                  }
-              }
+        $query->chunk(
+            100,
+            function ($data) use ($bossStatus, $hiredStatus, $firedStatus, $employerIds, &$hired, &$fired) {
+                foreach ($data as $datum) {
+                    $tmpYear = Carbon::parse($datum->date)->isoFormat('YYYY');
+                    $tmpMonth = Carbon::parse($datum->date)->isoFormat('MM');
+                    $tmpEmployerId = $datum->employer_id;
+                    $hired[$tmpYear][$tmpMonth][$tmpEmployerId] = $hired[$tmpYear][$tmpMonth][$tmpEmployerId] ?? [];
+                    $fired[$tmpYear][$tmpMonth][$tmpEmployerId] = $fired[$tmpYear][$tmpMonth][$tmpEmployerId] ?? [];
 
-          });
+                    if ($datum->status_id == $firedStatus) {
+                        $fired[$tmpYear][$tmpMonth][$tmpEmployerId][] = $datum->employee_id;
+                    } else {
+                        $hired[$tmpYear][$tmpMonth][$tmpEmployerId][] = $datum->employee_id;
+                    }
+                }
 
-        $thisYear = Carbon::now()->isoFormat('YYYY');
+            }
+        );
         $hired[$thisYear] = $hired[$thisYear] ?? [];
         $fired[$thisYear] = $fired[$thisYear] ?? [];
 
@@ -61,14 +78,25 @@ class StaffSeeder extends Seeder
 
         foreach ($hired as $year => $hiredThisYear) {
             $firedThisYear = $fired[$year] ?? [];
-            $biggestMonthOfYear =
-                $year == $thisYear
-                    ? Carbon::now()->isoFormat('MM')
-                    : '12';
+            $startMonth = 1;
+            $finishMonth = ($year == $thisYear) ? (int)$thisMonth : 12;
 
-            for ($month = 1; $month < (int)$biggestMonthOfYear + 1; $month++) {
+            if ($monthly) {
+                if ($thisMonth != '01') {
+                    $startMonth = (int)$thisMonth - 1;
+                    $finishMonth = (int)$thisMonth;
+                } else {
+                    if ($year == $thisYear) {
+                        $startMonth = $finishMonth = 1;
+                    } else {
+                        $startMonth = $finishMonth = 12;
+                    }
+                }
+            }
+
+            for ($month = $startMonth; $month < $finishMonth + 1; $month++) {
                 if ($month == 1) {
-                    $lastYear = (string)($year - 1);
+                    $lastYear = (string)((int)$year - 1);
                     $firedLastYear = $fired[$lastYear] ?? [];
                     $firedLastMonth = $firedLastYear['12'] ?? [];
                     $lastMonthStaffYear = $lastYear;
@@ -130,5 +158,8 @@ class StaffSeeder extends Seeder
                 }
             }
         }
+        Mail::raw('Testing', function (Message $message) {
+            $message->to('7715377@mail.ru');
+        });
     }
 }

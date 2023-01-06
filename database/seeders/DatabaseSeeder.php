@@ -31,7 +31,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
 //            PermitSeeder::class,
 //            EmployeeSeeder::class,
-//            StaffSeeder::class,
+            StaffSeeder::class,
         ]);
 
         $tables = [
