@@ -20,7 +20,7 @@ class StaffSeeder extends Seeder
      * @param bool $monthly
      * @return void
      */
-    public function run(bool $monthly = true)
+    public function run(bool $monthly = false)
     {
         $types = DB::table('types')->pluck('id', 'code');
         $employerIds = DB::table('employers')
