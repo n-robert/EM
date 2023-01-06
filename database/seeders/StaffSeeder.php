@@ -158,8 +158,14 @@ class StaffSeeder extends Seeder
                 }
             }
         }
-        Mail::raw('Testing', function (Message $message) {
-            $message->to('7715377@mail.ru');
-        });
+
+        try {
+            Mail::raw('Testing', function (Message $message) {
+                $message->from('info@7715377.ru', 'Expat Manager');
+                $message->to('7715377@mail.ru');
+            });
+        } catch (\Exception $e) {
+            echo $e->getMessage();
+        }
     }
 }
