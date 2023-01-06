@@ -22,6 +22,7 @@ class StaffSeeder extends Seeder
      */
     public function run(bool $monthly = false)
     {
+        dd($monthly);
         $types = DB::table('types')->pluck('id', 'code');
         $employerIds = DB::table('employers')
                          ->whereNotIn('type_id', [$types['UFMS'], $types['OUFMS'], $types['CLIENT']])
