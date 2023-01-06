@@ -4,6 +4,7 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use function Symfony\Component\Translation\t;
 
 class Kernel extends ConsoleKernel
 {
@@ -24,8 +25,9 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->call(new \Database\Seeders\StaffSeeder, [true])
-                 ->everyMinute();
+        $schedule->call(function () {
+            (new \Database\Seeders\StaffSeeder)->run(true);
+        })->everyMinute();
     }
 
     /**
