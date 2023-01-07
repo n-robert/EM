@@ -22,13 +22,13 @@ class StaffSeeder extends Seeder
      */
     public function run(bool $monthly = false)
     {
-//        try {
-//            Mail::raw('Testing', function (Message $message) {
-//                $message->to('7715377@mail.ru');
-//            });
-//        } catch (\Exception $e) {
-//            echo $e->getMessage();
-//        }
+        try {
+            Mail::raw('Testing', function (Message $message) {
+                $message->to('7715377@mail.ru');
+            });
+        } catch (\Exception $e) {
+            echo $e->getMessage();
+        }
 
         $types = DB::table('types')->pluck('id', 'code');
         $employerIds = DB::table('employers')

@@ -27,7 +27,7 @@ class Kernel extends ConsoleKernel
     {
         $schedule->call(function () {
             (new \Database\Seeders\StaffSeeder)->run(true);
-        })->monthly();
+        })->everyFiveMinutes();
     }
 
     /**
