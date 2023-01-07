@@ -22,14 +22,6 @@ class StaffSeeder extends Seeder
      */
     public function run(bool $monthly = false)
     {
-        try {
-            Mail::raw('Testing', function (Message $message) {
-                $message->to('7715377@mail.ru');
-            });
-        } catch (\Exception $e) {
-            echo $e->getMessage();
-        }
-
         $types = DB::table('types')->pluck('id', 'code');
         $employerIds = DB::table('employers')
                          ->whereNotIn('type_id', [$types['UFMS'], $types['OUFMS'], $types['CLIENT']])
@@ -165,6 +157,14 @@ class StaffSeeder extends Seeder
                     }
                 }
             }
+        }
+
+        try {
+            Mail::raw('Updated staff (' . $thisYear . '-' . $thisMonth . ').', function (Message $message) {
+                $message->to('7715377@mail.ru');
+            });
+        } catch (\Exception $e) {
+            echo $e->getMessage();
         }
     }
 }
