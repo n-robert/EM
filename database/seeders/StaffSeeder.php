@@ -159,12 +159,14 @@ class StaffSeeder extends Seeder
             }
         }
 
-        try {
-            Mail::raw('Updated staff (' . $thisYear . '-' . $thisMonth . ').', function (Message $message) {
-                $message->to('7715377@mail.ru');
-            });
-        } catch (\Exception $e) {
-            echo $e->getMessage();
+        if ($monthly) {
+            try {
+                Mail::raw('Updated staff (' . $thisYear . '-' . $thisMonth . ').', function (Message $message) {
+                    $message->to('7715377@mail.ru');
+                });
+            } catch (\Exception $e) {
+                echo $e->getMessage();
+            }
         }
     }
 }
