@@ -15,11 +15,13 @@ class PermitController extends BaseController
     public function getItem($id): array
     {
         $item = parent::getItem($id);
-        $details = $item['item']->details;
+        $details = $item['item']->details ?? [];
         $unused = $item['item']->unused;
 
-        foreach ($details as $key => $detail) {
-            $details[$key]['unused'] = $unused[$key];
+        if ($details) {
+            foreach ($details as $key => $detail) {
+                $details[$key]['unused'] = $unused[$key];
+            }
         }
 
         $item['item']->details = $details;

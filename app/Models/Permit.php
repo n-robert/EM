@@ -110,10 +110,12 @@ class Permit extends BaseModel
                            ->all();
         $unused = [];
 
-        foreach ($this->details as $key => $detail) {
-            $unused[$key] = isset($used[$detail['occupation_id']])
-                ? $detail['quantity'] - $used[$detail['occupation_id']]
-                : $detail['quantity'];
+        if ($this->details) {
+            foreach ($this->details as $key => $detail) {
+                $unused[$key] = isset($used[$detail['occupation_id']])
+                    ? $detail['quantity'] - $used[$detail['occupation_id']]
+                    : $detail['quantity'];
+            }
         }
 
         return $unused;
