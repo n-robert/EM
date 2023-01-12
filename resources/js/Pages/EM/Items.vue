@@ -273,7 +273,8 @@ export default {
 
         buttonTarget(field, item) {
             return (
-                field.open_modal && this.openModal(item.default_name)) || (field.is_link && this.visit(itemLink(item))
+                field.open_modal && this.openModal(item.default_name))
+                || (field.is_link && this.visit(this.itemLink(item))
             );
         },
 
