@@ -2,7 +2,8 @@
 <root>
     <field
             name="default_name"
-            label="Item name"/>
+            label="Item name"
+            is_link="true"/>
     <field
             name="type"/>
 </root>

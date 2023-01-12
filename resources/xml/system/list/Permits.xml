@@ -2,7 +2,9 @@
 <root>
     <field
         name="default_name"
-        label="number"/>
+        label="number"
+        is_button="true"
+        is_link="true"/>
     <field
             name="employer"/>
     <field

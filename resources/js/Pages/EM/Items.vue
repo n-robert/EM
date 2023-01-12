@@ -66,10 +66,17 @@
                         <div v-for="item in items" class="even:bg-indigo-100 text-sm table-row-group">
                             <div class="table-row">
                                 <div v-for="field in formFields" class="p-2 sm:px-0 align-middle table-cell">
-                                    <h2 v-if="field.name === 'default_name'" class="pl-6 py-1 text-left">
+                                    <em-button v-if="field.is_button"
+                                               class="min-w-max w-1/5
+                                               font-bold text-indigo-500 hover:text-white hover:bg-indigo-500"
+                                               @click.native="buttonTarget(field, item)">
+                                        {{ __(item[field.name]) }}
+                                    </em-button>
+
+                                    <h2 v-else-if="field.name === 'default_name'" class="pl-6 py-1 text-left">
                                         <inertia-link
-                                            v-if="!item.no_link"
-                                            :href="item.item_custom_link || '/' + controllerName + '/' + item.id"
+                                            v-if="field.is_link"
+                                            :href="itemLink(item)"
                                             class="font-bold text-indigo-500 hover:text-indigo-700">
                                             {{ item.default_name }}
                                         </inertia-link>
@@ -86,35 +93,30 @@
                                 </div>
 
                                 <div v-if="page.props.isAdmin" class="p-2 align-middle table-cell">
-                                    <form v-if="!item.no_link"
+                                    <form v-if="!item.no_edit_link"
                                           :id="'delete-' + item.id"
                                           @submit.prevent="deleteItem(item)">
-                                        <em-button class="font-bold text-indigo-500 hover:text-white hover:bg-indigo-500">
+                                        <em-button
+                                            class="font-bold text-indigo-500 hover:text-white hover:bg-indigo-500">
                                             {{ __('Delete') }}
                                         </em-button>
                                     </form>
-
-                                    <em-button v-else
-                                                class="font-bold text-indigo-500 hover:text-white hover:bg-indigo-500"
-                                                @click.native="openModal(item.default_name)">
-                                        {{ __('Detailed information') }}
-                                    </em-button>
                                 </div>
 
                                 <div v-if="Object.keys(docList).length"
                                      class="p-2 align-middle table-cell">
                                     <em-button :type="'button'"
-                                                class="font-bold text-indigo-500 hover:text-white hover:bg-indigo-500"
-                                                @click.native="openModal(item.id)">
+                                               class="font-bold text-indigo-500 hover:text-white hover:bg-indigo-500"
+                                               @click.native="openModal(item.id)">
                                         {{ __('Print documents') }}
                                     </em-button>
                                 </div>
 
-                                <div v-if="modal[item.id] || modal[item.default_name]">
+                                <div v-if="hasModal(item)">
                                     <dialog-modal
                                         v-if="!item.item_custom_link"
-                                        :show="modal[item.id] || modal[item.default_name]"
-                                        :id="item.id || modal[item.default_name]"
+                                        :show="hasModal(item)"
+                                        :id="modalId(item)"
                                         :position="'absolute'"
                                         @closeModalFromDialog="closeModal">
                                         <template #content>
@@ -130,20 +132,20 @@
                                     </dialog-modal>
 
                                     <dialog-modal v-else-if="item.modal_items_count"
-                                                  :show="modal[item.id] || modal[item.default_name]"
-                                                  :id="item.id || item.default_name"
+                                                  :show="hasModal(item)"
+                                                  :id="modalId(item)"
                                                   :position="'absolute'"
                                                   @closeModalFromDialog="closeModal">
                                         <template #content>
                                             <div v-for="k in item.modal_items_count">
                                                 <items-modal v-if="k === 1"
                                                              :itemCustomLink="item.item_custom_link"
-                                                             :modalId="item.id || item.default_name">
+                                                             :modalId="modalId(item)">
                                                 </items-modal>
 
                                                 <items-modal v-else
                                                              :itemCustomLink="item.item_custom_link + '?page=' + k"
-                                                             :modalId="item.id || item.default_name">
+                                                             :modalId="modalId(item)">
                                                 </items-modal>
                                             </div>
                                         </template>
@@ -173,8 +175,8 @@
 
             <div class="text-right">
                 <em-button :type="'button'"
-                            class="font-bold text-indigo-500 hover:text-white hover:bg-indigo-500"
-                            @click.native="printPage()">
+                           class="font-bold text-indigo-500 hover:text-white hover:bg-indigo-500"
+                           @click.native="printPage()">
                     {{ __('Print page') }}
                 </em-button>
             </div>
@@ -257,6 +259,24 @@ export default {
     },
 
     methods: {
+        itemLink(item) {
+            return item.item_custom_link || '/' + this.controllerName + '/' + item.id;
+        },
+
+        hasModal(item) {
+            return this.modal[item.id] || this.modal[item.default_name];
+        },
+
+        modalId(item) {
+            return item.id || item.default_name;
+        },
+
+        buttonTarget(field, item) {
+            return (
+                field.open_modal && this.openModal(item.default_name)) || (field.is_link && this.visit(itemLink(item))
+            );
+        },
+
         deleteItem(item) {
             const
                 form = document.getElementById('delete-' + item.id),

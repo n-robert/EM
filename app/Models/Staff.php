@@ -38,7 +38,7 @@ class Staff extends BaseModel
     public $toSelectRaw =
         "jsonb_agg(employees) as employees,
         '/staff/'||year||'/'||month as item_custom_link,
-        1 as no_link";
+        1 as no_edit_link";
 
     /**
      * @var array

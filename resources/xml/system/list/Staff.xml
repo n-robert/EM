@@ -5,5 +5,7 @@
     <field
         name="month"/>
     <field
-        name="quantity"/>
+        name="quantity"
+        is_button="true"
+        open_modal="true"/>
 </root>

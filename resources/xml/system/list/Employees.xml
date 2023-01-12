@@ -2,7 +2,8 @@
 <root>
     <field
         name="default_name"
-        label="Person full name"/>
+        label="Person full name"
+        is_link="true"/>
     <field
         name="status"/>
     <field

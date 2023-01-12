@@ -14,16 +14,19 @@ class StaffController extends BaseController
     /**
      * Show items list.
      *
+     * @param int|null $perPage
      * @param string $skippedField
      * @param bool $skip
      * @param array $selectedFilters
      * @return array
      */
-    public function getItems(string $skippedField = '',
+    public function getItems(int    $perPage = null,
+                             string $skippedField = '',
                              bool   $skip = true,
                              array  $selectedFilters = []): array
     {
-        $items = parent::getItems($skippedField, $skip, $selectedFilters);
+        $perPage = 5;
+        $items = parent::getItems($perPage, $skippedField, $skip, $selectedFilters);
 
         array_walk($items['items'], function (&$item) {
             $tmpEmployees = [];
@@ -49,7 +52,7 @@ class StaffController extends BaseController
     {
         $filters = $this->getStaffByMonthFilters($year, $month);
 
-        return app(EmployeeController::class)->getItems('', true, $filters);
+        return app(EmployeeController::class)->getItems(null, '', true, $filters);
     }
 
     /**
@@ -60,10 +63,10 @@ class StaffController extends BaseController
     public function getStaffByMonthFilters($year, $month): array
     {
         $employees = $this->model
-                ->applyFilters()
-                ->where(compact('year', 'month'))
-                ->pluck('employees')
-                ->all();
+            ->applyFilters()
+            ->where(compact('year', 'month'))
+            ->pluck('employees')
+            ->all();
         $tmpEmployees = [];
 
         foreach ($employees as $employee) {
