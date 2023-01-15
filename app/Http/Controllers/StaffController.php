@@ -14,19 +14,16 @@ class StaffController extends BaseController
     /**
      * Show items list.
      *
-     * @param int|null $perPage
      * @param string $skippedField
      * @param bool $skip
      * @param array $selectedFilters
      * @return array
      */
-    public function getItems(int    $perPage = null,
-                             string $skippedField = '',
+    public function getItems(string $skippedField = '',
                              bool   $skip = true,
                              array  $selectedFilters = []): array
     {
-        $perPage = 5;
-        $items = parent::getItems($perPage, $skippedField, $skip, $selectedFilters);
+        $items = parent::getItems($skippedField, $skip, $selectedFilters);
 
         array_walk($items['items'], function (&$item) {
             $tmpEmployees = [];
@@ -37,7 +34,8 @@ class StaffController extends BaseController
 
             $item->employees = array_unique($tmpEmployees);
             $item->quantity = count($item->employees);
-            $item->modal_items_count = count($this->staffByMonth($item->year, $item->month)['pagination']['links']);
+            $filters = $this->getStaffByMonthFilters($item->year, $item->month);
+            $item->modal_items_count = ceil(count($filters['employees']['id']) / session('perPage'));
         });
 
         return $items;
@@ -52,7 +50,7 @@ class StaffController extends BaseController
     {
         $filters = $this->getStaffByMonthFilters($year, $month);
 
-        return app(EmployeeController::class)->getItems(null, '', true, $filters);
+        return app(EmployeeController::class)->getItems('', true, $filters);
     }
 
     /**
@@ -67,15 +65,10 @@ class StaffController extends BaseController
             ->where(compact('year', 'month'))
             ->pluck('employees')
             ->all();
-        $tmpEmployees = [];
-
-        foreach ($employees as $employee) {
-            $tmpEmployees = array_merge($tmpEmployees, $employee);
-        }
 
         return [
             'employees' => [
-                'id' => array_unique($tmpEmployees)
+                'id' => array_unique(array_merge(...$employees))
             ]
         ];
     }

@@ -75,6 +75,9 @@ class BaseController extends Controller implements ControllerInterface
             str_replace('Controller', '', class_basename(static::class))
         );
         $this->names = Str::plural($this->name);
+
+        $perPage = request('perPage') ?: 15;
+        session(['perPage' => $perPage]);
     }
 
     /**
@@ -243,14 +246,12 @@ class BaseController extends Controller implements ControllerInterface
     /**
      * Show items list.
      *
-     * @param int|null $perPage
      * @param string $skippedField
      * @param bool $skip
      * @param array $selectedFilters
      * @return array
      */
-    public function getItems(int    $perPage = null,
-                             string $skippedField = '',
+    public function getItems(string $skippedField = '',
                              bool   $skip = true,
                              array  $selectedFilters = []): array
     {
@@ -270,8 +271,7 @@ class BaseController extends Controller implements ControllerInterface
             $query->groupBy($this->model->groupBy);
         }
 
-        $perPage = $perPage ?: request('perPage');
-        $items = $query->paginate($perPage);
+        $items = $query->paginate(session('perPage'));
         $filters = $this->model->getFilters($skip, $skippedField);
         $hasFilters = count_array_recursive(session($this->names . '.filters'));
         $pagination = $this->model->getPagination($items);
@@ -348,14 +348,12 @@ class BaseController extends Controller implements ControllerInterface
     /**
      * Show items list.
      *
-     * @param int|null $perPage
      * @param string $skippedField
      * @param bool $skip
      * @param array $selectedFilters
      * @return InertiaResponse
      */
-    public function showAll(int    $perPage = null,
-                            string $skippedField = '',
+    public function showAll(string $skippedField = '',
                             bool   $skip = true,
                             array  $selectedFilters = []): InertiaResponse
     {
@@ -364,7 +362,7 @@ class BaseController extends Controller implements ControllerInterface
         return Jetstream::inertia()
                         ->render($this->request,
                             $page,
-                            $this->getItems($perPage, $skippedField, $skip, $selectedFilters));
+                            $this->getItems($skippedField, $skip, $selectedFilters));
     }
 
     /**
