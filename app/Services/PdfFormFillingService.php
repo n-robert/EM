@@ -351,8 +351,12 @@ class PdfFormFillingService
             $rows = [];
 
             while (isset($allFields[$key . '_' . $count])) {
-                $rows[] = $allFields[$key . '_' . $count]['FieldMaxLength'];
-                $count++;
+                try {
+                    $rows[] = $allFields[$key . '_' . $count]['FieldMaxLength'];
+                    $count++;
+                } catch(\Exception $exception) {
+                    dd($key . ': ' . $exception->getMessage());
+                }
             }
 
             $options = $value['options'];
@@ -1155,10 +1159,13 @@ class PdfFormFillingService
     public static function printWorkContract($docData, $doc, $id): array
     {
         $employee = Employee::find($id);
-        $dateFrom = $docData['date_from'];
-        $workPermitExpired = $employee->work_permit_expired ?
-            date('d.m.Y', strtotime($employee->work_permit_expired)) : '';
-        $dateTo = $docData['date_to'] ?: $workPermitExpired;
+        $signedDate = $docData['signed_date'];
+        $workPermitStartedDate = $employee->work_permit_started_date ?
+            date('d/m/Y', strtotime($employee->work_permit_started_date)) : '';
+        $dateFrom = $docData['date_from'] ?: $workPermitStartedDate;
+        $workPermitExpiredDate = $employee->work_permit_expired_date ?
+            date('d/m/Y', strtotime($employee->work_permit_expired_date)) : '';
+        $dateTo = $docData['date_to'] ?: $workPermitExpiredDate;
         $salary = $docData['salary'];
         $contractNumber = $docData['contract_number'];
         $employerId = $docData['employer_id'];
@@ -1167,7 +1174,7 @@ class PdfFormFillingService
         $address = static::parseAddress($employerAddress);
         $title = array_filter([$address['region'], $address['city'], $address['locality']]);
         $title[] =
-            implode(' ', static::parseDate($dateFrom, true)) . __('YEAR_SUFFIX');
+            implode(' ', static::parseDate($signedDate, true)) . __('YEAR_SUFFIX');
         $title = implode(', ', $title);
 
         $director = Employee::find($employer->director_id);
@@ -1235,8 +1242,8 @@ class PdfFormFillingService
                 'employee'        => $employeeName,
                 'citizenship'     => $citizenship,
                 'address'         => $employeeAddress,
-                'date_from'       => date('d/m/Y', strtotime($dateFrom)),
-                'date_to'         => date('d/m/Y', strtotime($dateTo)),
+                'date_from'       => $dateFrom,
+                'date_to'         => $dateTo,
                 'salary'          => $salary,
                 'director2'       => $director2,
                 'contract_number' => $contractNumber,
