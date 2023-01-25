@@ -6,14 +6,6 @@
         type="date"
         format="dd-MM-yyyy"/>
     <field
-        name="date_from"
-        type="date"
-        format="dd-MM-yyyy"/>
-    <field
-        name="date_to"
-        type="date"
-        format="dd-MM-yyyy"/>
-    <field
         name="employer_id"
         type="select"
         required="true"
@@ -22,6 +14,14 @@
         name="salary"
         required="true"
         type="text"/>
+    <field
+        name="date_from"
+        type="date"
+        format="dd-MM-yyyy"/>
+    <field
+        name="date_to"
+        type="date"
+        format="dd-MM-yyyy"/>
     <field
         name="contract_number"
         type="text"/>
