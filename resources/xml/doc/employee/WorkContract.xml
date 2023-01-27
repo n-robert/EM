@@ -13,22 +13,20 @@
         model="Employer:LEGAL"
         reference="employee_job.0.employer_id"/>
     <field
+        name="contract_number"
+        type="text"
+        required="true"
+        model="Employee:employee_job.0.contract_number"/>
+    <field
         name="date_from"
         type="date"
-        required="true"
         format="dd-MM-yyyy"
         model="Employee:work_permit_started_date"/>
     <field
         name="date_to"
         type="date"
-        required="true"
         format="dd-MM-yyyy"
         model="Employee:work_permit_expired_date"/>
-    <field
-        name="contract_number"
-        type="text"
-        required="true"
-        model="Employee:employee_job.0.contract_number"/>
     <field
         name="salary"
         type="text"
