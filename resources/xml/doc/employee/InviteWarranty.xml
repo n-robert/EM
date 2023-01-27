@@ -23,10 +23,12 @@
         name="employer_id"
         type="select"
         required="true"
-        model="Employer:LEGAL"/>
+        model="Employer:LEGAL"
+        reference="employee_job.0.employer_id"/>
     <field
         name="destination_id"
         type="select"
         required="true"
-        model="Address"/>
+        model="Address"
+        reference="reg_address_id"/>
 </root>

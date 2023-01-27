@@ -10,7 +10,8 @@
         name="permit_id"
         type="select"
         required="true"
-        model="Permit:Valid"/>
+        model="Permit:Valid"
+        reference="permit_id"/>
     <field
         name="date"
         required="true"

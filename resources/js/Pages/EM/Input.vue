@@ -19,9 +19,11 @@
                         :onchange="onchange"
                         :disabled="disabled || ! page.props.canEdit"
                         :class="isRequired && (!modelValue || page.props.errors[name]) ? fieldWarningClass : inputDefaultClass">
-                    <option v-for="option in options" v-if="option !== null" :value="option.value">{{
-                            __(option.text)
-                        }}</option>
+                    <option v-for="option in options"
+                            v-if="option !== null"
+                            :value="option.value">
+                        {{ __(option.text) }}
+                    </option>
                 </select>
 
                 <datepicker v-else-if="type === 'date'"

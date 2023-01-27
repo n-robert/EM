@@ -750,7 +750,7 @@ class PdfFormFillingService
             ];
 
         if ($doc == 'hiring-notice') {
-            $dates['hired'] = $employee->hired_date;
+            $dates['hired'] = $docData['hired_date'];
 
             $address = Address::find($employee->reg_address_id);
             $data['work_place'] = $address->name_ru;
@@ -1160,11 +1160,9 @@ class PdfFormFillingService
     {
         $employee = Employee::find($id);
         $signedDate = $docData['signed_date'];
-        $workPermitStartedDate = $employee->work_permit_started_date ?
-            date('d/m/Y', strtotime($employee->work_permit_started_date)) : '';
+        $workPermitStartedDate = $employee->work_permit_started_date ?? '';
         $dateFrom = $docData['date_from'] ?: $workPermitStartedDate;
-        $workPermitExpiredDate = $employee->work_permit_expired_date ?
-            date('d/m/Y', strtotime($employee->work_permit_expired_date)) : '';
+        $workPermitExpiredDate = $employee->work_permit_expired_date ?? '';
         $dateTo = $docData['date_to'] ?: $workPermitExpiredDate;
         $salary = $docData['salary'];
         $contractNumber = $docData['contract_number'];
@@ -1242,8 +1240,8 @@ class PdfFormFillingService
                 'employee'        => $employeeName,
                 'citizenship'     => $citizenship,
                 'address'         => $employeeAddress,
-                'date_from'       => $dateFrom,
-                'date_to'         => $dateTo,
+                'date_from'       => date('d/m/Y', strtotime($dateFrom)),
+                'date_to'         => date('d/m/Y', strtotime($dateTo)),
                 'salary'          => $salary,
                 'director2'       => $director2,
                 'contract_number' => $contractNumber,

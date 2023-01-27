@@ -20,27 +20,20 @@ class XmlFormHandlingService
      */
     public static function buildSelectOptions(Collection $data): Collection
     {
-        $firstItem = $data->first();
-
-        if (
-            $firstItem
-            && is_object($firstItem)
-            && isset($firstItem->value)
-            && isset($firstItem->text)
-        ) {
-            return $data->sortBy('text');
-        }
-
         $data->transform(
             function ($item, $key) {
+                if (is_object($item) && isset($item->value) && isset($item->text)) {
+                    return $item;
+                }
+
                 if ($item) {
                     $item = (array)$item;
                     $keys = array_keys($item);
                     $tmp = new \stdClass();
                     $tmp->value = $item[$keys[0]];
-                    $tmp->text = count($keys) > 1 ? $item[$keys[1]] : $tmp->value;
+                    $tmp->text = count($keys) > 1 ? $item[$keys[1]] : $item[$keys[0]];
 
-                    return $item = $tmp;
+                    return $tmp;
                 }
             }
         );
@@ -92,19 +85,26 @@ class XmlFormHandlingService
         );
         $xmlFile = $path . to_pascal_case($name) . '.xml';
 
-        return XmlFormHandlingService::parseFormFields($xmlFile, $id);
+        if ($dir[0] == 'doc') {
+            $mainModel = $dir[1] ?? '';
+        } else {
+            $mainModel = '';
+        }
+
+        return XmlFormHandlingService::parseFormFields($xmlFile, $id, $mainModel);
     }
 
     /**
      * Parse XML-form file to get array of form fields
      * @param string $xmlFile
      * @param int|string $id
+     * @param string $mainModel
      * @return array[]
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      * @throws Exception
      */
-    public static function parseFormFields(string $xmlFile, $id = 0): array
+    public static function parseFormFields(string $xmlFile, $id = 0, string $mainModel = ''): array
     {
         $formFields = [
             'requiredFields' => [],
@@ -147,7 +147,8 @@ class XmlFormHandlingService
                 }
 
                 if ($id) {
-                    static::parseFieldByModel($fieldAttributes, $id, $tmpField);
+                    $item = !$mainModel ? null : app('App\\Models\\' . ucfirst($mainModel))->find($id);
+                    static::parseFieldByModel($fieldAttributes, $tmpField, $item);
                 }
 
                 static::parseFieldByOptions($field, $fieldAttributes, $tmpField);
@@ -170,17 +171,17 @@ class XmlFormHandlingService
      * Get field options|value using "model" attribute
      *
      * @param SimpleXMLElement $fieldAttributes
-     * @param int $id
      * @param array $tmp
+     * @param BaseModel|null $item
      * @return void
      */
-    public static function parseFieldByModel($fieldAttributes, $id, &$tmp)
+    public static function parseFieldByModel(SimpleXMLElement $fieldAttributes, array &$tmp, BaseModel $item = null)
     {
         if ($fieldAttributes['model']) {
+            $tmp['value'] = static::getFieldValue($fieldAttributes, $item);
+
             if ($fieldAttributes['type'] == 'select') {
-                $tmp['options'] = static::getSingleSelectOptions($fieldAttributes['model']);
-            } else {
-                $tmp['value'] = static::getSingleValue($fieldAttributes['model'], $id);
+                $tmp['options'] = static::getSelectOptions($fieldAttributes, $item);
             }
         }
     }
@@ -188,17 +189,17 @@ class XmlFormHandlingService
     /**
      * Get options for a single select.
      *
-     * @param string|array $params
+     * @param SimpleXMLElement $fieldAttributes
+     * @param BaseModel|null $item
      * @param boolean $distinct
      * @return Collection
      */
-    public static function getSingleSelectOptions($params, bool $distinct = true): Collection
+    public static function getSelectOptions(SimpleXMLElement $fieldAttributes,
+                                            BaseModel        $item = null,
+                                            bool             $distinct = true): Collection
     {
-        if (!is_array($params)) {
-            $params = explode(':', $params);
-        }
-
-        $model = app('App\\Models\\' . array_shift($params));
+        $params = explode(':', $fieldAttributes['model']);
+        $model = app('App\\Models\\' . ucfirst(array_shift($params)));
         $args = $params;
         $method = array_shift($params);
 
@@ -215,30 +216,49 @@ class XmlFormHandlingService
             $options = $model->getSelfSelectOptions(...$args);
         }
 
-        return XmlFormHandlingService::buildSelectOptions($options);
+        return static::buildSelectOptions($options);
     }
 
     /**
      * Get an item property value
      *
-     * @param string|array $params
-     * @param int $id
-     * @return string
+     * @param SimpleXMLElement $fieldAttributes
+     * @param BaseModel $item
+     * @return string|null
      */
-    public static function getSingleValue($params, int $id): string
+    public static function getFieldValue(SimpleXMLElement $fieldAttributes, BaseModel $item = null): ?string
     {
-        if (!is_array($params)) {
-            $params = explode(':', $params, 2);
+        if (is_null($item)) {
+            return null;
         }
 
-        list($model, $properties) = $params;
-        $item = app('App\\Models\\' . $model)->find($id);
+        $delimiter = $fieldAttributes['delimiter'] ?? ' ';
+
+        if ($fieldAttributes['type'] == 'select') {
+            $properties = $fieldAttributes['reference'];
+        } else {
+            list($model, $properties) = explode(':', $fieldAttributes['model'], 2);
+        }
 
         return array_reduce(
             explode(':', $properties),
-            function ($result, $property) use ($item) {
-                $result .= ' ' . $item->{$property};
-                return $result;
+            function ($result, $property) use ($item, $delimiter) {
+                if (strpos($property, '.') === false) {
+                    $delimiter = $result && $item->{$property} ? $delimiter : '';
+                    $item = $delimiter . $item->{$property};
+                } else {
+                    foreach (explode('.', $property) as $segment) {
+                        $item = (is_array($item) && array_key_exists($segment, $item)) ? $item[$segment] : $item;
+                        $item = $item->{$segment} ?? $item;
+                        $item = ($item instanceof Collection) ? $item->all() : $item;
+                    }
+
+                    $delimiter = $result && $item ? $delimiter : '';
+                    $item = (is_object($item) || is_array($item)) ? '' : $item;
+                    $item = $delimiter . $item;
+                }
+
+                return $result . $item;
             }
         );
     }
@@ -246,10 +266,10 @@ class XmlFormHandlingService
     /**
      * Get list of available models
      *
-     * @param $onlyAdmin
+     * @param bool $onlyAdmin
      * @return array
      */
-    public static function getModelList($onlyAdmin = false): array
+    public static function getModelList(bool $onlyAdmin = false): array
     {
         $fileSystem = app('files');
         $systemViews = $fileSystem->files(config('app.xml_form_path')['system']['item']);
@@ -299,15 +319,16 @@ class XmlFormHandlingService
      * @param string $fieldName
      * @param array $formFields
      * @param array $tmpField
-     * @param bool $hasAncestor
+     * @param $hasFieldGroup
+     * @param $hasFieldSet
      * @return void
      */
-    public static function addFieldToCollection($field,
-                                                $fieldName,
-                                                &$formFields,
-                                                &$tmpField,
-                                                &$hasFieldGroup,
-                                                &$hasFieldSet)
+    public static function addFieldToCollection(SimpleXMLElement $field,
+                                                string           $fieldName,
+                                                array            &$formFields,
+                                                array            &$tmpField,
+                                                                 &$hasFieldGroup,
+                                                                 &$hasFieldSet)
     {
         $hasFieldGroup = $field->xpath('ancestor::fieldgroup[@name]/@name');
         $hasFieldSet = $field->xpath('ancestor::fieldset[@name]/@name');

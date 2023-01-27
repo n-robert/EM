@@ -25,7 +25,7 @@
         required="true"
         type="date"
         format="dd-MM-yyyy"
-        model="Employee:work_permit_expired_date"/>
+        model="Employee:employee_job.0.fired_date"/>
     <field
         name="toggle_proxy"
         type="checkbox"

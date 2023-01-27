@@ -83,6 +83,8 @@ class ExpatManagerServiceProvider extends ServiceProvider
                 Route::post('/staff/{year}/{month}', 'App\Http\Controllers\StaffController@staffByMonth');
                 Route::post('/get-options/{dir}/{name}/{id}',
                     'App\Http\Controllers\BaseController@getFormFields');
+                Route::get('/get-options/{dir}/{name}/{id}',
+                    'App\Http\Controllers\BaseController@getFormFields');
                 Route::post('/print/{doc}/{id}', 'App\Http\Controllers\BaseController@printDoc');
             });
         });

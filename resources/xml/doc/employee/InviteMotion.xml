@@ -7,6 +7,7 @@
     <field
         name="invite_form"
         type="select"
+        value="ELECTRONIC"
         required="true">
         <option value="PAPER"/>
         <option value="ELECTRONIC"/>
@@ -15,10 +16,12 @@
         name="inviter_id"
         type="select"
         required="true"
-        model="Employer"/>
+        model="Employer:LEGAL"
+        reference="employee_job.0.employer_id"/>
     <field
         name="visa_multiplicity"
         type="select"
+        value="MULTI"
         required="true">
         <option value="MULTI"/>
         <option value="SINGLE"/>
@@ -26,6 +29,7 @@
     <field
         name="visa_purpose"
         type="select"
+        value="WORK"
         required="true">
         <option value="WORK"/>
         <option value="BUSINESS"/>
@@ -34,5 +38,6 @@
         name="destination_id"
         type="select"
         required="true"
-        model="Address"/>
+        model="Address"
+        reference="reg_address_id"/>
 </root>
