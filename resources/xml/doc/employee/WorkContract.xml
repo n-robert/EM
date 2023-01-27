@@ -2,31 +2,35 @@
 <root upper_case="false" justify="false" split_word="false" cells="true">
     <field
         name="signed_date"
-        required="true"
         type="date"
+        required="true"
         format="dd-MM-yyyy"/>
     <field
         name="employer_id"
         type="select"
         required="true"
+        label="Employer"
         model="Employer:LEGAL"
         reference="employee_job.0.employer_id"/>
     <field
-        name="salary"
-        required="true"
-        type="text"/>
-    <field
         name="date_from"
         type="date"
+        required="true"
         format="dd-MM-yyyy"
         model="Employee:work_permit_started_date"/>
     <field
         name="date_to"
         type="date"
+        required="true"
         format="dd-MM-yyyy"
         model="Employee:work_permit_expired_date"/>
     <field
         name="contract_number"
         type="text"
+        required="true"
         model="Employee:employee_job.0.contract_number"/>
+    <field
+        name="salary"
+        type="text"
+        required="true"/>
 </root>

@@ -244,8 +244,7 @@ class XmlFormHandlingService
             explode(':', $properties),
             function ($result, $property) use ($item, $delimiter) {
                 if (strpos($property, '.') === false) {
-                    $delimiter = $result && $item->{$property} ? $delimiter : '';
-                    $item = $delimiter . $item->{$property};
+                    $item = $item->{$property} ?? '';
                 } else {
                     foreach (explode('.', $property) as $segment) {
                         $item = (is_array($item) && array_key_exists($segment, $item)) ? $item[$segment] : $item;
@@ -253,12 +252,12 @@ class XmlFormHandlingService
                         $item = ($item instanceof Collection) ? $item->all() : $item;
                     }
 
-                    $delimiter = $result && $item ? $delimiter : '';
                     $item = (is_object($item) || is_array($item)) ? '' : $item;
-                    $item = $delimiter . $item;
                 }
 
-                return $result . $item;
+                $delimiter = ($result && $item) ? $delimiter : '';
+
+                return $result . $delimiter . $item;
             }
         );
     }
