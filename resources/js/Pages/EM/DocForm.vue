@@ -82,7 +82,7 @@ export default {
 
     methods: {
         submit() {
-            if (!this.validateRequiredFields(this.requiredFields, this.$el, this.errors)) {
+            if (!this.validateRequiredFields(this.requiredFields, this.$el)) {
                 return false;
             }
 

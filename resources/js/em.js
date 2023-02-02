@@ -87,7 +87,8 @@ module.exports = {
             return order;
         },
 
-        validateRequiredFields(requiredFields, el, errors) {
+        validateRequiredFields(requiredFields, el) {
+            let errors = {};
             requiredFields.forEach(id => {
                     const field = el.querySelector('[name="' + id + '"]');
 

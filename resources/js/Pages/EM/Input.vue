@@ -7,8 +7,7 @@
                 <em-label
                     :text="(hasLabel && hasLabel !== 'false' && labelText) ? (__(labelText).toPhrase(true)) : ''"
                     :for="name"
-                    :class="[(error)
-                        ? warningClass : '', labelDefaultClass]"></em-label>
+                    :class="[error || requiredButEmpty ? warningClass : '', labelDefaultClass]"></em-label>
             </span>
 
             <span :class="rightColumn">
@@ -19,8 +18,7 @@
                         :id="id"
                         :onchange="onchange"
                         :disabled="disabled || ! $page.props.canEdit"
-                        :class="(isRequired && !modelValue) || (error)
-                            ? fieldWarningClass : inputDefaultClass">
+                        :class="error || requiredButEmpty ? fieldWarningClass : inputDefaultClass">
                     <option v-for="option in options"
                             v-if="option !== null"
                             :value="option.value">
@@ -38,15 +36,14 @@
                             :clear-button="clearButton"
                             :highlighted="highlighted"
                             :input-class=
-                                "(isRequired && !modelValue) || (error)
-                                ? fieldWarningClass : inputDefaultClass"></datepicker>
+                                "error || requiredButEmpty ? fieldWarningClass : inputDefaultClass"></datepicker>
 
                 <textarea v-else-if="type === 'textarea'"
                           :name="name"
                           :id="id"
                           v-model="modelValue"
                           :class="[
-                              (isRequired && !modelValue) || (error)
+                              error || requiredButEmpty
                               ? fieldWarningClass : inputDefaultClass, textareaDefaultClass]"></textarea>
 
                 <em-button v-else-if="type === 'button' || type === 'submit'"
@@ -65,9 +62,7 @@
                        :id="id"
                        :disabled="disabled || ! $page.props.canEdit"
                        :onclick="onclick"
-                       :class=
-                           "(isRequired && !modelValue) || (error)
-                           ? fieldWarningClass : inputDefaultClass"/>
+                       :class= "error || requiredButEmpty ? fieldWarningClass : inputDefaultClass"/>
 
                 <input v-else
                        :name="name"
@@ -76,11 +71,9 @@
                        :disabled="disabled || ! $page.props.canEdit"
                        v-model="modelValue"
                        :onclick="onclick"
-                       :class=
-                           "(isRequired && !modelValue) || (error)
-                           ? fieldWarningClass : inputDefaultClass"/>
+                       :class="error || requiredButEmpty ? fieldWarningClass : inputDefaultClass"/>
 
-                <p v-if="error"
+                <p v-if="error || requiredButEmpty"
                    :class="[warningClass, pDefaultClass]">
                     {{ error }}
                 </p>
@@ -187,6 +180,10 @@ export default {
     computed: {
         error: function () {
             return this.$page.props.errors[this.name] || this.$page.props.errors[this.dotName];
+        },
+
+        requiredButEmpty: function () {
+            return this.isRequired && !this.modelValue;
         }
     },
 
