@@ -75,7 +75,7 @@ class Permit extends BaseModel
     /**
      * @var array
      */
-    protected $defaultOrderBy = ['number desc'];
+    protected $defaultOrderBy = ['expired_date desc'];
 
     /**
      * @var array
@@ -151,7 +151,8 @@ class Permit extends BaseModel
             ->leftJoin('employees', 'employees.permit_id', 'permits.id')
             ->leftJoin('employee_job', 'employee_job.employee_id', 'employees.id')
             ->leftJoin('statuses', 'statuses.id', 'employees.status_id')
-            ->where('statuses.name_en', '<>', 'Cancelled');
+            ->where('statuses.name_en', '<>', 'Cancelled')
+            ->orWhereNull('statuses.name_en');
 
         return $builder;
     }
@@ -197,7 +198,9 @@ class Permit extends BaseModel
         $issuedDate = request('issued_date');
         $year = Carbon::parse($issuedDate)->isoFormat('YYYY');
         $employerId = request('employer_id');
-        $quotaId = Quota::where(['year' => $year, 'employer_id' => $employerId])->first()->id;
+        $quotaId =
+            Quota::where(['year' => $year, 'employer_id' => $employerId])->first()->id
+            ?? Quota::create(['year' => $year, 'employer_id' => $employerId])->id;
         $this->setAttribute('quota_id', (int)$quotaId);
 
         return parent::save($options);

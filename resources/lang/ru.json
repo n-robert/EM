@@ -433,7 +433,7 @@
     "Remove phone": "Удалить данный номер",
     "fired_date": "Дата увольнения",
     "proxy_date": "Дата выдачи доверенности",
-    "Field \":fieldName\" is required.": "Поле обязательное для заполнения.",
+    "This field is required.": "Поле обязательное для заполнения.",
     "New employer": "Новая организация",
     "New address": "Новый адрес",
     "New occupation": "Новая профессия",

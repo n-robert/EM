@@ -36,7 +36,8 @@
                 :id="subField.name.toString().toKebabCase()"
                 :isRequired="subField.required"
                 :parenId="subField.parent_id"
-                :show="subField.show"></em-input>
+                :show="subField.show"
+                :error="errors[name + '.' + subKey + '.' + subField.name]"></em-input>
 
             <span :class="leftColumn"></span>
             <span :class="rightColumn">
@@ -75,12 +76,23 @@ export default {
         'rightColumn',
     ],
 
-    props: [
-        'field',
-        'name',
-        'item',
-        'controllerName',
-    ],
+    props: {
+        field: {
+            default: null,
+        },
+        name: {
+            default: null,
+        },
+        item: {
+            default: null,
+        },
+        controllerName: {
+            default: null,
+        },
+        errors: {
+            default: null,
+        },
+    },
 
     data() {
         return {

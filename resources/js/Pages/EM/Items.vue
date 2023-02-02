@@ -92,7 +92,7 @@
                                     </div>
                                 </div>
 
-                                <div v-if="page.props.isAdmin" class="p-2 align-middle table-cell">
+                                <div v-if="$page.props.isAdmin" class="p-2 align-middle table-cell">
                                     <form v-if="!item.no_edit_link"
                                           :id="'delete-' + item.id"
                                           @submit.prevent="deleteItem(item)">
@@ -230,7 +230,6 @@ export default {
 
     data() {
         return {
-            page: this.$page,
             centeredItemWidth: {
                 md: 'full',
                 xl: '10/12',

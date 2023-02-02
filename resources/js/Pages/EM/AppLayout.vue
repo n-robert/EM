@@ -21,7 +21,8 @@
                                              :class="'h-9'"
                                              :key="view"
                                              :href="'/' + view.pluralize()"
-                                             :active="(page.props.currentRouteName === 'gets.' + view) || (page.props.currentRouteName === 'gets.' + view.pluralize())">
+                                             :active="($page.props.currentRouteName === 'gets.' + view)
+                                                || ($page.props.currentRouteName === 'gets.' + view.pluralize())">
                                     {{ __(view.ucFirst().pluralize()) }}
                                 </em-nav-link>
                             </div>
@@ -33,12 +34,12 @@
                                 <jet-dropdown
                                     align="right"
                                     width="60"
-                                    v-if="page.props.jetstream.hasTeamFeatures && $page.props.isAdmin">
+                                    v-if="$page.props.jetstream.hasTeamFeatures && $page.props.isAdmin">
                                     <template #trigger>
                                         <span class="inline-flex rounded-md">
                                             <button type="button"
                                                     class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md bg-white hover:bg-gray-50 hover:text-indigo-600 focus:outline-none focus:bg-gray-50 active:bg-gray-50 transition ease-in-out duration-150">
-                                                {{ __(page.props.user.current_team.name.ucFirst().pluralize()) }}
+                                                {{ __($page.props.user.current_team.name.ucFirst().pluralize()) }}
 
                                                 <svg class="ml-2 -mr-0.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg"
                                                      viewBox="0 0 20 20" fill="currentColor">
@@ -53,7 +54,7 @@
                                     <template #content>
                                         <div class="w-60">
                                             <!-- Team Management -->
-                                            <template v-if="page.props.jetstream.hasTeamFeatures">
+                                            <template v-if="$page.props.jetstream.hasTeamFeatures">
                                                 <div class="block px-4 py-2 text-xs text-gray-400">
                                                     {{ __('Manage Team') }}
                                                 </div>
@@ -65,7 +66,7 @@
                                                 </em-dropdown-link>
 
                                                 <em-dropdown-link :href="route('teams.create')"
-                                                                  v-if="page.props.jetstream.canCreateTeams">
+                                                                  v-if="$page.props.jetstream.canCreateTeams">
                                                     {{ __('Create New Team') }}
                                                 </em-dropdown-link>
 
@@ -80,7 +81,7 @@
                                                     <form @submit.prevent="switchToTeam(team)" :key="team.id">
                                                         <em-dropdown-link as="button">
                                                             <div class="flex items-center">
-                                                                <svg v-if="team.id == $page.props.user.current_team_id"
+                                                                <svg v-if="team.id === $page.props.user.current_team_id"
                                                                      class="mr-2 h-5 w-5 text-green-400" fill="none"
                                                                      stroke-linecap="round" stroke-linejoin="round"
                                                                      stroke-width="2" stroke="currentColor"
@@ -103,11 +104,11 @@
                             <div class="ml-3 relative">
                                 <jet-dropdown align="right" width="48">
                                     <template #trigger>
-                                        <button v-if="page.props.jetstream.managesProfilePhotos"
+                                        <button v-if="$page.props.jetstream.managesProfilePhotos"
                                                 class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition duration-150 ease-in-out">
                                             <img class="h-8 w-8 rounded-full object-cover"
-                                                 :src="page.props.user.profile_photo_url"
-                                                 :alt="page.props.user.name"/>
+                                                 :src="$page.props.user.profile_photo_url"
+                                                 :alt="$page.props.user.name"/>
                                         </button>
 
                                         <span v-else class="inline-flex rounded-md">
@@ -136,7 +137,7 @@
                                         </em-dropdown-link>
 
                                         <em-dropdown-link :href="route('api-tokens.index')"
-                                                          v-if="page.props.jetstream.hasApiFeatures">
+                                                          v-if="$page.props.jetstream.hasApiFeatures">
                                             {{ __('API Tokens') }}
                                         </em-dropdown-link>
 
@@ -179,7 +180,8 @@
                         <em-responsive-nav-link v-for="view in $page.props.views"
                                                 :key="view"
                                                 :href="'/' + view.pluralize()"
-                                                :active="(page.props.currentRouteName === 'gets.' + view) || (page.props.currentRouteName === 'gets.' + view.pluralize())">
+                                                :active="($page.props.currentRouteName === 'gets.' + view)
+                                                    || ($page.props.currentRouteName === 'gets.' + view.pluralize())">
                             {{ __(view.ucFirst().pluralize()) }}
                         </em-responsive-nav-link>
                     </div>
@@ -187,9 +189,9 @@
                     <!-- Responsive Settings Options -->
                     <div class="pt-4 pb-1 border-t border-gray-200">
                         <div class="flex items-center px-4">
-                            <div v-if="page.props.jetstream.managesProfilePhotos" class="flex-shrink-0 mr-3">
+                            <div v-if="$page.props.jetstream.managesProfilePhotos" class="flex-shrink-0 mr-3">
                                 <img class="h-10 w-10 rounded-full object-cover"
-                                     :src="page.props.user.profile_photo_url" :alt="page.props.user.name"/>
+                                     :src="$page.props.user.profile_photo_url" :alt="$page.props.user.name"/>
                             </div>
 
                             <div>
@@ -206,7 +208,7 @@
 
                             <em-responsive-nav-link :href="route('api-tokens.index')"
                                                     :active="route().current('api-tokens.index')"
-                                                    v-if="page.props.jetstream.hasApiFeatures">
+                                                    v-if="$page.props.jetstream.hasApiFeatures">
                                 {{ __('API Tokens') }}
                             </em-responsive-nav-link>
 
@@ -218,7 +220,7 @@
                             </form>
 
                             <!-- Team Management -->
-                            <template v-if="page.props.jetstream.hasTeamFeatures">
+                            <template v-if="$page.props.jetstream.hasTeamFeatures">
                                 <div class="border-t border-gray-200"></div>
 
                                 <div class="block px-4 py-2 text-xs text-gray-400">
@@ -247,7 +249,7 @@
                                     <form @submit.prevent="switchToTeam(team)" :key="team.id">
                                         <em-responsive-nav-link as="button">
                                             <div class="flex items-center">
-                                                <svg v-if="team.id == $page.props.user.current_team_id"
+                                                <svg v-if="team.id === $page.props.user.current_team_id"
                                                      class="mr-2 h-5 w-5 text-green-400" fill="none"
                                                      stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                      stroke="currentColor" viewBox="0 0 24 24">
@@ -319,7 +321,6 @@ export default {
     data() {
         return {
             showingNavigationDropdown: false,
-            page: this.$page,
         };
     },
 

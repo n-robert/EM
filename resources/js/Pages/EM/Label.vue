@@ -1,5 +1,5 @@
 <template>
-    <label :for="this.for" :class="page.props.errors[this.for] ? warningClass : labelDefaultClass">
+    <label :for="this.for" :class="$page.props.errors[this.for] ? warningClass : labelDefaultClass">
         {{ text }}
         <slot></slot>
     </label>
@@ -19,12 +19,6 @@ export default {
         text: {
             defautl: null,
         },
-    },
-
-    data() {
-        return {
-            page: this.$page,
-        };
     },
 };
 </script>

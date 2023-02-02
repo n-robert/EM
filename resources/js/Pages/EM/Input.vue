@@ -75,7 +75,7 @@
 
                 <p v-if="error || requiredButEmpty"
                    :class="[warningClass, pDefaultClass]">
-                    {{ error }}
+                    {{ error || defaultError }}
                 </p>
             </span>
         </div>
@@ -158,13 +158,15 @@ export default {
         show: {
             default: true,
         },
+        error: {
+            default: null,
+        },
     },
 
     data() {
         const labelText = this.label || this.name || '';
 
         return {
-            dotName: this.bracketsToDots(this.name),
             ru: ru,
             modelValue:
                 this.type === 'checkbox' ? this.checked : this.value || null,
@@ -174,26 +176,14 @@ export default {
                 from: new Date().setDate(new Date().getDate() - 1),
                 to: new Date(),
             },
+            defaultError: this.__('This field is required.'),
         };
     },
 
     computed: {
-        error: function () {
-            return this.$page.props.errors[this.name] || this.$page.props.errors[this.dotName];
-        },
-
         requiredButEmpty: function () {
             return this.isRequired && !this.modelValue;
         }
     },
-
-    // watch: {
-    //     error: {
-    //         immediate: true,
-    //         handler: (newVal, oldVal) => {
-    //             console.log('new: %s, old: %s', newVal, oldVal);
-    //         },
-    //     },
-    // },
 };
 </script>

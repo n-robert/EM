@@ -11,6 +11,7 @@
 
             <item v-if="dataLoaded"
                   noBorder="true"
+                  ref="item"
                   :item="item"
                   :formFields="formFields"
                   :requiredFields="requiredFields"
@@ -21,7 +22,7 @@
             <slot name="submit"></slot>
         </div>
 
-        <input type="hidden" name="_token" :value="page.props._token"/>
+        <input type="hidden" name="_token" :value="$page.props._token"/>
     </form>
 </template>
 
@@ -51,7 +52,6 @@ export default {
 
     data() {
         return {
-            page: this.$page,
             id: this.name + '-' + this.item.id,
             getFieldsUri: '/get-options/doc.' + this.controllerName + '/' + this.name + '/' + this.item.id,
             actionUri: '/print/' + this.name + '/' + this.item.id,
@@ -77,12 +77,16 @@ export default {
     },
 
     computed: {
-        console: () => console,
+        // console: () => console,
     },
 
     methods: {
         submit() {
-            if (!this.validateRequiredFields(this.requiredFields, this.$el)) {
+            this.errors = this.getErrors(this.requiredFields, this.$el);
+
+            if (Object.keys(this.errors).length) {
+                this.$refs.item.updateSelected(this.errors);
+
                 return false;
             }
 
@@ -95,9 +99,16 @@ export default {
     // watch: {
     //     errors: {
     //         immediate: true,
-    //         handler: function (newVal, oldVal) {
-    //             console.log('new: %s, old: %s', newVal, oldVal);
+    //         handler: function (newVal) {
+    //             let res = [];
+    //
+    //             for (const k in newVal) {
+    //                 res.push(k + ': ' + newVal[k]);
+    //             }
+    //
+    //             console.log(res.join("\r\n"));
     //         },
+    //         deep: true,
     //     },
     // },
 };

@@ -3,7 +3,7 @@
         <ul :class="tabLayer" class="flex w-full">
             <li v-for="(fieldGroup, name) in formFields"
                 v-if="fieldGroup.type === 'fieldgroup'"
-                :class="selectedByError[name] || selected[name] ? tabActive : tabInActive"
+                :class="updatedSelected[name] || selected[name] ? tabActive : tabInActive"
                 @click="selectTab(name)"
                 class="cursor-pointer w-full">
                 <span>
@@ -16,7 +16,7 @@
             <div v-for="(element, key) in formFields">
                 <tab v-if="element.type === 'fieldgroup'"
                      :key="key"
-                     :selected="selectedByError[key] || selected[key]">
+                     :selected="updatedSelected[key] || selected[key]">
                     <div v-for="(field, name) in element"
                          v-if="!isNotFields.includes(name)"
                          class="table-row"
@@ -29,6 +29,7 @@
                             :item="item"
                             :key="fieldSetKey"
                             :controllerName="controllerName"
+                            :errors="errors"
                             @addItem="addItem"
                             @removeItem="removeItem"></field-set>
 
@@ -45,7 +46,8 @@
                                   :id="field.name.toString().toKebabCase()"
                                   :isRequired="field.required"
                                   :parenId="field.parent_id"
-                                  :show="field.show"></em-input>
+                                  :show="field.show"
+                                  :error="errors[field.name]"></em-input>
                     </div>
                 </tab>
 
@@ -60,6 +62,7 @@
                             :item="item"
                             :key="fieldSetKey"
                             :controllerName="controllerName"
+                            :errors="errors"
                             @addItem="addItem"
                             @removeItem="removeItem"></field-set>
 
@@ -77,7 +80,8 @@
                                       :id="element.name && element.name.toString().toKebabCase()"
                                       :isRequired="element.required"
                                       :parenId="element.parent_id"
-                                      :show="element.show"></em-input>
+                                      :show="element.show"
+                                      :error="errors[element.name]"></em-input>
                         </div>
                     </div>
                 </div>
@@ -155,30 +159,37 @@ export default {
             fieldSetKey: 0,
             tabActive,
             tabInActive,
+            errors: {},
         };
     },
 
     computed: {
-        selectedByError: function () {
-            if (this.$page.props.errors) {
-                for (const key in this.$page.props.errors) {
-                    let field = key.split('.')[0];
+        updatedSelected: function () {
+            return this.updateSelected();
+        },
+
+        // console: () => console,
+    },
+
+    methods: {
+        updateSelected(errors = {}) {
+            this.errors = {...this.$page.props.errors, ...errors};
+
+            if (Object.keys(this.errors).length) {
+                for (const key in this.errors) {
+                    const set = key.split('.').shift();
 
                     for (const tab in this.formFields) {
-                        if (this.formFields.hasOwnProperty(tab) && this.formFields[tab][field]) {
+                        if (this.formFields.hasOwnProperty(tab) && this.formFields[tab][set]) {
                             this.selectTab(tab);
-
-                            return this.selected;
                         }
                     }
                 }
             }
 
             return this.selected;
-        }
-    },
+        },
 
-    methods: {
         selectTab(fieldGroupName) {
             for (const index in this.selected) {
                 if (this.selected.hasOwnProperty(index)) {
@@ -197,5 +208,21 @@ export default {
             this.fieldSetKey++;
         },
     },
+
+    // watch: {
+    //     errors: {
+    //         immediate: true,
+    //         handler: function (newVal) {
+    //             let res = [];
+    //
+    //             for (const k in newVal) {
+    //                 res.push(k + ': ' + newVal[k]);
+    //             }
+    //
+    //             console.log(res.join("\r\n"));
+    //         },
+    //         deep: true,
+    //     },
+    // },
 };
 </script>

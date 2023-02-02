@@ -87,20 +87,32 @@ module.exports = {
             return order;
         },
 
-        validateRequiredFields(requiredFields, el) {
+        getErrors(requiredFields, el) {
             let errors = {};
             requiredFields.forEach(id => {
                     const field = el.querySelector('[name="' + id + '"]');
 
                     if (!field.value) {
-                        errors[id] = true;
+                        errors[id] = this.__('This field is required.');
                     } else {
                         delete errors[id];
                     }
                 },
             );
 
-            return Object.keys(errors).length === 0;
+            return errors;
+        },
+
+        dotsToBrackets(str) {
+            if (str.indexOf('.')) {
+                let parts = str.split('.');
+                str = parts.shift();
+
+                for (let part of parts)
+                    str += '[' + part + ']';
+            }
+
+            return str;
         },
 
         bracketsToDots(str) {

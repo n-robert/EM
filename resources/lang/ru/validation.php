@@ -163,6 +163,11 @@ return [
 
     'attributes' => [
         'name'                           => 'Имя',
+        'name_ru'                        => 'Наименование',
+        'full_name_ru'                   => 'Полное наименование',
+        'type_id'                        => 'Тип',
+        'director_id'                    => 'Директор',
+        'booker_id'                      => 'Бухгалтер',
         'username'                       => 'Никнейм',
         'email'                          => 'E-Mail адрес',
         'first_name'                     => 'Имя',
@@ -198,6 +203,8 @@ return [
         'passport_number'                => 'Номер паспорта',
         'entry_date'                     => 'Дата въезда',
         'departure_date'                 => 'Дата убытия',
+        'employee_job.*.employer_id'     => 'Организация',
+        'employee_job.*.occupation_id'   => 'Профессия / должность',
         'employee_job.*.contract_number' => 'Номер трудового договора',
         'employee_job.*.hired_date'      => 'Дата приема',
         'employee_job.*.fired_date'      => 'Дата увольнения',
