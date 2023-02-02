@@ -41,7 +41,7 @@
             <span :class="leftColumn"></span>
             <span :class="rightColumn">
                 <em-button
-                    v-if="field.deletable || page.props.isAdmin"
+                    v-if="field.deletable || $page.props.isAdmin"
                     type="button"
                     :originalText="__('Remove ' + name)"
                     customClass="hover:text-white hover:bg-indigo-500"
@@ -85,7 +85,6 @@ export default {
     data() {
         return {
             isNotFields: ['type', 'show', 'repeatable', 'deletable'],
-            page: this.$page,
         };
     },
 

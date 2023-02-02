@@ -7,7 +7,8 @@
                 <em-label
                     :text="(hasLabel && hasLabel !== 'false' && labelText) ? (__(labelText).toPhrase(true)) : ''"
                     :for="name"
-                    :class="[isRequired && (!modelValue || page.props.errors[name]) ? warningClass : '', labelDefaultClass]"></em-label>
+                    :class="[(error)
+                        ? warningClass : '', labelDefaultClass]"></em-label>
             </span>
 
             <span :class="rightColumn">
@@ -17,8 +18,9 @@
                         v-model="modelValue"
                         :id="id"
                         :onchange="onchange"
-                        :disabled="disabled || ! page.props.canEdit"
-                        :class="isRequired && (!modelValue || page.props.errors[name]) ? fieldWarningClass : inputDefaultClass">
+                        :disabled="disabled || ! $page.props.canEdit"
+                        :class="(isRequired && !modelValue) || (error)
+                            ? fieldWarningClass : inputDefaultClass">
                     <option v-for="option in options"
                             v-if="option !== null"
                             :value="option.value">
@@ -32,28 +34,28 @@
                             :id="id"
                             v-model="modelValue"
                             :language="ru"
-                            :format="page.props.defaultDateFormat"
+                            :format="$page.props.defaultDateFormat"
                             :clear-button="clearButton"
                             :highlighted="highlighted"
                             :input-class=
-                                "isRequired && (!modelValue || page.props.errors[name]) ?
-                                fieldWarningClass : inputDefaultClass"></datepicker>
+                                "(isRequired && !modelValue) || (error)
+                                ? fieldWarningClass : inputDefaultClass"></datepicker>
 
                 <textarea v-else-if="type === 'textarea'"
                           :name="name"
                           :id="id"
                           v-model="modelValue"
                           :class="[
-                              isRequired && (!modelValue || page.props.errors[name]) ? fieldWarningClass : inputDefaultClass,
-                              textareaDefaultClass]"></textarea>
+                              (isRequired && !modelValue) || (error)
+                              ? fieldWarningClass : inputDefaultClass, textareaDefaultClass]"></textarea>
 
                 <em-button v-else-if="type === 'button' || type === 'submit'"
-                            :type="type"
-                            :onclick="onclick"
-                            :open="open"
-                            :originalText="__(value)"
-                            :disabled="disabled || ! page.props.canEdit"
-                            :customClass="customClass">
+                           :type="type"
+                           :onclick="onclick"
+                           :open="open"
+                           :originalText="__(value)"
+                           :disabled="disabled || ! $page.props.canEdit"
+                           :customClass="customClass">
                 </em-button>
 
                 <input v-else-if="type === 'checkbox'"
@@ -61,26 +63,26 @@
                        :type="type"
                        v-model="modelValue"
                        :id="id"
-                       :disabled="disabled || ! page.props.canEdit"
+                       :disabled="disabled || ! $page.props.canEdit"
                        :onclick="onclick"
                        :class=
-                           "isRequired && (!modelValue || page.props.errors[name]) ?
-                           fieldWarningClass : inputDefaultClass"/>
+                           "(isRequired && !modelValue) || (error)
+                           ? fieldWarningClass : inputDefaultClass"/>
 
                 <input v-else
                        :name="name"
                        :id="id"
                        :type="type"
-                       :disabled="disabled || ! page.props.canEdit"
+                       :disabled="disabled || ! $page.props.canEdit"
                        v-model="modelValue"
                        :onclick="onclick"
                        :class=
-                           "isRequired && (!modelValue || page.props.errors[name]) ?
-                           fieldWarningClass : inputDefaultClass"/>
+                           "(isRequired && !modelValue) || (error)
+                           ? fieldWarningClass : inputDefaultClass"/>
 
-                <p v-if="isRequired && (!modelValue || page.props.errors[name])"
+                <p v-if="error"
                    :class="[warningClass, pDefaultClass]">
-                    {{ page.props.errors[name] ? page.props.errors[name] : errorMessage }}
+                    {{ error }}
                 </p>
             </span>
         </div>
@@ -169,21 +171,23 @@ export default {
         const labelText = this.label || this.name || '';
 
         return {
-            page: this.$page,
+            dotName: this.bracketsToDots(this.name),
             ru: ru,
             modelValue:
                 this.type === 'checkbox' ? this.checked : this.value || null,
             labelText: labelText.toString().replace(/[^\w\s]/gi, ''),
             clearButton: true,
-            errorMessage: this.__(
-                'Field ":fieldName" is required.',
-                {fieldName: this.__(this.name)}
-            ),
             highlighted: {
                 from: new Date().setDate(new Date().getDate() - 1),
                 to: new Date(),
             },
         };
+    },
+
+    computed: {
+        error: function () {
+            return this.$page.props.errors[this.name] || this.$page.props.errors[this.dotName];
+        }
     },
 
     // watch: {

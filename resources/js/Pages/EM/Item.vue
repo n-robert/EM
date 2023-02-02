@@ -3,7 +3,7 @@
         <ul :class="tabLayer" class="flex w-full">
             <li v-for="(fieldGroup, name) in formFields"
                 v-if="fieldGroup.type === 'fieldgroup'"
-                :class="selected[name] ? tabActive : tabInActive"
+                :class="selectedByError[name] || selected[name] ? tabActive : tabInActive"
                 @click="selectTab(name)"
                 class="cursor-pointer w-full">
                 <span>
@@ -16,7 +16,7 @@
             <div v-for="(element, key) in formFields">
                 <tab v-if="element.type === 'fieldgroup'"
                      :key="key"
-                     :selected="selected[key]">
+                     :selected="selectedByError[key] || selected[key]">
                     <div v-for="(field, name) in element"
                          v-if="!isNotFields.includes(name)"
                          class="table-row"
@@ -33,19 +33,19 @@
                             @removeItem="removeItem"></field-set>
 
                         <em-input v-else
-                                   :name="field.name"
-                                   :type="field.type"
-                                   :value="item[field.name] || field.value"
-                                   :options="field.options"
-                                   :onclick="field.onclick"
-                                   :onchange="field.onchange"
-                                   :label="field.label"
-                                   :hasLabel="field.hasLabel"
-                                   :checked="field.checked"
-                                   :id="field.name.toString().toKebabCase()"
-                                   :isRequired="field.required"
-                                   :parenId="field.parent_id"
-                                   :show="field.show"></em-input>
+                                  :name="field.name"
+                                  :type="field.type"
+                                  :value="item[field.name] || field.value"
+                                  :options="field.options"
+                                  :onclick="field.onclick"
+                                  :onchange="field.onchange"
+                                  :label="field.label"
+                                  :hasLabel="field.hasLabel"
+                                  :checked="field.checked"
+                                  :id="field.name.toString().toKebabCase()"
+                                  :isRequired="field.required"
+                                  :parenId="field.parent_id"
+                                  :show="field.show"></em-input>
                     </div>
                 </tab>
 
@@ -65,19 +65,19 @@
 
                         <div v-else>
                             <em-input :name="element.name"
-                                       :type="element.type"
-                                       :disabled="element.disabled"
-                                       :value="item[element.name] || element.value"
-                                       :options="element.options"
-                                       :onclick="element.onclick"
-                                       :onchange="element.onchange"
-                                       :label="element.label"
-                                       :hasLabel="element.hasLabel"
-                                       :checked="element.checked"
-                                       :id="element.name && element.name.toString().toKebabCase()"
-                                       :isRequired="element.required"
-                                       :parenId="element.parent_id"
-                                       :show="element.show"></em-input>
+                                      :type="element.type"
+                                      :disabled="element.disabled"
+                                      :value="item[element.name] || element.value"
+                                      :options="element.options"
+                                      :onclick="element.onclick"
+                                      :onchange="element.onchange"
+                                      :label="element.label"
+                                      :hasLabel="element.hasLabel"
+                                      :checked="element.checked"
+                                      :id="element.name && element.name.toString().toKebabCase()"
+                                      :isRequired="element.required"
+                                      :parenId="element.parent_id"
+                                      :show="element.show"></em-input>
                         </div>
                     </div>
                 </div>
@@ -156,6 +156,26 @@ export default {
             tabActive,
             tabInActive,
         };
+    },
+
+    computed: {
+        selectedByError: function () {
+            if (this.$page.props.errors) {
+                for (const key in this.$page.props.errors) {
+                    let field = key.split('.')[0];
+
+                    for (const tab in this.formFields) {
+                        if (this.formFields.hasOwnProperty(tab) && this.formFields[tab][field]) {
+                            this.selectTab(tab);
+
+                            return this.selected;
+                        }
+                    }
+                }
+            }
+
+            return this.selected;
+        }
     },
 
     methods: {

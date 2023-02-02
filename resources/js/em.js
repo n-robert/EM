@@ -101,6 +101,23 @@ module.exports = {
 
             return Object.keys(errors).length === 0;
         },
+
+        bracketsToDots(str) {
+            let pos = str.indexOf('[');
+
+            if (pos > 0) {
+                let tmp = str,
+                    re = /\[(.*?)\]/g,
+                    item;
+                str = tmp.slice(0, pos);
+                tmp = tmp.slice(pos);
+
+                while (item = re.exec(tmp))
+                    str += '.' + item[1];
+            }
+
+            return str;
+        },
     },
 };
 

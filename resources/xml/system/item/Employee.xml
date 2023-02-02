@@ -134,7 +134,6 @@
             <field
                 name="employer_id"
                 type="select"
-                label="employer_id"
                 model="Employer"/>
             <field
                 name="occupation_id"

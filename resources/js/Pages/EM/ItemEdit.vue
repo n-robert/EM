@@ -94,9 +94,9 @@ export default {
                 formData = new FormData(this.$refs.itemForm)
             ;
 
-            if (!this.validateRequiredFields(this.requiredFields, this.$el, this.errors)) {
-                return false;
-            }
+            // if (!this.validateRequiredFields(this.requiredFields, this.$el, this.errors)) {
+            //     return false;
+            // }
 
             url += this.item.id ? ('/' + this.item.id) : '';
             formData.append('type', type);

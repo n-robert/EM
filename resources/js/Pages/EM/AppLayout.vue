@@ -17,7 +17,7 @@
 
                             <!-- Navigation Links -->
                             <div class="hidden pl-6 space-x-8 sm:-my-px sm:flex sm:items-center">
-                                <em-nav-link v-for="view in page.props.views"
+                                <em-nav-link v-for="view in $page.props.views"
                                              :class="'h-9'"
                                              :key="view"
                                              :href="'/' + view.pluralize()"
@@ -33,7 +33,7 @@
                                 <jet-dropdown
                                     align="right"
                                     width="60"
-                                    v-if="page.props.jetstream.hasTeamFeatures && page.props.isAdmin">
+                                    v-if="page.props.jetstream.hasTeamFeatures && $page.props.isAdmin">
                                     <template #trigger>
                                         <span class="inline-flex rounded-md">
                                             <button type="button"
@@ -60,7 +60,7 @@
 
                                                 <!-- Team Settings -->
                                                 <em-dropdown-link
-                                                    :href="route('teams.show', page.props.user.current_team)">
+                                                    :href="route('teams.show', $page.props.user.current_team)">
                                                     {{ __('Team Settings') }}
                                                 </em-dropdown-link>
 
@@ -76,11 +76,11 @@
                                                     {{ __('Switch Teams') }}
                                                 </div>
 
-                                                <template v-for="team in page.props.user.all_teams">
+                                                <template v-for="team in $page.props.user.all_teams">
                                                     <form @submit.prevent="switchToTeam(team)" :key="team.id">
                                                         <em-dropdown-link as="button">
                                                             <div class="flex items-center">
-                                                                <svg v-if="team.id == page.props.user.current_team_id"
+                                                                <svg v-if="team.id == $page.props.user.current_team_id"
                                                                      class="mr-2 h-5 w-5 text-green-400" fill="none"
                                                                      stroke-linecap="round" stroke-linejoin="round"
                                                                      stroke-width="2" stroke="currentColor"
@@ -113,7 +113,7 @@
                                         <span v-else class="inline-flex rounded-md">
                                             <button type="button"
                                                     class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                                                {{ page.props.user.name }}
+                                                {{ $page.props.user.name }}
 
                                                 <svg class="ml-2 -mr-0.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg"
                                                      viewBox="0 0 20 20" fill="currentColor">
@@ -176,7 +176,7 @@
                 <div :class="{'block': showingNavigationDropdown, 'hidden': ! showingNavigationDropdown}"
                      class="sm:hidden">
                     <div class="pt-2 pb-3 space-y-1">
-                        <em-responsive-nav-link v-for="view in page.props.views"
+                        <em-responsive-nav-link v-for="view in $page.props.views"
                                                 :key="view"
                                                 :href="'/' + view.pluralize()"
                                                 :active="(page.props.currentRouteName === 'gets.' + view) || (page.props.currentRouteName === 'gets.' + view.pluralize())">
@@ -193,8 +193,8 @@
                             </div>
 
                             <div>
-                                <div class="font-medium text-base text-gray-800">{{ page.props.user.name }}</div>
-                                <div class="font-medium text-sm text-gray-500">{{ page.props.user.email }}</div>
+                                <div class="font-medium text-base text-gray-800">{{ $page.props.user.name }}</div>
+                                <div class="font-medium text-sm text-gray-500">{{ $page.props.user.email }}</div>
                             </div>
                         </div>
 
@@ -226,7 +226,7 @@
                                 </div>
 
                                 <!-- Team Settings -->
-                                <em-responsive-nav-link :href="route('teams.show', page.props.user.current_team)"
+                                <em-responsive-nav-link :href="route('teams.show', $page.props.user.current_team)"
                                                         :active="route().current('teams.show')">
                                     {{ __('Team Settings') }}
                                 </em-responsive-nav-link>
@@ -243,11 +243,11 @@
                                     {{ __('Switch Teams') }}
                                 </div>
 
-                                <template v-for="team in page.props.user.all_teams">
+                                <template v-for="team in $page.props.user.all_teams">
                                     <form @submit.prevent="switchToTeam(team)" :key="team.id">
                                         <em-responsive-nav-link as="button">
                                             <div class="flex items-center">
-                                                <svg v-if="team.id == page.props.user.current_team_id"
+                                                <svg v-if="team.id == $page.props.user.current_team_id"
                                                      class="mr-2 h-5 w-5 text-green-400" fill="none"
                                                      stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                      stroke="currentColor" viewBox="0 0 24 24">
