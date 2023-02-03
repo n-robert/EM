@@ -62,7 +62,7 @@
                        :id="id"
                        :disabled="disabled || ! $page.props.canEdit"
                        :onclick="onclick"
-                       :class= "error || requiredButEmpty ? fieldWarningClass : inputDefaultClass"/>
+                       :class="error || requiredButEmpty ? fieldWarningClass : inputDefaultClass"/>
 
                 <input v-else
                        :name="name"
@@ -176,7 +176,10 @@ export default {
                 from: new Date().setDate(new Date().getDate() - 1),
                 to: new Date(),
             },
-            defaultError: this.__('This field is required.'),
+            defaultError: this.__('Field ":attribute" is required.').replace(
+                ':attribute',
+                this.__(this.name).toPhrase()
+            ),
         };
     },
 

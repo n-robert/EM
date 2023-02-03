@@ -198,10 +198,10 @@ class Permit extends BaseModel
         $issuedDate = request('issued_date');
         $year = Carbon::parse($issuedDate)->isoFormat('YYYY');
         $employerId = request('employer_id');
-        $quotaId =
-            Quota::where(['year' => $year, 'employer_id' => $employerId])->first()->id
-            ?? Quota::create(['year' => $year, 'employer_id' => $employerId])->id;
-        $this->setAttribute('quota_id', (int)$quotaId);
+
+        if ($quotaId = Quota::where(['year' => $year, 'employer_id' => $employerId])->first()->id ?? null) {
+            $this->setAttribute('quota_id', (int)$quotaId);
+        }
 
         return parent::save($options);
     }
