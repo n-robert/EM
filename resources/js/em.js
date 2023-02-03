@@ -93,7 +93,10 @@ module.exports = {
                     const field = el.querySelector('[name="' + id + '"]');
 
                     if (!field.value) {
-                        errors[id] = this.__('This field is required.');
+                        errors[id] = this.__('Field ":attribute" is required.').replace(
+                            ':attribute',
+                            this.__(id).toPhrase()
+                        );
                     } else {
                         delete errors[id];
                     }

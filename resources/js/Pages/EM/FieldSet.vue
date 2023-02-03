@@ -33,7 +33,7 @@
                 :onclick="subField.onclick"
                 :label="subField.label"
                 :hasLabel="subField.hasLabel"
-                :id="subField.name.toString().toKebabCase()"
+                :id="(name + '-' + subKey + '-' + subField.name).toString().toKebabCase()"
                 :isRequired="subField.required"
                 :parenId="subField.parent_id"
                 :show="subField.show"

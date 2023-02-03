@@ -3,7 +3,7 @@
         <ul :class="tabLayer" class="flex w-full">
             <li v-for="(fieldGroup, name) in formFields"
                 v-if="fieldGroup.type === 'fieldgroup'"
-                :class="updatedSelected[name] || selected[name] ? tabActive : tabInActive"
+                :class="selectedByError[name] || selected[name] ? tabActive : tabInActive"
                 @click="selectTab(name)"
                 class="cursor-pointer w-full">
                 <span>
@@ -16,7 +16,7 @@
             <div v-for="(element, key) in formFields">
                 <tab v-if="element.type === 'fieldgroup'"
                      :key="key"
-                     :selected="updatedSelected[key] || selected[key]">
+                     :selected="selectedByError[key] || selected[key]">
                     <div v-for="(field, name) in element"
                          v-if="!isNotFields.includes(name)"
                          class="table-row"
@@ -164,15 +164,15 @@ export default {
     },
 
     computed: {
-        updatedSelected: function () {
-            return this.updateSelected();
+        selectedByError: function () {
+            return this.selectTabByError();
         },
 
         // console: () => console,
     },
 
     methods: {
-        updateSelected(errors = {}) {
+        selectTabByError(errors = {}) {
             this.errors = {...this.$page.props.errors, ...errors};
 
             if (Object.keys(this.errors).length) {
@@ -182,6 +182,8 @@ export default {
                     for (const tab in this.formFields) {
                         if (this.formFields.hasOwnProperty(tab) && this.formFields[tab][set]) {
                             this.selectTab(tab);
+                            const id = key.replace('.', '-').toString().toKebabCase();
+                            this.$nextTick(() => this.$el.querySelector('#' + id).focus());
                         }
                     }
                 }

@@ -85,7 +85,7 @@ export default {
             this.errors = this.getErrors(this.requiredFields, this.$el);
 
             if (Object.keys(this.errors).length) {
-                this.$refs.item.updateSelected(this.errors);
+                this.$refs.item.selectTabByError(this.errors);
 
                 return false;
             }
