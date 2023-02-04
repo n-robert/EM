@@ -45,15 +45,17 @@ class ReminderService
         });
 //        dd($result);
         try {
+            if (!$result) return;
+
             array_walk($result, function ($data, $email) {
                 $text = [];
                 $text[] = __('Visas of following employees expire soon:');
                 array_walk($data, function ($items, $date) use (&$text) {
-                    $text[] = "$date:";
+                    $text[] = "   $date:";
 
                     foreach ($items as $k => $item) {
                         $k++;
-                        $text[] = " $k. $item";
+                        $text[] = "      $k. $item";
                     }
                 });
                 $text = implode(PHP_EOL, $text);
