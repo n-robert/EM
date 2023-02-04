@@ -2,8 +2,7 @@
 
 namespace App\Providers;
 
-use App\Contracts\RepositoryInterface;
-use App\Models\Team;
+use App\Services\UserService;
 use App\Services\XmlFormHandlingService;
 use Carbon\Carbon;
 use Illuminate\Database\Query\Builder as QueryBuilder;
@@ -25,19 +24,11 @@ class ExpatManagerServiceProvider extends ServiceProvider
     public function boot()
     {
         Gate::define('is-admin', function ($user) {
-            // An admin owns a team named "admin"
-            if ($adminTeam = Team::query()->where(['name' => 'admin'])->first()) {
-                return $user->hasTeamRole($adminTeam, 'admin');
-            }
-
-            // or is the first user
-            return $user->id == 1;
+            return UserService::isAdmin($user);
         });
 
         Gate::define('can-edit', function ($user) {
-            return $user->teams->contains(function ($team, $key) use ($user) {
-                return $user->hasTeamRole($team, 'admin');
-            });
+            return UserService::canEdit($user);
         });
 
         Route::group(['middleware' => config('jetstream.middleware', ['web'])], function () {
@@ -83,9 +74,10 @@ class ExpatManagerServiceProvider extends ServiceProvider
                 Route::post('/staff/{year}/{month}', 'App\Http\Controllers\StaffController@staffByMonth');
                 Route::post('/get-options/{dir}/{name}/{id}',
                     'App\Http\Controllers\BaseController@getFormFields');
-                Route::get('/get-options/{dir}/{name}/{id}',
-                    'App\Http\Controllers\BaseController@getFormFields');
                 Route::post('/print/{doc}/{id}', 'App\Http\Controllers\BaseController@printDoc');
+
+                Route::get('/test',
+                    'App\Services\ReminderService@visaExtensionReminder');
             });
         });
 

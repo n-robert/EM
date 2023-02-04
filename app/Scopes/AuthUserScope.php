@@ -16,9 +16,10 @@ class AuthUserScope implements Scope
      *
      * @param Builder $builder
      * @param Model $model
+     * @param int|null $id
      * @return void
      */
-    public function apply(Builder $builder, Model $model)
+    public function apply(Builder $builder, Model $model, int $id = null)
     {
         $builder->where(function ($builder) use ($model) {
             $builder->whereJsonContains($model->getTable() . '.user_ids', Auth::id())

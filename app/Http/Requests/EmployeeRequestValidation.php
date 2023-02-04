@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Support\Facades\DB;
+use App\Models\Status;
 use Illuminate\Validation\Rule;
 
 class EmployeeRequestValidation extends BaseRequestValidation
@@ -14,7 +14,7 @@ class EmployeeRequestValidation extends BaseRequestValidation
      */
     public function rules(): array
     {
-        $statuses = DB::table('statuses')->pluck('id', 'name_en');
+        $statuses = Status::query()->pluck('id', 'name_en');
 
         return [
             'status_id'                 => [

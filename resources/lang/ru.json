@@ -545,5 +545,6 @@
     "resident_document_issued_date": "Дата выдачи ВНЖ / РВП",
     "resident_document_expired_date": "Срок действия ВНЖ / РВП",
     "visa": "виза",
-    "passport": "паспорт"
+    "passport": "паспорт",
+    "Visas of following employees expire soon:": "Сроки виз следующих работников скоро истекают:"
 }

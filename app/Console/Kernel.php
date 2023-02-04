@@ -28,6 +28,9 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             (new \Database\Seeders\StaffSeeder)->run(true);
         })->monthly();
+        $schedule->call(function () {
+            \App\Services\ReminderService::visaExtensionReminder();
+        })->everyFiveMinutes();
     }
 
     /**
