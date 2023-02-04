@@ -7,7 +7,6 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Mail\Message;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
 
 class ReminderService
@@ -15,7 +14,7 @@ class ReminderService
     public static function visaExtensionReminder()
     {
         $statuses = Status::query()->pluck('id', 'name_en')->all();
-        $userEmails = User::query()->where('email', '7715377@mail.ru')->pluck('email', 'id')->all();
+        $userEmails = User::query()->whereNotIn('email', ['ngphnam@gmail.com'])->pluck('email', 'id')->all();
         $now = Carbon::now();
         $term = $now->addWeekdays(60);
         $result = [];

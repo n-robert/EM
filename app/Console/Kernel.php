@@ -30,7 +30,7 @@ class Kernel extends ConsoleKernel
         })->monthly();
         $schedule->call(function () {
             \App\Services\ReminderService::visaExtensionReminder();
-        })->everyFiveMinutes();
+        })->twiceMonthly();
     }
 
     /**
