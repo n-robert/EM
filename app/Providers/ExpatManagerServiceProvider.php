@@ -76,8 +76,8 @@ class ExpatManagerServiceProvider extends ServiceProvider
                     'App\Http\Controllers\BaseController@getFormFields');
                 Route::post('/print/{doc}/{id}', 'App\Http\Controllers\BaseController@printDoc');
 
-                Route::get('/test',
-                    'App\Services\ReminderService@visaExtensionReminder');
+//                Route::get('/test',
+//                    'App\Services\ReminderService@visaExtensionReminder');
             });
         });
 
