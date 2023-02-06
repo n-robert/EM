@@ -55,6 +55,35 @@ export default {
         };
     },
 
+    computed: {
+        maxWidthClass() {
+            return {
+                'sm': 'sm:max-w-sm',
+                'md': 'sm:max-w-md',
+                'lg': 'sm:max-w-lg',
+                'xl': 'sm:max-w-xl',
+                '2xl': 'sm:max-w-2xl',
+                '3xl': 'sm:max-w-3xl',
+                '4xl': 'sm:max-w-4xl',
+                'full': 'sm:max-w-full',
+            }[this.maxWidth];
+        },
+    },
+
+    created() {
+        const closeOnEscape = (e) => {
+            if (e.key === 'Escape' && this.show) {
+                this.close();
+            }
+        };
+
+        document.addEventListener('keydown', closeOnEscape);
+
+        this.$once('hook:destroyed', () => {
+            document.removeEventListener('keydown', closeOnEscape);
+        });
+    },
+
     mounted() {
         this.$nextTick(() => {
             window.addEventListener('resize', this.onResize);
@@ -89,34 +118,5 @@ export default {
 //                },
 //            },
 //        },
-
-    created() {
-        const closeOnEscape = (e) => {
-            if (e.key === 'Escape' && this.show) {
-                this.close();
-            }
-        };
-
-        document.addEventListener('keydown', closeOnEscape);
-
-        this.$once('hook:destroyed', () => {
-            document.removeEventListener('keydown', closeOnEscape);
-        });
-    },
-
-    computed: {
-        maxWidthClass() {
-            return {
-                'sm': 'sm:max-w-sm',
-                'md': 'sm:max-w-md',
-                'lg': 'sm:max-w-lg',
-                'xl': 'sm:max-w-xl',
-                '2xl': 'sm:max-w-2xl',
-                '3xl': 'sm:max-w-3xl',
-                '4xl': 'sm:max-w-4xl',
-                'full': 'sm:max-w-full',
-            }[this.maxWidth];
-        },
-    },
 };
 </script>
