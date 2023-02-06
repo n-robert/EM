@@ -31,7 +31,8 @@ class ReminderService
             $user = User::find($id);
             $query = DB::table('employees')
                        ->where('visa_expired_date', '<=', $term)
-                       ->where('status_id', $statuses['Hired']);
+                       ->where('status_id', $statuses['Hired'])
+                       ->orderBy('visa_expired_date');
             $query = !UserService::isAdmin($user) ? $query->whereJsonContains('user_ids', $id) : $query;
             $deadlineSoon = $query->get()->all();
             $data = [];
