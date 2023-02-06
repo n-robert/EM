@@ -11,7 +11,7 @@
                             leave-active-class="ease-in duration-200"
                             leave-class="opacity-100"
                             leave-to-class="opacity-0">
-                    <div v-show="show" class="fixed inset-0 transform transition-all" @click="close">
+                    <div v-show="show" class="fixed inset-0 transform transition-all" @click="closeModal">
                         <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
                     </div>
                 </transition>
@@ -73,7 +73,7 @@ export default {
     created() {
         const closeOnEscape = (e) => {
             if (e.key === 'Escape' && this.show) {
-                this.close();
+                this.closeModal();
             }
         };
 
@@ -95,9 +95,9 @@ export default {
     },
 
     methods: {
-        close() {
+        closeModal() {
             if (this.closeable) {
-                this.$emit('close');
+                this.$emit('closeModal');
             }
         },
 

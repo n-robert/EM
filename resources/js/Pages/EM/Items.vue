@@ -32,8 +32,7 @@
 
                 <dialog-modal v-if="showVisaExtensionReminder && modal['visaExtensionReminder']"
                               :show="showVisaExtensionReminder"
-                              :id="'visaExtensionReminder'"
-                              @closeModalFromDialog="closeModal">
+                              :id="'visaExtensionReminder'">
                     <template #content>
                         <div class="text-indigo-500">
                             <pre>{{ visaExtensionReminder }}</pre>
@@ -41,7 +40,10 @@
                             <div class="mt-4 text-center mx-auto">
                                 <em-button :type="'button'"
                                            class="mt-4 font-bold hover:text-white hover:bg-indigo-500"
-                                           @click.native="closeModal('visaExtensionReminder', true)">
+                                           @click.native="closeModal([
+                                               'visaExtensionReminder',
+                                               true,
+                                           ])">
                                     {{ __("Don't show this any more") }}
                                 </em-button>
                             </div>
@@ -136,16 +138,12 @@
                                         v-if="!item.item_custom_link"
                                         :show="hasModal(item)"
                                         :id="modalId(item)"
-                                        :position="'absolute'"
-                                        @closeModalFromDialog="closeModal">
+                                        :position="'absolute'">
                                         <template #content>
                                             <doc-list v-if="Object.keys(docList).length"
                                                       :modal="modal"
                                                       :item="item"
-                                                      :docList="docList"
-                                                      @openModalFromDocList="openModal"
-                                                      @closeModalFromDocList="closeModal"
-                                                      @addFieldStateFromDocList="addFieldToDocList">
+                                                      :docList="docList">
                                             </doc-list>
                                         </template>
                                     </dialog-modal>
@@ -153,8 +151,7 @@
                                     <dialog-modal v-else-if="item.modal_items_count"
                                                   :show="hasModal(item)"
                                                   :id="modalId(item)"
-                                                  :position="'absolute'"
-                                                  @closeModalFromDialog="closeModal">
+                                                  :position="'absolute'">
                                         <template #content>
                                             <div v-for="k in item.modal_items_count">
                                                 <items-modal v-if="k === 1"
@@ -282,6 +279,18 @@ export default {
         },
     },
 
+    mounted() {
+        this.$root.$on('openModal', (id) => {
+            this.modal[id] = true;
+        });
+
+        this.$root.$on('closeModal', (data) => {
+            const id = data[0], noCookie = data[1] || null;
+            this.modal[id] = !this.modal[id] || false;
+            noCookie && $cookies.isKey(id) && $cookies.set(id, false);
+        });
+    },
+
     methods: {
         itemLink(item) {
             return item.item_custom_link || '/' + this.controllerName + '/' + item.id;
@@ -304,7 +313,7 @@ export default {
 
         deleteItem(item) {
             const
-                form = document.getElementById('delete-' + item.id),
+                form = this.$root.$el.querySelector('#delete-' + item.id),
                 confirm =
                     window.confirm(
                         this.__(
@@ -321,16 +330,11 @@ export default {
         },
 
         openModal(doc) {
-            this.modal[doc] = true;
+            this.$root.$emit('openModal', doc);
         },
 
-        closeModal(doc, setFalseCookie = false) {
-            this.modal[doc] = false;
-            setFalseCookie && $cookies.isKey(doc) && $cookies.set(doc, false);
-        },
-
-        addFieldToDocList(doc, id) {
-            this.docList[doc][id] = true;
+        closeModal(data) {
+            this.$root.$emit('closeModal', data);
         },
 
         visit(url) {

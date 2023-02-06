@@ -90,9 +90,10 @@ export default {
                 return false;
             }
 
-            this.$emit('closeModalFromDocForm', this.name.toPascalCase());
-            this.$emit('addFieldStateFromDocForm', this.name.toPascalCase(), this.item.id);
-            document.getElementById(this.id).submit();
+            this.$root.$emit('closeModal', [
+                this.name.toPascalCase()
+            ]);
+            this.$root.$el.querySelector('#' + this.id).submit();
         },
     },
 

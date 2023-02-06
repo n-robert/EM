@@ -183,7 +183,7 @@ export default {
                         if (this.formFields.hasOwnProperty(tab) && this.formFields[tab][set]) {
                             this.selectTab(tab);
                             const id = key.replace('.', '-').toString().toKebabCase();
-                            this.$nextTick(() => this.$el.querySelector('#' + id).focus());
+                            this.$nextTick(() => this.$root.$el.querySelector('#' + id).focus());
                         }
                     }
                 }

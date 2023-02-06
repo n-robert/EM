@@ -9,19 +9,16 @@
         </div>
 
         <div v-for="(state, doc) in docList">
-            <dialog-modal v-if="modal[doc] || state[item.id]"
+            <dialog-modal v-if="modal[doc]"
                           :show="modal[doc]"
                           :id="doc"
-                          :position="'absolute'"
-                          @closeModalFromDialog="closeModal">
+                          :position="'absolute'">
                 <template #content>
                     <doc-form :name="doc.toKebabCase()"
                               :item="item"
                               :modal="modal"
                               :leftColumn="leftColumn"
-                              :rightColumn="rightColumn"
-                              @closeModalFromDocForm="closeModal"
-                              @addFieldStateFromDocForm="addFieldToDocList">
+                              :rightColumn="rightColumn">
                         <template #submit>
                             <div class="table-row">
                                 <div>
@@ -31,7 +28,9 @@
                                         <span :class="rightColumn">
                                             <em-button :type="'button'"
                                                         class="mr-6 hover:text-white hover:bg-indigo-500"
-                                                        @click.native="closeModal(doc)">{{ __('Cancel') }}</em-button>
+                                                        @click.native="closeModal([doc])">
+                                                {{ __('Cancel') }}
+                                            </em-button>
 
                                             <em-button :type="'submit'" class="hover:text-white hover:bg-indigo-500">
                                                 {{ __('Print') }}
@@ -72,15 +71,11 @@ export default {
 
     methods: {
         openModal(doc) {
-            this.$emit('openModalFromDocList', doc);
+            this.$root.$emit('openModal', doc);
         },
 
-        closeModal(doc) {
-            this.$emit('closeModalFromDocList', doc);
-        },
-
-        addFieldToDocList(doc, id) {
-            this.$emit('addFieldStateFromDocList', doc, id);
+        closeModal(data) {
+            this.$root.$emit('closeModal', data);
         },
     },
 };

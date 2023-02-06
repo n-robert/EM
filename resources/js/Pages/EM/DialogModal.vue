@@ -1,5 +1,5 @@
 <template>
-    <modal :show="show" :max-width="maxWidth" :closeable="closeable" :position="position" @close="closeModal">
+    <modal :show="show" :max-width="maxWidth" :closeable="closeable" :position="position" @closeModal="closeModal">
         <div class="px-6 py-4">
             <em-button class="relative float-right cursor-pointer m-1" @click.native="closeModal">X</em-button>
 
@@ -46,7 +46,7 @@ export default {
 
     methods: {
         closeModal() {
-            this.$emit('closeModalFromDialog', this.id);
+            this.$root.$emit('closeModal', [this.id]);
         },
     },
 };
