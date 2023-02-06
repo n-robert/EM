@@ -226,6 +226,7 @@
     "Nevermind": "Никогда",
     "New Password": "Новый пароль",
     "Not Found": "Не найдено",
+    "for this":"у",
     "of": "из",
     "Oh no": "О, нет",
     "Once a team is deleted, all of its resources and data will be permanently deleted. Before deleting this team, please download any data or information regarding this team that you wish to retain.": "После удаления команды все её ресурсы и данные будут удалены без возможности восстановления. Перед удалением скачайте данные и информацию о команде, которые хотите сохранить.",
@@ -546,5 +547,6 @@
     "resident_document_expired_date": "Срок действия ВНЖ / РВП",
     "visa": "виза",
     "passport": "паспорт",
-    "Visas of following employees expire soon:": "Сроки виз следующих работников скоро истекают:"
+    "Visas of following employees expire soon:": "Сроки виз следующих работников скоро истекают:",
+    "Don't show this any more": "Больше не показывать"
 }

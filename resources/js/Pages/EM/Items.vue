@@ -30,6 +30,25 @@
                     </template>
                 </dropdown>
 
+                <dialog-modal v-if="showVisaExtensionReminder && modal['visaExtensionReminder']"
+                              :show="showVisaExtensionReminder"
+                              :id="'visaExtensionReminder'"
+                              @closeModalFromDialog="closeModal">
+                    <template #content>
+                        <div class="text-indigo-500">
+                            <pre>{{ visaExtensionReminder }}</pre>
+
+                            <div class="mt-4 text-center mx-auto">
+                                <em-button :type="'button'"
+                                           class="mt-4 font-bold hover:text-white hover:bg-indigo-500"
+                                           @click.native="closeModal('visaExtensionReminder', true)">
+                                    {{ __("Don't show this any more") }}
+                                </em-button>
+                            </div>
+                        </div>
+                    </template>
+                </dialog-modal>
+
                 <div v-if="pagination.hasPages" class="mx-1 mt-2">
                     <pagination :pagination="pagination"></pagination>
                 </div>
@@ -219,6 +238,7 @@ export default {
         'controllerName',
         'controllerNames',
         'canCreateNewItem',
+        'visaExtensionReminder',
     ],
 
     provide() {
@@ -229,6 +249,10 @@ export default {
     },
 
     data() {
+        this.visaExtensionReminder && (
+            $cookies.isKey('visaExtensionReminder')
+            || $cookies.set('visaExtensionReminder', true)
+        );
         return {
             centeredItemWidth: {
                 md: 'full',
@@ -236,6 +260,7 @@ export default {
             },
             needAdditionalButton: this.canCreateNewItem && this.items.length > 5,
             createNewItem: this.__('New ' + this.controllerName),
+            showVisaExtensionReminder: $cookies.get('visaExtensionReminder') === 'true',
         };
     },
 
@@ -272,9 +297,9 @@ export default {
 
         buttonTarget(field, item) {
             return (
-                field.open_modal && this.openModal(item.default_name))
+                    field.open_modal && this.openModal(item.default_name))
                 || (field.is_link && this.visit(this.itemLink(item))
-            );
+                );
         },
 
         deleteItem(item) {
@@ -299,8 +324,9 @@ export default {
             this.modal[doc] = true;
         },
 
-        closeModal(doc) {
+        closeModal(doc, setFalseCookie = false) {
             this.modal[doc] = false;
+            setFalseCookie && $cookies.isKey(doc) && $cookies.set(doc, false);
         },
 
         addFieldToDocList(doc, id) {

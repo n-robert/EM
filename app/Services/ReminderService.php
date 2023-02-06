@@ -6,18 +6,26 @@ use App\Models\Status;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Mail\Message;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
 class ReminderService
 {
-    public static function visaExtensionReminder()
+    /**
+     * @param bool $cli
+     * @return string
+     */
+    public static function visaExtensionReminder(bool $cli = true): string
     {
         $statuses = Status::query()->pluck('id', 'name_en')->all();
-        $userEmails = User::query()->whereNotIn('email', ['ngphnam@gmail.com'])->pluck('email', 'id')->all();
+        $currentUser = Auth::user();
+        $userEmails = !$cli ? [$currentUser->id => $currentUser->emails]
+            : User::query()->whereNotIn('email', ['ngphnam@gmail.com'])->pluck('email', 'id')->all();
         $now = Carbon::now();
         $term = $now->addWeekdays(60);
         $result = [];
+        $text = '';
 
         array_walk($userEmails, function ($email, $id) use ($statuses, $term, &$result) {
             $user = User::find($id);
@@ -43,12 +51,11 @@ class ReminderService
             $result[$email] = $data;
         });
 //        dd($result);
-        try {
-            if (!$result) return;
+        if (!$result) return $text;
 
-            array_walk($result, function ($data, $email) {
-                $text = [];
-                $text[] = __('Visas of following employees expire soon:');
+        try {
+            array_walk($result, function ($data, $email) use ($cli, &$text) {
+                $text = [__('Visas of following employees expire soon:')];
                 array_walk($data, function ($items, $date) use (&$text) {
                     $text[] = "   $date:";
 
@@ -58,13 +65,17 @@ class ReminderService
                     }
                 });
                 $text = implode(PHP_EOL, $text);
-//                dd($text);
-                Mail::raw($text, function (Message $message) use ($email) {
-                    $message->to($email);
-                });
+
+                if ($cli) {
+                    Mail::raw($text, function (Message $message) use ($email) {
+                        $message->to($email);
+                    });
+                }
             });
         } catch (\Exception $e) {
             echo $e->getMessage();
         }
+//        dd($text);
+        return $text;
     }
 }

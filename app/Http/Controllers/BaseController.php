@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Contracts\ControllerInterface;
+use App\Services\ReminderService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controller;
 use Illuminate\Database\Eloquent\Model;
@@ -295,6 +296,10 @@ class BaseController extends Controller implements ControllerInterface
         );
         unset($formFields['requiredFields']);
 
+        if ($visaExtensionReminder = ReminderService::visaExtensionReminder(false)) {
+            $modal['visaExtensionReminder'] = true;
+        }
+
         return [
             'items'            => $items->all(),
             'filters'          => $filters,
@@ -306,6 +311,7 @@ class BaseController extends Controller implements ControllerInterface
             'controllerName'   => $this->name,
             'controllerNames'  => $this->names,
             'canCreateNewItem' => $this->canCreateNewItem,
+            'visaExtensionReminder' => $visaExtensionReminder,
         ];
     }
 
