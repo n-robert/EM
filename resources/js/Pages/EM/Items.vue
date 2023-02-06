@@ -32,7 +32,8 @@
 
                 <dialog-modal v-if="showVisaExtensionReminder && modal['visaExtensionReminder']"
                               :show="showVisaExtensionReminder"
-                              :id="'visaExtensionReminder'">
+                              :id="'visaExtensionReminder'"
+                              :position="'absolute'">
                     <template #content>
                         <div class="text-indigo-500">
                             <pre>{{ visaExtensionReminder }}</pre>
@@ -42,7 +43,7 @@
                                            class="mt-4 font-bold hover:text-white hover:bg-indigo-500"
                                            @click.native="closeModal([
                                                'visaExtensionReminder',
-                                               true,
+                                               '14d',
                                            ])">
                                     {{ __("Don't show this any more") }}
                                 </em-button>
@@ -247,8 +248,7 @@ export default {
 
     data() {
         this.visaExtensionReminder && (
-            $cookies.isKey('visaExtensionReminder')
-            || $cookies.set('visaExtensionReminder', true)
+            $cookies.isKey('visaExtensionReminder') || $cookies.set('visaExtensionReminder', true)
         );
         return {
             centeredItemWidth: {
@@ -257,7 +257,8 @@ export default {
             },
             needAdditionalButton: this.canCreateNewItem && this.items.length > 5,
             createNewItem: this.__('New ' + this.controllerName),
-            showVisaExtensionReminder: $cookies.get('visaExtensionReminder') === 'true',
+            showVisaExtensionReminder:
+                this.visaExtensionReminder && $cookies.get('visaExtensionReminder') === 'true',
         };
     },
 
@@ -285,9 +286,9 @@ export default {
         });
 
         this.$root.$on('closeModal', (data) => {
-            const id = data[0], noCookie = data[1] || null;
+            const id = data[0], cookieExpires = data[1] || 0;
             this.modal[id] = !this.modal[id] || false;
-            noCookie && $cookies.isKey(id) && $cookies.set(id, false);
+            $cookies.isKey(id) && $cookies.set(id, false, cookieExpires);
         });
     },
 

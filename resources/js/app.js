@@ -11,7 +11,7 @@ Vue.mixin(EM);
 Vue.mixin({ methods: { route } });
 Vue.use(InertiaPlugin);
 Vue.use(PortalVue);
-Vue.use(VueCookies, {expires: '14 days'});
+Vue.use(VueCookies);
 
 const app = document.getElementById('app');
 
