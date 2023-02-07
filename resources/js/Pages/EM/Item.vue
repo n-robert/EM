@@ -183,7 +183,9 @@ export default {
                     const set = key.split('.').shift();
 
                     for (const tab in this.formFields) {
-                        this.formFields.hasOwnProperty(tab) && this.formFields[tab][set] && this.selectTab(tab);
+                        this.formFields.hasOwnProperty(tab)
+                        && this.formFields[tab].hasOwnProperty(set)
+                        && this.selectTab(tab);
                     }
                 }
 

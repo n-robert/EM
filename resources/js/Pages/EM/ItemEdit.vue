@@ -91,12 +91,7 @@ export default {
         submit(action, type) {
             let
                 url = '/' + this.controllerName + '/' + action,
-                formData = new FormData(this.$refs.itemForm)
-            ;
-
-            // if (!this.validateRequiredFields(this.requiredFields, this.$el, this.errors)) {
-            //     return false;
-            // }
+                formData = new FormData(this.$refs.itemForm);
 
             url += this.item.id ? ('/' + this.item.id) : '';
             formData.append('type', type);
