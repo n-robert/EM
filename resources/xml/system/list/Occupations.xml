@@ -2,6 +2,6 @@
 <root>
     <field
             name="default_name"
-            label="Item name"
+            label="occupation"
             is_link="true"/>
 </root>

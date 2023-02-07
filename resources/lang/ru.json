@@ -428,6 +428,7 @@
     "passport_issued_date": "Дата выдачи паспорта",
     "passport_expired_date": "Срок действия паспорта",
     "address": "Адрес постоянного проживания",
+    "address_label": "Адрес",
     "address_id": "Адрес",
     "phone": "Телефон",
     "Add phone": "Добавить номер телефона",

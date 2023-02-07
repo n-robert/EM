@@ -6,6 +6,7 @@
     <field
             name="name_ru"
             type="text"
+            label="occupation"
             required="true"/>
     <field
             name="code"
