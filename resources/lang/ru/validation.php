@@ -203,6 +203,7 @@ return [
         'passport_number'                => 'Номер паспорта',
         'entry_date'                     => 'Дата въезда',
         'departure_date'                 => 'Дата убытия',
+        'employer_id'                    => 'Организация',
         'employee_job.*.employer_id'     => 'Организация',
         'employee_job.*.occupation_id'   => 'Профессия / должность',
         'employee_job.*.contract_number' => 'Номер трудового договора',

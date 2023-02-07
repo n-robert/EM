@@ -2,6 +2,6 @@
 <root>
     <field
             name="default_name"
-            label="address_label"
+            label="address"
             is_link="true"/>
 </root>

@@ -164,13 +164,14 @@ export default {
     },
 
     data() {
-        const labelText = this.label || this.name || '';
+        let labelText = this.label || this.name || '';
+        labelText = labelText.toString().replace(/[^\w\s]/gi, '');
 
         return {
             ru: ru,
             modelValue:
                 this.type === 'checkbox' ? this.checked : this.value || null,
-            labelText: labelText.toString().replace(/[^\w\s]/gi, ''),
+            labelText: labelText,
             clearButton: true,
             highlighted: {
                 from: new Date().setDate(new Date().getDate() - 1),
@@ -178,7 +179,7 @@ export default {
             },
             defaultError: this.__('Field ":attribute" is required.').replace(
                 ':attribute',
-                this.__(this.name).toPhrase()
+                this.__(labelText).toPhrase()
             ),
         };
     },

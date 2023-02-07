@@ -13,6 +13,7 @@ class QuotaRequestValidation extends BaseRequestValidation
     {
         return [
             'year' => 'required',
+            'employer_id' => 'required',
         ];
     }
 }

@@ -87,25 +87,6 @@ module.exports = {
             return order;
         },
 
-        getErrors(requiredFields, el) {
-            let errors = {};
-            requiredFields.forEach(id => {
-                    const field = el.querySelector('[name="' + id + '"]');
-
-                    if (!field.value) {
-                        errors[id] = this.__('Field ":attribute" is required.').replace(
-                            ':attribute',
-                            this.__(id).toPhrase()
-                        );
-                    } else {
-                        delete errors[id];
-                    }
-                },
-            );
-
-            return errors;
-        },
-
         dotsToBrackets(str) {
             if (str.indexOf('.')) {
                 let parts = str.split('.');

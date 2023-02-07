@@ -13,6 +13,19 @@ class OccupationRequestValidation extends BaseRequestValidation
     {
         return [
             'name_ru' => 'required',
+            'code' => 'required',
+        ];
+    }
+
+    /**
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array
+     */
+    public function messages()
+    {
+        return [
+            'name_ru.required' => __('The "Occupation" field is required.'),
         ];
     }
 }

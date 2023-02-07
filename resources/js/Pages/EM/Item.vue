@@ -176,17 +176,19 @@ export default {
             this.errors = {...this.$page.props.errors, ...errors};
 
             if (Object.keys(this.errors).length) {
+                let lastKey;
+
                 for (const key in this.errors) {
+                    lastKey = key;
                     const set = key.split('.').shift();
 
                     for (const tab in this.formFields) {
-                        if (this.formFields.hasOwnProperty(tab) && this.formFields[tab][set]) {
-                            this.selectTab(tab);
-                            const id = key.replace('.', '-').toString().toKebabCase();
-                            this.$nextTick(() => this.$root.$el.querySelector('#' + id).focus());
-                        }
+                        this.formFields.hasOwnProperty(tab) && this.formFields[tab][set] && this.selectTab(tab);
                     }
                 }
+
+                const id = lastKey.replace('.', '-').toString().toKebabCase();
+                this.$nextTick(() => this.$el.querySelector('#' + id).focus());
             }
 
             return this.selected;

@@ -82,7 +82,7 @@ export default {
 
     methods: {
         submit() {
-            this.errors = this.getErrors(this.requiredFields, this.$el);
+            this.errors = this.getErrors(this.requiredFields);
 
             if (Object.keys(this.errors).length) {
                 this.$refs.item.selectTabByError(this.errors);
@@ -94,6 +94,22 @@ export default {
                 this.name.toPascalCase()
             ]);
             this.$root.$el.querySelector('#' + this.id).submit();
+        },
+
+        getErrors(requiredFields) {
+            let errors = {};
+            requiredFields.forEach(name => {
+                    const field = this.$el.querySelector('[name="' + name + '"]');
+
+                    if (!field.value) {
+                        errors[name] = true;
+                    } else {
+                        delete errors[name];
+                    }
+                },
+            );
+
+            return errors;
         },
     },
 

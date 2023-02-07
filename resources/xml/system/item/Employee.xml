@@ -73,6 +73,7 @@
                 format="dd-MM-YYYY"/>
         <field
                 name="address"
+                label="residence_address"
                 type="textarea"/>
         <field
                 name="phone"

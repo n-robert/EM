@@ -7,7 +7,7 @@
         <field
                 name="name_ru"
                 type="textarea"
-                label="address_label"
+                label="address"
                 required="true"/>
         <field
                 name="description"
