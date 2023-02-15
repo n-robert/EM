@@ -30,5 +30,10 @@ RUN wget https://getcomposer.org/installer -O - -q \
 # npm
 RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
 RUN apt-get install -y nodejs
+RUN /bin/bash -c 'chown -R www-data:www-data storage bootstrap/cache;  \
+    chgrp -R www-data storage bootstrap/cache;  \
+    chmod -R ug+rwx storage bootstrap/cache;  \
+    composer install;  \
+    npm install'
 
 WORKDIR /var/www
