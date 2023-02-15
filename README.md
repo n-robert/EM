@@ -1,8 +1,8 @@
 git clone git@github.com:n-robert/em.nginx
 
-chown -R www-data:www-data storage bootstrap/cache
-chgrp -R www-data storage bootstrap/cache
-chmod -R ug+rwx storage bootstrap/cache
+chown -R www-data:www-data storage bootstrap/cache \
+&& chgrp -R www-data storage bootstrap/cache \
+&& chmod -R ug+rwx storage bootstrap/cache
 
 docker compose up --build --remove-orphans
 
