@@ -31,7 +31,7 @@ RUN wget https://getcomposer.org/installer -O - -q \
 RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
 RUN apt-get install -y nodejs
 
-COPY ../../../ /var/www
+COPY ../../ /var/www
 #RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 #RUN chgrp -R www-data /var/www/storage /var/www/bootstrap/cache
 #RUN chmod -R ug+rwx /var/www/storage /var/www/bootstrap/cache
