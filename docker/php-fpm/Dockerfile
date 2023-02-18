@@ -32,10 +32,10 @@ RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
 RUN apt-get install -y nodejs
 
 ADD ./ /var/www/
-#RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
-#RUN chgrp -R www-data /var/www/storage /var/www/bootstrap/cache
-#RUN chmod -R ug+rwx /var/www/storage /var/www/bootstrap/cache
-#RUN composer install
-#RUN npm install
+RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+RUN chgrp -R www-data /var/www/storage /var/www/bootstrap/cache
+RUN chmod -R ug+rwx /var/www/storage /var/www/bootstrap/cache
+RUN composer install
+RUN npm install
 
 WORKDIR /var/www
