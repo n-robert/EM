@@ -21,7 +21,7 @@ RUN mkdir -p /usr/share/man/man1/ \
     && apt-get update \
     && apt-get install -y pdftk
 
-ADD ./php.ini /usr/local/etc/php/php.ini
+ADD ./docker/php-fpm/php.ini /usr/local/etc/php/php.ini
 
 # composer
 RUN wget https://getcomposer.org/installer -O - -q \
@@ -31,7 +31,7 @@ RUN wget https://getcomposer.org/installer -O - -q \
 RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
 RUN apt-get install -y nodejs
 
-ADD ../../ /var/www/
+ADD ./ /var/www/
 #RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 #RUN chgrp -R www-data /var/www/storage /var/www/bootstrap/cache
 #RUN chmod -R ug+rwx /var/www/storage /var/www/bootstrap/cache
