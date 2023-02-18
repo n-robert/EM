@@ -36,10 +36,10 @@ RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 RUN chgrp -R www-data /var/www/storage /var/www/bootstrap/cache
 RUN chmod -R ug+rwx /var/www/storage /var/www/bootstrap/cache
 
+WORKDIR /var/www
+
 ENV COMPOSER_ALLOW_SUPERUSER 1
 RUN composer install
 
 RUN npm install
 RUN npm run dev
-
-WORKDIR /var/www
