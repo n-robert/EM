@@ -38,8 +38,8 @@ RUN chmod -R ug+rwx /var/www/storage /var/www/bootstrap/cache
 
 WORKDIR /var/www
 
-ENV COMPOSER_ALLOW_SUPERUSER 1
-RUN composer install
-
-RUN npm install
-RUN npm run dev
+#ENV COMPOSER_ALLOW_SUPERUSER 1
+#RUN composer install
+#
+#RUN npm install
+#RUN npm run dev
