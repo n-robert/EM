@@ -19,7 +19,7 @@
 
             <slot name="lowerFields"></slot>
 
-            <slot name="submit"></slot>
+            <slot v-if="$page.props.canEdit" name="submit"></slot>
         </div>
 
         <input type="hidden" name="_token" :value="$page.props._token"/>
