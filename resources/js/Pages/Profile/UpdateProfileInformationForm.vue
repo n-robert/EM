@@ -50,7 +50,7 @@
             </div>
 
             <!-- Email -->
-            <div class="col-span-6 sm:col-span-4">
+            <div v-if="$page.props.isAdmin" class="col-span-6 sm:col-span-4">
                 <jet-label for="email" :value="__('Email')"/>
                 <jet-input id="email" type="email" class="mt-1 block w-full" v-model="form.email"/>
                 <jet-input-error :message="form.errors.email" class="mt-2"/>
