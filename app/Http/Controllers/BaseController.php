@@ -77,7 +77,7 @@ class BaseController extends Controller implements ControllerInterface
         );
         $this->names = Str::plural($this->name);
 
-        $perPage = request('perPage') ?: 15;
+        $perPage = (int)$this->request->get('perPage') ?: 15;
         session(['perPage' => $perPage]);
     }
 
