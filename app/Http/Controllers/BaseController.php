@@ -324,6 +324,9 @@ class BaseController extends Controller implements ControllerInterface
      */
     public function printDoc(string $doc, int $id)
     {
+        if (!Gate::allows('can-edit'))
+            dd(__('Sorry, you are not authorized to access this page.'));
+
         $docData = $this->request->input();
 
         array_walk($docData, function (&$data) {
@@ -389,9 +392,10 @@ class BaseController extends Controller implements ControllerInterface
      */
     public function save(Model $model = null): RedirectResponse
     {
-        if (!$model) {
-            $model = $this->model;
-        }
+        if (!Gate::allows('can-edit'))
+            dd(__('Sorry, you are not authorized to access this page.'));
+
+        if (!$model) $model = $this->model;
 
         $model
             ->fill($this->requestValidation->except('type'))
