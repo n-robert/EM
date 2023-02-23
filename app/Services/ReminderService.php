@@ -8,24 +8,24 @@ use Carbon\Carbon;
 use Illuminate\Mail\Message;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
 
 class ReminderService
 {
     /**
      * @param bool $cli
-     * @return string
+     * @return string|null
      */
-    public static function visaExtensionReminder(bool $cli = true): string
+    public static function visaExtensionReminder(bool $cli = true): ?string
     {
         $statuses = Status::query()->pluck('id', 'name_en')->all();
         $currentUser = Auth::user();
-        $userEmails = !$cli ? [$currentUser->id => $currentUser->emails]
+        $userEmails = !$cli ? [$currentUser->id => $currentUser->email]
             : User::query()->whereNotIn('email', ['ngphnam@gmail.com'])->pluck('email', 'id')->all();
         $now = Carbon::now();
         $term = $now->addWeekdays(60);
         $result = [];
-        $text = '';
 
         array_walk($userEmails, function ($email, $id) use ($statuses, $term, &$result) {
             $user = User::find($id);
@@ -49,12 +49,13 @@ class ReminderService
                 );
             }, $deadlineSoon);
 
-            $result[$email] = $data;
+            if ($data) $result[$email] = $data;
         });
 //        dd($result);
-        if (!$result) return $text;
+        if (!$result) return null;
 
         try {
+            $text = [];
             array_walk($result, function ($data, $email) use ($cli, &$text) {
                 $text = [__('Visas of following employees expire soon:')];
                 array_walk($data, function ($items, $date) use (&$text) {
@@ -67,7 +68,7 @@ class ReminderService
                 });
                 $text = implode(PHP_EOL, $text);
 
-                if ($cli) {
+                if ($cli && Gate::allows('can-edit')) {
                     Mail::raw($text, function (Message $message) use ($email) {
                         $message->to($email);
                     });

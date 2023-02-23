@@ -177,10 +177,9 @@ export default {
                 from: new Date().setDate(new Date().getDate() - 1),
                 to: new Date(),
             },
-            defaultError: this.__('Field ":attribute" is required.').replace(
-                ':attribute',
-                this.__(labelText).toPhrase()
-            ),
+            defaultError:
+                this.__('Field ":attribute" is required.')
+                    .replace(':attribute', this.__(labelText).toPhrase()),
         };
     },
 

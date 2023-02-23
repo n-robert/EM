@@ -4,12 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Contracts\ControllerInterface;
 use App\Services\ReminderService;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controller;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\URL;
@@ -344,7 +344,7 @@ class BaseController extends Controller implements ControllerInterface
      */
     public function show($id): InertiaResponse
     {
-        $canEdit = Gate::allows('is-admin') || Gate::allows('can-edit');
+        $canEdit = Gate::allows('can-edit');
         $page = 'EM/Item';
         $page .= $canEdit ? 'Edit' : 'View';
 

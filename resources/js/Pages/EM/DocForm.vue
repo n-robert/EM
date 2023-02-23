@@ -81,7 +81,7 @@ export default {
     },
 
     methods: {
-        submit() {
+        async submit() {
             this.errors = this.getErrors(this.requiredFields);
 
             if (Object.keys(this.errors).length) {
@@ -90,10 +90,13 @@ export default {
                 return false;
             }
 
-            this.$root.$emit('closeModal', [
-                this.name.toPascalCase()
-            ]);
             this.$root.$el.querySelector('#' + this.id).submit();
+            setTimeout(() => {
+                this.$root.$emit(
+                    'closeModal',
+                    [this.name.toPascalCase()]
+                );
+            }, "100")
         },
 
         getErrors(requiredFields) {
@@ -102,7 +105,9 @@ export default {
                     const field = this.$el.querySelector('[name="' + name + '"]');
 
                     if (!field.value) {
-                        errors[name] = true;
+                        errors[name] =
+                            this.__('Field ":attribute" is required.')
+                                .replace(':attribute', this.__(name).toPhrase());
                     } else {
                         delete errors[name];
                     }
