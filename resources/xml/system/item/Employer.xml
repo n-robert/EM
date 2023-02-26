@@ -29,7 +29,7 @@
             name="director_id"
             type="select"
             required="true"
-            model="Employee:Boss"/>
+            model="Employee:Director"/>
         <field
             name="booker_id"
             type="select"

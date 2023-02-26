@@ -70,26 +70,6 @@ return [
             ]) : [],
         ],
 
-        'mysqlx' => [
-            'driver' => 'mysql',
-            'url' => env('DATABASE_URL_X'),
-            'host' => env('DB_HOST_X'),
-            'port' => env('DB_PORT_X'),
-            'database' => env('DB_DATABASE_X'),
-            'username' => env('DB_USERNAME_X'),
-            'password' => env('DB_PASSWORD_X'),
-            'unix_socket' => env('DB_SOCKET'),
-            'charset' => 'utf8mb4',
-            'collation' => 'utf8mb4_unicode_ci',
-            'prefix' => env('DB_PREFIX_X'),
-            'prefix_indexes' => true,
-            'strict' => true,
-            'engine' => null,
-            'options' => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-            ]) : [],
-        ],
-
         'sqlite' => [
             'driver' => 'sqlite',
             'url' => env('DATABASE_URL'),

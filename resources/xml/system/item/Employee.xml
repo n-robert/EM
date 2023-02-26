@@ -32,8 +32,7 @@
                 format="dd-MM-yyyy"/>
         <field
                 name="birth_place"
-                type="select"
-                model="Employee:__pluck:birth_place"/>
+                type="textarea"/>
         <field
                 name="gender"
                 type="select">
@@ -58,8 +57,7 @@
                 type="text"/>
         <field
                 name="passport_issuer"
-                type="select"
-                model="Employee:__pluck:passport_issuer"/>
+                type="textarea"/>
         <field
                 name="passport_issuer_code"
                 type="text"/>
@@ -115,8 +113,7 @@
                 type="text"/>
         <field
                 name="cert_issuer"
-                type="select"
-                model="Employee:__pluck:cert_issuer"/>
+                type="textarea"/>
         <field
                 name="cert_issued_date"
                 type="date"
@@ -200,8 +197,7 @@
                 format="dd-MM-YYYY"/>
         <field
                 name="entry_checkpoint"
-                type="select"
-                model="Employee:__pluck:entry_checkpoint"/>
+                type="text"/>
         <field
             name="departure_date"
             type="date"
