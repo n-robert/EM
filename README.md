@@ -21,6 +21,7 @@ docker exec -it php-fpm-em bash
 
 ### 7. Install dependencies and run executables in node_modules
 composer install\
-npm install && npm audit fix && npm run dev
+npm install && npm audit fix\
+npm run dev
 
 ### Site will be available at http://your_host:8002 {email: test@mail.ru, password: test1234}
