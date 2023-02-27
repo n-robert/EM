@@ -13,8 +13,8 @@ services:
       - "8002:80"
     depends_on:
       - php-fpm
-    networks:
-      - internal
+#    networks:
+#      - internal
 
   php-fpm:
     container_name: php-fpm-em
@@ -24,12 +24,12 @@ services:
     volumes:
       - ./:/var/www
     environment:
-      XDEBUG_CONFIG: "remote_host=192.168.221.0 remote_enable=1"
+      XDEBUG_CONFIG: "remote_host=localhost remote_enable=1"
       PHP_IDE_CONFIG: "serverName=Docker"
     depends_on:
       - db
-    networks:
-      - internal
+#    networks:
+#      - internal
 
   db:
     container_name: pgsql-em  # mysql-em
@@ -45,8 +45,8 @@ services:
       - POSTGRES_DB=${DB_DATABASE_PG}          # MYSQL_DB
       - POSTGRES_USER=${DB_USERNAME_PG}        # MYSQL_USER
       - POSTGRES_PASSWORD=${DB_PASSWORD_PG}    # MYSQL_PASSWORD
-    networks:
-      - internal
+#    networks:
+#      - internal
 
   pgbackup:
     container_name: backup-em
@@ -69,13 +69,13 @@ services:
       - BACKUP_KEEP_WEEKS=4
       - BACKUP_KEEP_MONTHS=6
       - HEALTHCHECK_PORT=83
-    networks:
-      - internal
+#    networks:
+#      - internal
 
-networks:
-  internal:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 192.168.221.0/24
+#networks:
+#  internal:
+#    driver: bridge
+#    ipam:
+#      driver: default
+#      config:
+#        - subnet: 192.168.221.0/24
