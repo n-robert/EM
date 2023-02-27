@@ -36,7 +36,7 @@ services:
     build: ./docker/pgsql     # mysql
     image: pgsql              # mysql
     ports:
-      - "5436:5432"           # "3309:3306"
+      - "5439:5432"           # "3309:3306"
     volumes:
 #      - ./docker/pgsql/init:/docker-entrypoint-initdb.d                              # ./docker/mysql/init
       - ./backup/last/em-latest.sql.gz:/docker-entrypoint-initdb.d/em-latest.sql.gz   # ./backup/latest/em_my-latest.sql.gz
