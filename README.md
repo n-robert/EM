@@ -14,7 +14,7 @@ chgrp -R www-data storage bootstrap/cache\
 chmod -R ug+rwx storage bootstrap/cache
 
 ### 5. Build containers
-docker compose up --build --remove-orphans
+docker compose up -d --build --remove-orphans
 
 ### 6. Get in to "php-fpm-em" container
 docker exec -it php-fpm-em bash
