@@ -6,7 +6,7 @@ git clone git@github.com:n-robert/em
 cd em
 
 ### 3. Add .env file from .env.example
-mv .env.example .env
+cp .env.example .env
 
 ### 4. Change ownership and permissions for folders "storage" and "bootstrap/cache"
 chown -R www-data:www-data storage bootstrap/cache\
@@ -24,4 +24,11 @@ composer install\
 npm install && npm audit fix\
 npm run dev
 
+### 8. Install Orchid admin panel
+composer require orchid/platform
+php artisan orchid:install
+php artisan migrate
+php artisan orchid:admin --id=1
+
 ### Site will be available at http://your_host:8002 {email: test@mail.ru, password: test1234}
+### Admin panel will be available at http://your_host:8002/admin {email: test@mail.ru, password: test1234}
