@@ -30,5 +30,9 @@ php artisan orchid:install
 php artisan migrate
 php artisan orchid:admin --id=1
 
+### 9. Exit and restore our User model
+exit
+cp app/Models/User.php.example app/Models/User.php
+
 ### Site will be available at http://your_host:8002 {email: test@mail.ru, password: test1234}
 ### Admin panel will be available at http://your_host:8002/admin {email: test@mail.ru, password: test1234}
