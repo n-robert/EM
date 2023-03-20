@@ -1473,7 +1473,7 @@ class PdfFormFillingService
         $gender = ''
     ): string
     {
-        $last_name = $last_name ?: $person ? $person->last_name_ru : '';
+        $last_name = $last_name ?: ($person ? $person->last_name_ru : '');
 
         if (str_contains(
             mb_strtolower($last_name),
@@ -1482,9 +1482,9 @@ class PdfFormFillingService
             return '';
         }
 
-        $first_name = $first_name ?: $person ? $person->first_name_ru : '';
-        $middle_name = $middle_name ?: $person ? $person->middle_name_ru : '';
-        $gender = $gender ?: $person ? $person->gender : '';
+        $first_name = $first_name ?: ($person ? $person->first_name_ru : '');
+        $middle_name = $middle_name ?: ($person ? $person->middle_name_ru : '');
+        $gender = $gender ?: ($person ? $person->gender : '');
         $name = [static::declension($last_name, $case, $gender, 'name')];
 
         $first_name = explode(' ', $first_name);
