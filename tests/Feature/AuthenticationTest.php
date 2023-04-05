@@ -42,4 +42,10 @@ class AuthenticationTest extends TestCase
 
         $this->assertGuest();
     }
+
+    protected function afterRefreshingDatabase()
+    {
+//        $this->artisan('migrate');
+//        $this->artisan('db:seed');
+    }
 }

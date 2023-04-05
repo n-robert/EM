@@ -10,7 +10,7 @@ use Tests\TestCase;
 
 class ApiTokenPermissionsTest extends TestCase
 {
-    use RefreshDatabase;
+//    use RefreshDatabase;
 
     public function test_api_token_permissions_can_be_updated()
     {
