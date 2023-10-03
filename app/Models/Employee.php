@@ -26,7 +26,7 @@ class Employee extends BaseModel
             ['leftJoin' => 'statuses|statuses.id|status_id'],
             ['where' => 'statuses.name_en|Official'],
         ],
-        'Boss'    => [
+        'Boss'     => [
             ['leftJoin' => 'statuses|statuses.id|status_id'],
             ['where' => 'statuses.name_en|Boss'],
         ],
@@ -148,7 +148,7 @@ class Employee extends BaseModel
      */
     public function getFullNameEnAttribute(): string
     {
-        return implode(' ', array_filter([$this->last_name_en, $this->first_name_en, $this->middle_name_en]));
+        return $this->getFullName('en');
     }
 
     /**
@@ -158,11 +158,24 @@ class Employee extends BaseModel
      */
     public function getFullNameRuAttribute(): string
     {
+        return $this->getFullName('ru');
+    }
+
+    /**
+     * Get the employee's full name
+     *
+     * @param string $lang
+     * @return string
+     */
+    public function getFullName(string $lang): string
+    {
+        $suffix = '_' . $lang;
+
         return implode(' ',
             array_filter([
-                $this->last_name_ru,
-                $this->first_name_ru,
-                $this->middle_name_ru
+                $this->{'last_name' . $suffix},
+                $this->{'first_name' . $suffix},
+                $this->{'middle_name' . $suffix}
             ])
         );
     }
@@ -321,8 +334,8 @@ class Employee extends BaseModel
                                 $staffModel =
                                     Staff::withoutGlobalScopes()
                                          ->where([
-                                             'year'  => $year,
-                                             'month' => $month,
+                                             'year'        => $year,
+                                             'month'       => $month,
                                              'employer_id' => $employerId,
                                          ])
                                          ->first() ?? new Staff();
@@ -332,11 +345,11 @@ class Employee extends BaseModel
 
                                 $staffModel
                                     ->fill([
-                                        'year'      => $year,
-                                        'month'     => $month,
+                                        'year'        => $year,
+                                        'month'       => $month,
                                         'employer_id' => $employerId,
-                                        'employees' => array_unique($employees),
-                                        'user_ids'  => Employer::find($employerId)->user_ids,
+                                        'employees'   => array_unique($employees),
+                                        'user_ids'    => Employer::find($employerId)->user_ids,
                                     ])
                                     ->save();
                             }

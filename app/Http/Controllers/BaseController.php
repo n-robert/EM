@@ -301,16 +301,16 @@ class BaseController extends Controller implements ControllerInterface
         }
 
         return [
-            'items'            => $items->all(),
-            'filters'          => $filters,
-            'hasFilters'       => $hasFilters,
-            'pagination'       => $pagination,
-            'modal'            => $modal,
-            'docList'          => $docList,
-            'formFields'       => $formFields,
-            'controllerName'   => $this->name,
-            'controllerNames'  => $this->names,
-            'canCreateNewItem' => $this->canCreateNewItem,
+            'items'                 => $items->all(),
+            'filters'               => $filters,
+            'hasFilters'            => $hasFilters,
+            'pagination'            => $pagination,
+            'modal'                 => $modal,
+            'docList'               => $docList,
+            'formFields'            => $formFields,
+            'controllerName'        => $this->name,
+            'controllerNames'       => $this->names,
+            'canCreateNewItem'      => $this->canCreateNewItem,
             'visaExtensionReminder' => $visaExtensionReminder,
         ];
     }
@@ -351,7 +351,12 @@ class BaseController extends Controller implements ControllerInterface
         $page = 'EM/Item';
         $page .= $canEdit ? 'Edit' : 'View';
 
-        return Jetstream::inertia()->render($this->request, $page, $this->getItem($id));
+        return Jetstream::inertia()
+                        ->render(
+                            $this->request,
+                            $page,
+                            $this->getItem($id)
+                        );
     }
 
     /**
@@ -369,9 +374,11 @@ class BaseController extends Controller implements ControllerInterface
         $page = 'EM/Items';
 
         return Jetstream::inertia()
-                        ->render($this->request,
+                        ->render(
+                            $this->request,
                             $page,
-                            $this->getItems($skippedField, $skip, $selectedFilters));
+                            $this->getItems($skippedField, $skip, $selectedFilters)
+                        );
     }
 
     /**
